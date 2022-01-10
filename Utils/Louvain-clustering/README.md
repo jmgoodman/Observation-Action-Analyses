@@ -1,0 +1,3 @@
+# Louvain-clustering
+Contains the files for implementing the Louvain clustering algorithm. In addition to a lil test file I wrote which implements it.
+Also implements a custom "modularity.m" function (forked from https://github.com/JinglinHan/Louvain-clustering) for calculating & accessing the objective function of Louvain clustering directly (i.e., the modularity, that is, the within-community interconnectedness over expected).

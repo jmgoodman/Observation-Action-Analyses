@@ -1,0 +1,18 @@
+output classification conventions:
+
+level0:
+subsamplings x context1 x context2 x alignment1 x alignment2 x subalignment1 x subalignment2
+
+note: "X1" is "training"
+	  "X2" is "test"
+	  in this way, it isn't strictly symmetrical
+
+note: there are 3 500ms-wide (250ms step) bins per align for neural, spanning -500 to +500ms.
+there are 5 bin edges (250ms step) for kin postures, spanning -500 to +500ms.
+
+level1:
+x-validation fold (kfold)
+
+level2:
+neural:    AIP-F5-M1-Pooled-Chance
+kinematic: kins-chance

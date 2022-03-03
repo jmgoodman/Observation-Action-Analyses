@@ -29,3 +29,24 @@ Analysis-Outputs/*
 !Analysis-Outputs/cresults.m
 !Analysis-Outputs/classify_output_analysis.m
 !Analysis-Outputs/newheatmap.m
+!Analysis-Outputs/kinviz
+*.m~
+MirrorData/Moe32.mat
+MirrorData/Moe32_datastruct.mat
+MirrorData/Moe34.mat
+MirrorData/Moe34_datastruct.mat
+MirrorData/Moe46.mat
+MirrorData/Moe46_datastruct.mat
+MirrorData/Moe50.mat
+MirrorData/Moe50_datastruct.mat
+MirrorData/Zara64.mat
+MirrorData/Zara64_datastruct.mat
+MirrorData/Zara65.mat
+MirrorData/Zara65_datastruct.mat
+MirrorData/Zara68.mat
+MirrorData/Zara68_datastruct.mat
+MirrorData/Zara70.mat
+MirrorData/Zara70_datastruct.mat
+MirrorData/KinematicsProcessing/Template Files/.DS_Store
+MirrorData/KinematicsProcessing/.DS_Store
+MirrorData/KinematicsProcessing/.DS_Store

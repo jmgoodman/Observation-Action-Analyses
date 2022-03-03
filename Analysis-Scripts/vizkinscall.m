@@ -1,49 +1,55 @@
+%% comment/uncomment below depending on whether you do or do not need to load in the data
 %% cleanup
-% clear,clc,close all
-% 
-% %% setup
-% restoredefaultpath
-% analysis_setup
-% 
-% %% load data
-% 
-% kinsessions = {'Moe32_JUSTKinematics.mat','Moe34_JUSTKinematics.mat'};
-% kincat      = [];
-% kintracecat = [];
-% objcat  = {};
-% seshcat = {};
-% for ii = 1:numel(kinsessions)
-%     load(kinsessions{ii}); % imports M
-%     ppd = preprocess(M,'removebaseline',false,...
-%         'alignments',{'hold_onset_time'},...
-%         'alignment_realnames',{'hold_onset_time'},...
-%         'windows',{[-1500 500]},...
-%         'normalize',false,...
-%          'domarker',true); % allow markers to be visualized and assessed here! only possible for Moe's data, Zara's data have preprocessing issues with the marker kinematics (long stretches of NaN that bookend trial blocks, which breaks NaN detection and interpolation routines) that preclude dealing with them using the standard preprocess routine.
-%     triallabels = extractlabels(ppd);
-%     
-%     % grab hold-onset postures
-%     B0 = find( ppd{1}{1}.BinTimes >= 0,1,'first' );
-%     kincat = vertcat( kincat, ...
-%         squeeze( ppd{1}{1}.KinematicData(B0,:,:) )' );
-%     
-%     % grab traces
-%     kintracecat = cat(3,kintracecat,ppd{1}{1}.KinematicData);
-%     
-%     if ii == 1
-%         bincat = ppd{1}{1}.BinTimes;
-%         colcat = ppd{1}{1}.KinematicColNames;
-%     else
-%         % pass (should be equal for session 2)
-%     end
-%     
-%     % grab object IDs
-%     objcat = vertcat( objcat, ...
-%         triallabels.objects.names );
-%     
-%     seshcat = vertcat( seshcat, ...
-%         repmat(kinsessions(ii),numel(triallabels.objects.names),1) );
-% end
+clear,clc,close all
+
+%% setup
+restoredefaultpath
+analysis_setup
+
+%% load data
+
+% kinsessions = {'Moe32.mat','Moe34.mat'};
+kinsessions = {'Zara64.mat','Zara68.mat','Zara70.mat'};
+kincat      = [];
+kintracecat = [];
+objcat  = {};
+seshcat = {};
+for ii = 1:numel(kinsessions)
+    load(kinsessions{ii}); % imports M
+    ppd = preprocess(M,'removebaseline',false,...
+        'alignments',{'hold_onset_time'},...
+        'alignment_realnames',{'hold_onset_time'},...
+        'windows',{[-1500 500]},...
+        'normalize',false,...
+         'domarker',true); % allow markers to be visualized and assessed here! only possible for Moe's data, Zara's data have preprocessing issues with the marker kinematics (long stretches of NaN that bookend trial blocks, which breaks NaN detection and interpolation routines) that preclude dealing with them using the standard preprocess routine.
+    triallabels = extractlabels(ppd);
+    
+    % pick your subject
+    %     keeptrials = ismember(triallabels.trialcontexts.names,{'control','active'}); % monkey
+    keeptrials = ismember(triallabels.trialcontexts.names,{'passive'}); % hooman
+    
+    % grab hold-onset postures
+    B0 = find( ppd{1}{1}.BinTimes >= 0,1,'first' );
+    kincat = vertcat( kincat, ...
+        squeeze( ppd{1}{1}.KinematicData(B0,:,keeptrials) )' );
+    
+    % grab traces
+    kintracecat = cat(3,kintracecat,ppd{1}{1}.KinematicData(:,:,keeptrials));
+    
+    if ii == 1
+        bincat = ppd{1}{1}.BinTimes;
+        colcat = ppd{1}{1}.KinematicColNames;
+    else
+        % pass (should be equal for session 2)
+    end
+    
+    % grab object IDs
+    objcat = vertcat( objcat, ...
+        triallabels.objects.names(keeptrials) );
+    
+    seshcat = vertcat( seshcat, ...
+        repmat(kinsessions(ii),sum(keeptrials),1) );
+end
 
 %% port the important parts of test_kinclust here
 % for starters: port the louvain & agglomerative clustering methods without all the tertiary visualization
@@ -181,6 +187,7 @@ totalnodes    = size(Xdist,1);
 max2swap      = floor(sqrt(solutionnodes));
 
 currentsolution = guessinds; %1:solutionnodes;
+Xdist(isnan(Xdist)) = 0; % uncensor diag to be 0s
 currentloss     = summinloss(Xdist,currentsolution); % varloss(X_trav,currentsolution); % varloss sucks
 bestsolution    = currentsolution;
 bestloss        = currentloss; % we actually wanna MAXIMIZE this
@@ -309,6 +316,8 @@ for ii = 1:numel(kinsessions)
     % (based on KINEMATICS, not talking about neural data here...)
 end
 
+% always plots a right hand.
+
 
 % take the OVERALL average and replace within-sessions averages with those (when considering joint angles)
 % (after all, without the proper base posture, that shit's gonna look weird...)
@@ -324,7 +333,7 @@ jointcount = size(Xtraj,2);
 bincount   = size(Xtraj,1);
 X_trav = zeros(bincount,jointcount,objcount);
 
-uind = uind(keepinds(:));
+% uind = uind(keepinds(:)); % keepinds does not exist...
 
 for objind = 1:objcount
     thesetrials = uind == objind;
@@ -335,8 +344,18 @@ end
 
 %% NOW we get to call vizkins!
 mkdir('../Analysis-Outputs/kinviz/')
-mkdir('../Analysis-Outputs/kinviz/Moe_32_34_HoldAligned_pooled')
 
-dir2save = '../Analysis-Outputs/kinviz/Moe_32_34_HoldAligned_pooled';
+%%
+% swap depending on subject
+% mkdir('../Analysis-Outputs/kinviz/Moe_32_34_HoldAligned_pooled')
+% dir2save = '../Analysis-Outputs/kinviz/Moe_32_34_HoldAligned_pooled';
+
+% mkdir('../Analysis-Outputs/kinviz/Zara_AllSessions_HoldAligned_pooled')
+% dir2save = '../Analysis-Outputs/kinviz/Zara_AllSessions_HoldAligned_pooled';
+
+mkdir('../Analysis-Outputs/kinviz/Alex_AllSessions_HoldAligned_pooled')
+dir2save = '../Analysis-Outputs/kinviz/Alex_AllSessions_HoldAligned_pooled';
+
+%%
 addpath(genpath(fullfile('..','MirrorData','KinematicsProcessing')))
 vizkins(X_trav,bincat,colcat,uobj,dir2save)

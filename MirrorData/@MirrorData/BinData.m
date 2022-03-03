@@ -360,8 +360,17 @@ if ~isempty(obj.Kinematic) && DoKinematics
     if DoMarker
         % now do the same but for the marker data
         % (or just ignore if you pass the right option through - NaN handling is NOT clean with these!!!)
-        for ii = 1:numel(MD)
+        for ii = 1:numel(MD) %#ok<UNRCH>
             MDtemp = MD{ii};
+            
+            % delete nan rows, then interpolate
+            removeinds = isnan(MDtemp(:,1));
+            MDtemp(removeinds,:) = [];
+            
+            MDtemp(:,1) = round(MDtemp(:,1)); % get to int
+            
+            MDtemp = interp1(MDtemp(:,1),MDtemp,( min(MDtemp(:,1)):max(MDtemp(:,1)) )'); % default linear
+            
             MDfilttemp = zeros(size(MDtemp));
             
             for jj = 1:size(MDtemp,2)
@@ -395,7 +404,7 @@ if ~isempty(obj.Kinematic) && DoKinematics
         % for each trial
         for trialind = 1:numel(align_times)
             MAT_shifted = MDcat(:,2) - align_times(trialind);
-            
+                        
             tempmat = interp1(MAT_shifted(:),MDcat(:,3:end),bin_centers(:));
             
             mkindata(:,:,trialind) = tempmat;

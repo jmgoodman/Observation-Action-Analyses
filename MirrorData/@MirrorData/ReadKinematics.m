@@ -662,7 +662,21 @@ try
                 % pass
             end
             
-            Batch_extractfeatures_noStatusBar;
+            Batch_extractfeatures_noStatusBar; % wait... this SHOULD work! ughhhh but it DOESN'T GRRRR
+            % specifically, it doesn't work for moe
+            % it's not a matter of L vs R hand (Moe is R), because it works fine for
+            % Zara (L) and Alex (R)
+            % it's not faulty scaling because that only happens after this
+            % part
+            % I think Moe's sensors were just funny and didn't follow the
+            % proper conventions. and/or kinematracks was not properly
+            % configured.
+            % ergo, maybe the sensors were oriented incorrectly w.r.t.
+            % assumptions and/or segment lengths not properly configured
+            % in any case, I'm not digging into the code to really fix
+            % this. that's a fool's errand.
+            % Instead, I'll just apply a very low weight to the inferred
+            % markers when doing IK.
             
             % so, I already rigged the function above to create a struct that
             % appends to itself with successive calls. So I don't need to worry

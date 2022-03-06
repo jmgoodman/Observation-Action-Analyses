@@ -16,7 +16,7 @@ seshcat = {};
 for ii = 1:numel(kinsessions)
     %     tempdstruct = dataload(kinsessions{ii});
     seshstr = kinsessions{ii};
-    load(sprintf('%s_datastruct.mat',seshstr));
+    load(sprintf('%s_datastruct.mat',seshstr)); %#ok<LOAD>
     triallabels = extractlabels(datastruct.cellform);
     
     % grab hold-onset postures

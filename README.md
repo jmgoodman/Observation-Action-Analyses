@@ -5,4 +5,4 @@
 
  Code here should work across a wide variety of MATLAB versions, spanning from MATLAB 2015a to MATLAB 2018b to MATLAB 2020b.
 
- Given the specialized nature of this code, and the fact that output of this code is but an intermediate step toward reproducing a rather dense academic publication, I do not foresee the pressing need for a detailed step-by-step guide to using this codebase. I am happy to get in touch with anyone who wishes to undertake a reproduction study, though!
+ A step-by-step guide to reproducing my results using this codebase is forthcoming. It will require datasets which are planned to be hosted elsewhere.

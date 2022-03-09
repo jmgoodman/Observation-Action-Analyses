@@ -27,8 +27,7 @@ kcstruct_zara  = zara_kinclust;
 kcstruct_human = human_kinclust;
 
 %% load data
-sesh_strs = {'Moe32','Moe34'}
-% sesh_strs = {'Moe32','Moe34','Moe46','Moe50','Zara64','Zara68','Zara70'};
+sesh_strs = {'Moe32','Moe34','Moe46','Moe50','Zara64','Zara68','Zara70'};
 
 warning('off','manopt:getHessian:approx')
 for sesh_ind = 1:numel(sesh_strs)

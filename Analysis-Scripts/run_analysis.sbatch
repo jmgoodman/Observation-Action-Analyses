@@ -15,7 +15,7 @@
 
 cd /scratch2/jgoodma/Mirror-Analysis/Analysis-Scripts # hard-coded directory here, too
 
-module load matlab/2020b
+module load matlab/R2020b
 
 # Kick off matlab
 matlab -c "/home/uni08/jgoodma/.matlab/R2020b/R2020b_licenses/network.lic" -nodisplay < Call.m

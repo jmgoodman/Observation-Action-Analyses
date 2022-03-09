@@ -10,7 +10,7 @@ addpath(genpath(fullfile('..','Analysis-Scripts')))
 analysis_setup
 addpath(genpath(fullfile('..','Analysis-Outputs')))
 
-seshnames = {'Zara64','Zara68','Zara70','Moe46','Moe50'};
+seshnames = {'Zara64','Zara68','Zara70','Moe46','Moe50','Moe32','Moe34'};
 
 fn = {'normal','withMGG','mediansplit','commonspace','special','kinematics','kinclust'}; % vertex ids
 % note: kinematic classifier outputs have a different shape since they use

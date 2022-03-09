@@ -27,7 +27,7 @@ kcstruct_zara  = zara_kinclust;
 kcstruct_human = human_kinclust;
 
 %% load data
-sesh_strs = {'Moe32','Moe34'};%,'Moe46','Moe50','Zara64','Zara68','Zara70'};
+sesh_strs = {'Moe32','Moe34','Moe46','Moe50','Zara64','Zara68','Zara70'};
 
 warning('off','manopt:getHessian:approx')
 for sesh_ind = 1:numel(sesh_strs)
@@ -200,7 +200,7 @@ for sesh_ind = 1:numel(sesh_strs)
             cstruct.kinematics.active = crossclassify_refactor(datastruct.cellform,[],copts.kinematics.active);
             cstruct.kinematics.passive = crossclassify_refactor(datastruct.cellform,[],copts.kinematics.passive);
         else
-            cstruct.kinematics.active = crossclassify_refactor(datastruct.cellform,[],copts.kinematics.control);
+            cstruct.kinematics.control = crossclassify_refactor(datastruct.cellform,[],copts.kinematics.control);
         end
     else
         % just don't add kinematics fields if they ain't available

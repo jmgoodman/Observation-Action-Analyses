@@ -109,11 +109,15 @@ for sesh_ind = 1:numel(sesh_strs)
     
     % "special"-only classification will use the "normal" and "withMGG" settings
 
-    % these two settings are meant to demonstrate the lack of overfitting. i.e., if we just focused on the putative mirror neurons or common space, we might have performed better
-    copts.mediansplit.active  = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'active'},'PCAdims',30,'transformdims',20,'mediansplit',this_cs);
-    copts.mediansplit.passive = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'passive'},'PCAdims',30,'transformdims',20,'mediansplit',this_cs);
-    copts.commonspace.active  = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'active'},'PCAdims',30,'transformdims',20,'commonspace',commonspace_FXVE_mov);
-    copts.commonspace.passive = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'passive'},'PCAdims',30,'transformdims',20,'commonspace',commonspace_FXVE_mov);
+    if neuralflag
+        % these two settings are meant to demonstrate the lack of overfitting. i.e., if we just focused on the putative mirror neurons or common space, we might have performed better
+        copts.mediansplit.active  = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'active'},'PCAdims',30,'transformdims',20,'mediansplit',this_cs);
+        copts.mediansplit.passive = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'passive'},'PCAdims',30,'transformdims',20,'mediansplit',this_cs);
+        copts.commonspace.active  = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'active'},'PCAdims',30,'transformdims',20,'commonspace',commonspace_FXVE_mov);
+        copts.commonspace.passive = makeclassifyopts('transform','none','alignment',{'lighton','move','hold'},'targetcontexts',{'passive'},'PCAdims',30,'transformdims',20,'commonspace',commonspace_FXVE_mov);
+    else
+        % pass
+    end
     
     %% now, we run the analyses
     if neuralflag

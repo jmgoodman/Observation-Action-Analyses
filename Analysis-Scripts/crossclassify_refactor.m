@@ -485,9 +485,9 @@ parfor ii = 1:ncell
             ind2sub(ocsize,ii);
         
         d1 = Incell{ii}.d1; % me want pointers :( :( :(
-        d2 = Incell{ii}.d2; % okay, where the HELL are "non-structure arrays"???
-        o1 = Incell{ii}.o1; % Error using crossclassify_refactor>(parfor body) (line 408) Attempt to reference field of non-structure array.
-        o2 = Incell{ii}.o2; % COOL FUN AND GOOD ERROR MESSAGE! (it meant in the part previously, there were empty cells...)
+        d2 = Incell{ii}.d2; 
+        o1 = Incell{ii}.o1; 
+        o2 = Incell{ii}.o2; 
         
         %     keepers1 = ismember(namen,unamen{context1ind}); %#ok<PFBNS> % this inefficient communication overhead is NOT as big a problem. just a 500-or-so cellstring of labels.
         %     keepers2 = ismember(namen,unamen{context2ind});

@@ -120,6 +120,12 @@ for seshind = 1:numel(seshnames)
                 mumat = zeros(nalign*nsubalign,nalign*nsubalign,narrays); % train x test x array
                 sdmat = zeros(size(mumat));
                 
+                cstemp = cs(:,1,1,1,1,1,1);
+                nsubsamp = numel(cstemp);
+                nfold    = numel(cstemp{1});
+                
+                stackmat = zeros(nalign*nsubalign,nalign*nsubalign,narrays,nsubsamp,nfold);
+                
                 for context1 = 1:ncontext % train
                     for context2 = 1:ncontext % test
                         for align1 = 1:nalign % train
@@ -130,6 +136,10 @@ for seshind = 1:numel(seshnames)
                                         thisaligncat  = vertcat(thisalignpair{:}); % cat all subsamplings
                                         thisaligncat  = horzcat(thisaligncat{:}); % cat all kfold x subsamplings
                                         
+                                        newcat        = horzcat(thisalignpair{:}); % cat folds along a different axis, gives folds x subsamplings
+                                        newcat        = permute(newcat,[3,2,1]); % get to area x subsamplings x folds
+                                        newcat        = cell2mat(newcat); % et voila
+                                        
                                         mu_ = mean(thisaligncat,2);
                                         sd_ = std(thisaligncat,0,2);
                                         
@@ -138,6 +148,7 @@ for seshind = 1:numel(seshnames)
                                         
                                         mumat(matind1,matind2,:) = mu_;
                                         sdmat(matind1,matind2,:) = sd_;
+                                        stackmat(matind1,matind2,:,:,:) = newcat;
                                     end
                                 end
                             end
@@ -160,9 +171,11 @@ for seshind = 1:numel(seshnames)
                     try % skip fields that aren't present in the old array, for instance
                         oldmumat = eval( sprintf( '%s.mu;',oldlh ) );
                         oldsdmat = eval( sprintf( '%s.sd;',oldlh ) );
+                        oldstackmat = eval( sprintf( '%s.stack;',oldlh ) );
                     
                         testval = all( abs( oldmumat(:) - mumat(:) ) < 1e-6 ) && ...
-                            all( abs( oldsdmat(:) - sdmat(:) ) < 1e-6 );
+                            all( abs( oldsdmat(:) - sdmat(:) ) < 1e-6 ) && ...
+                            all( abs( oldstackmat(:) - stackmat(:) )<1e-6 );
                         
                         if testval
                             doflag = false;
@@ -178,6 +191,7 @@ for seshind = 1:numel(seshnames)
                 if doflag
                     eval( sprintf('%s.mu = mumat;',lh) );
                     eval( sprintf('%s.sd = sdmat;',lh) );
+                    eval( sprintf('%s.stack = stackmat;',lh) );
                 else
                     % pass
                 end
@@ -219,3 +233,12 @@ end
 
 fname = fullfile('..','Analysis-Outputs','all-sessions-classmats.mat');
 save(fname,'classmats','-v7.3')
+
+%%
+% note: subsamples AND folds are normally paired samples when comparing
+% across areas & with chance level
+%
+% subsamples, but NOT folds, are paired samples when comparing across
+% contexts, alignments, and subalignments
+%
+% note: stack is now aligns x aligns x areas x subsamples x folds

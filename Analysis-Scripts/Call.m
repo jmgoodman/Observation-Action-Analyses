@@ -292,4 +292,9 @@ for sesh_ind = 1:numel(sesh_strs)
     %% abandoning regular snapshots, writing to disk ends up being the most time-consuming thing!!!
     % save after completion of each loop instead
     saveclassifyoutput(seshstr,cstruct,copts);
+    
+    %% cleanup
+    %     clear cstruct copts % to make sure no classification results are "carried over" to the next session!
+    %     % (note: I never actually ran this code with this cell uncommented,
+    %     % instead I simply detected duplication of fields and removed all instances of it)
 end

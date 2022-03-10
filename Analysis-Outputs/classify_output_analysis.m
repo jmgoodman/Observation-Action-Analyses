@@ -10,7 +10,7 @@ addpath(genpath(fullfile('..','Analysis-Scripts')))
 analysis_setup
 addpath(genpath(fullfile('..','Analysis-Outputs')))
 
-seshnames = {'Zara64','Zara68','Zara70','Moe46','Moe50','Moe32','Moe34'};
+seshnames = {'Moe32','Moe34','Moe46','Moe50','Zara64','Zara68','Zara70'}; % order that Call.m ran them in
 
 fn = {'normal','withMGG','mediansplit','commonspace','special','kinematics','kinclust'}; % vertex ids
 % note: kinematic classifier outputs have a different shape since they use
@@ -145,8 +145,42 @@ for seshind = 1:numel(seshnames)
                     end
                 end
                 
-                eval( sprintf('%s.mu = mumat;',lh) );
-                eval( sprintf('%s.sd = sdmat;',lh) );
+                % compare output to previous structs, if exactly the same,
+                % disregard (a way to salvage data where I ended up
+                % duplicating fields that weren't overwritten between
+                % sessions)
+                doflag = true;
+                for prevseshind = 1:(seshind-1)
+                    oldseshname = seshnames{prevseshind};
+                    [seshbeg,seshend] = regexpi(lh,sname,'start','end');
+                    lhbeg = lh(1:(seshbeg-1));
+                    lhend = lh((seshend+1):end);
+                    oldlh = [lhbeg,oldseshname,lhend];
+                    
+                    try % skip fields that aren't present in the old array, for instance
+                        oldmumat = eval( sprintf( '%s.mu;',oldlh ) );
+                        oldsdmat = eval( sprintf( '%s.sd;',oldlh ) );
+                    
+                        testval = all( abs( oldmumat(:) - mumat(:) ) < 1e-6 ) && ...
+                            all( abs( oldsdmat(:) - sdmat(:) ) < 1e-6 );
+                        
+                        if testval
+                            doflag = false;
+                            break
+                        else
+                            % pass
+                        end
+                    catch err
+                        % pass
+                    end
+                end
+                
+                if doflag
+                    eval( sprintf('%s.mu = mumat;',lh) );
+                    eval( sprintf('%s.sd = sdmat;',lh) );
+                else
+                    % pass
+                end
                 
                 %                 % make a plot
                 %                 cmap = flipud(bone);

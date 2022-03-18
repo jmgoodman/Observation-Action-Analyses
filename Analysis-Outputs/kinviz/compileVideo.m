@@ -23,3 +23,13 @@ cd(old_dir)
 %% mot trawler
 D = dir(mfd);
 kinfolderid = cellfun(@(x) ~isempty( regexpi(x.name,'_pooled$','once') ),D);
+kinfolders = D(kinfolderid);
+nfolders   = numel(kinfolders)
+
+% don't need to implement a stack or queue or anything for a full tree traversal. We just have one level here
+for folderind = 1:kinfolders
+	% find all the .mot files
+	% use motRead to read them
+	% pull out the last frame (& the formatting / metadata / column names)
+	% use motWrite to make the new video
+end

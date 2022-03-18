@@ -150,5 +150,7 @@ for folderind = 1:nfolders
         frame = postures_cropped(:,:,:,imind);
         imwrite( frame,fname,'Alpha',Amat(:,:,1,imind) );
     end
+    
+    % TODO: re-take the vids with properly contrasting BG color...
         
 end

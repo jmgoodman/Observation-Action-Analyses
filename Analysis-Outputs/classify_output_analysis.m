@@ -124,7 +124,8 @@ for seshind = 1:numel(seshnames)
                 nsubsamp = numel(cstemp);
                 nfold    = numel(cstemp{1});
                 
-                stackmat = zeros(nalign*nsubalign,nalign*nsubalign,narrays,nsubsamp,nfold);
+                stackmat = zeros(ncontext*nalign*nsubalign,ncontext*nalign*nsubalign,narrays,nsubsamp,nfold);
+                % (training subalign-align-context) x (test subalign-align-context) x arrays x subsamplings x folds
                 
                 for context1 = 1:ncontext % train
                     for context2 = 1:ncontext % test

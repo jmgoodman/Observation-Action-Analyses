@@ -22,7 +22,7 @@ function varargout = VisualOrtho(varargin)
 
 % Edit the above text to modify the response to help VisualOrtho
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 12:08:53
+% Last Modified by GUIDE v2.5 22-Mar-2022 13:43:33
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -117,3 +117,35 @@ function areaSelector_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in returnButton.
+function returnButton_Callback(hObject, eventdata, handles)
+% hObject    handle to returnButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+closereq();
+ResultsExplorer();
+
+
+
+% --- Executes on button press in saveProjectionPlot.
+function saveProjectionPlot_Callback(hObject, eventdata, handles)
+% hObject    handle to saveProjectionPlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveVariancePlot.
+function saveVariancePlot_Callback(hObject, eventdata, handles)
+% hObject    handle to saveVariancePlot (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveStats.
+function saveStats_Callback(hObject, eventdata, handles)
+% hObject    handle to saveStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

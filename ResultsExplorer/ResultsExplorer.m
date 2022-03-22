@@ -22,7 +22,7 @@ function varargout = ResultsExplorer(varargin)
 
 % Edit the above text to modify the response to help ResultsExplorer
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 12:05:18
+% Last Modified by GUIDE v2.5 22-Mar-2022 13:54:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -107,17 +107,19 @@ function goButton_Callback(hObject, eventdata, handles)
 % 3 Common Subspace
 % 4 Grip Classification
 
-charArray = get(handles.analysisSelector,'String');
 elementSelected = get(handles.analysisSelector,'value');
+
+closereq(); % https://de.mathworks.com/matlabcentral/answers/482362-use-a-push-button-to-close-the-gui
 
 switch elementSelected
     case 1
+        NeuronClustering();
     case 2
+        VisualOrtho();
     case 3
+        CommonSubspace();
     case 4
+        GripClassification();
     otherwise
         error('Dropdown list was somehow set to wrong value')
 end
-
-
-disp( strtrim( charArray(elementSelected,:) ) );

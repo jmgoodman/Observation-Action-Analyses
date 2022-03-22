@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 11:53:14
+% Last Modified by GUIDE v2.5 22-Mar-2022 13:32:16
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -71,3 +71,81 @@ function varargout = CommonSubspace_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
+
+
+% --- Executes on selection change in sessionSelector.
+function sessionSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to sessionSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from sessionSelector
+
+
+% --- Executes during object creation, after setting all properties.
+function sessionSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to sessionSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in areaSelector.
+function areaSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to areaSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from areaSelector
+
+
+% --- Executes during object creation, after setting all properties.
+function areaSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to areaSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on button press in returnButton.
+function returnButton_Callback(hObject, eventdata, handles)
+% hObject    handle to returnButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+closereq();
+ResultsExplorer();
+
+
+
+% --- Executes on button press in saveProjection.
+function saveProjection_Callback(hObject, eventdata, handles)
+% hObject    handle to saveProjection (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveDimSweep.
+function saveDimSweep_Callback(hObject, eventdata, handles)
+% hObject    handle to saveDimSweep (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveStats.
+function saveStats_Callback(hObject, eventdata, handles)
+% hObject    handle to saveStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

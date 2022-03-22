@@ -22,7 +22,7 @@ function varargout = NeuronClustering(varargin)
 
 % Edit the above text to modify the response to help NeuronClustering
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 12:03:06
+% Last Modified by GUIDE v2.5 22-Mar-2022 13:40:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -117,3 +117,48 @@ function areaSelector_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in returnButton.
+function returnButton_Callback(hObject, eventdata, handles)
+% hObject    handle to returnButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+closereq();
+ResultsExplorer();
+
+
+% --- Executes on button press in saveMarginalPreference.
+function saveMarginalPreference_Callback(hObject, eventdata, handles)
+% hObject    handle to saveMarginalPreference (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveMarginalCongruence.
+function saveMarginalCongruence_Callback(hObject, eventdata, handles)
+% hObject    handle to saveMarginalCongruence (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveJointMetrics.
+function saveJointMetrics_Callback(hObject, eventdata, handles)
+% hObject    handle to saveJointMetrics (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in savePairsStats.
+function savePairsStats_Callback(hObject, eventdata, handles)
+% hObject    handle to savePairsStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in saveManovaStats.
+function saveManovaStats_Callback(hObject, eventdata, handles)
+% hObject    handle to saveManovaStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

@@ -92,7 +92,7 @@ for seshind = 1:numel(seshnames)
     clear dtflat dtflatter
     
     % ignore neurons that don't have an IQR (range) of at least X Hz
-    keepinds = dtiqrtotal > 0.2; %10; % when I switched to using pre-computed datastructs, this meant using normalized instead of absolute firing rates. ergo, this threshold needed to change. So, change it did; now, firing rate modulation needs to be at least 20% of the base firing rate OR 5Hz, whichever is higher. In other words, don't give me neurons whose overall modulation is less than 1 Hz. This is a "looser" restriction than the one I was using before, but hey, the results should *still* hold (in fact, firing rate as a threshold is kinda suspect, since multi units tend to have the highest rates!)
+    keepinds = dtiqrtotal > 0.2; %10; % when I switched to using pre-computed datastructs, this meant using normalized instead of absolute firing rates. ergo, this threshold needed to change. So, change it did; now, firing rate modulation needs to be at least 20% of the base firing rate OR 5Hz (given the "soft" part of soft-normalization), whichever is higher. In other words, don't give me neurons whose overall modulation is less than 1 Hz. This is a "looser" restriction than the one I was using before, but hey, the results should *still* hold (in fact, firing rate as a threshold is kinda suspect, since multi units tend to have the highest rates!)
     szvals   = dtiqrtotal(keepinds)./max(dtiqrtotal(keepinds));
     szvals   = 625 * szvals;
     szvals   = 100 * ones(size(szvals)); % all the same size, no information overload please!

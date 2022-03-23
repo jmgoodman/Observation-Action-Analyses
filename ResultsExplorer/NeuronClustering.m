@@ -22,7 +22,7 @@ function varargout = NeuronClustering(varargin)
 
 % Edit the above text to modify the response to help NeuronClustering
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 13:40:25
+% Last Modified by GUIDE v2.5 23-Mar-2022 14:59:08
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,11 +55,39 @@ function NeuronClustering_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for NeuronClustering
 handles.output = hObject;
 
+% pull data and set to the handles structure as appdata
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+[cd_,~,~] = fileparts(cd_);
+
+clusterDir = fullfile(cd_,'Analysis-Outputs','clustfiles');
+mObj       = matfile( fullfile( clusterDir,'clustout_stats.mat' ),'Writable',false );
+
+% write data to some fields
+seshNames = mObj.seshnames;
+set(handles.sessionSelector,'String',seshNames(:))
+set(handles.sessionSelector,'Value',1);
+
+contrastStruct  = mObj.contraststruct; partialAreas = unique(contrastStruct(1).pooledareanames); partialAreas = partialAreas(:);
+nStruct         = mObj.Nstruct; wholeAreas = fieldnames(nStruct); wholeAreas = wholeAreas(:);
+uniqueAreaNames = vertcat(...
+    wholeAreas,...
+    {'pooled-split'},...
+    partialAreas...
+    );
+set(handles.areaSelector,'String',uniqueAreaNames(:));
+set(handles.areaSelector,'Value',1);
+
+setappdata(handles.output,'clusterDir',clusterDir);
+setappdata(handles.output,'clusterData',mObj);
+setappdata(handles.output,'colorConvention',defColorConvention);
+
 % Update handles structure
 guidata(hObject, handles);
 
-% pull data and set to the handles structure
-handles.clusterData = load(fullfile('..','Analysis-Outputs',
+% make plots
+plotRefresher(hObject,eventdata,handles);
+
 
 % UIWAIT makes NeuronClustering wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -85,6 +113,11 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
+% nevermind, this could get real annoying real fast
+% plotRefresher(hObject,eventdata,handles);
+
+
+
 
 % --- Executes during object creation, after setting all properties.
 function sessionSelector_CreateFcn(hObject, eventdata, handles)
@@ -107,6 +140,10 @@ function areaSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from areaSelector
+
+% nevermind, this could get real annoying real fast
+% plotRefresher(hObject,eventdata,handles);
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -165,3 +202,12 @@ function saveManovaStats_Callback(hObject, eventdata, handles)
 % hObject    handle to saveManovaStats (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in plotButton.
+function plotButton_Callback(hObject, eventdata, handles)
+% hObject    handle to plotButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+plotRefresher(hObject,eventdata,handles);

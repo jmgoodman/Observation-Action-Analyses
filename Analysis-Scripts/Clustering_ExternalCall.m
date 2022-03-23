@@ -312,7 +312,7 @@ for seshind = 1:numel(seshnames)
     pairsdata = [contrastinds(:),corrvals(:)];
     
     clear ps
-    ps = PAIRStest(pairsdata,3,2,1000);
+    ps = PAIRStest(pairsdata,3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
     figure,pause(0.5)
     %     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'filled','markerfacealpha',0.5,'markeredgecolor',[0 0 0],'markeredgealpha',1)
     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])

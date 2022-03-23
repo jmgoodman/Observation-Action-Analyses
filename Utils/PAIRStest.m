@@ -22,7 +22,7 @@ varexp  = sum( latent(1:d) )./sum(latent);
 
 nrows   = size(scored,1); % keep this number for later
 
-datatheta = thetacomp(scored,k); % centered data aligned on axes of most variance
+datatheta = thetacomp(scored,k); % centered data aligned on axes of most variance (note: not consistent with the original philosophy of PAIRS, where the centrality per se was important)
 % datatheta = euccomp(scored,k); % misnomer now that we're trying this with nearest euclidean distances (density-based clustering criterion)
 datatheta = median(datatheta);
 
@@ -49,7 +49,7 @@ for iterc = 1:niter
     nt      = noisetheta( :,[1:(iterc-1),(iterc+1):end] );
     nt      = median(nt(:)); % grand median, as descripted in Raposo et al.
     
-    dPAIRS(iterc) = (nt - dt)/nt; % PAIRS computation as given in Raposo et al. Denominator doesn't feel super necessary, but I suppose it helps to counteract dependence of the statistic on the quirks of the null sample and instead make it more dependent on the properties of the data per se. In any case, this really, really shouldn't matter unless you're taking a laughably small number of resamplings for a permutation test; that denominator should be pretty fucking constant.
+    dPAIRS(iterc) = (nt - dt)/nt; % PAIRS computation as given in Raposo et al. Denominator doesn't feel super necessary, but I suppose it helps to counteract dependence of the statistic on the quirks of the null sample and instead make it more dependent on the properties of the data per se. In any case, this really, really shouldn't matter unless you're taking a laughably small number of resamplings for a permutation test; that denominator should be pretty constant.
     nPAIRS(iterc) = (nt - fake_dt)/nt;
 end
 

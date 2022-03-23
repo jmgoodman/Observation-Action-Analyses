@@ -58,6 +58,11 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% update current path
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+addpath(genpath(cd_));
+
 % UIWAIT makes ResultsExplorer wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 

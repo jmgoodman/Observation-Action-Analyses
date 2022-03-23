@@ -30,6 +30,7 @@ Analysis-Outputs/*
 !Analysis-Outputs/classify_output_analysis.m
 !Analysis-Outputs/newheatmap.m
 !Analysis-Outputs/kinviz
+!Analysis-Outputs/clustfiles
 *.m~
 MirrorData/Moe32.mat
 MirrorData/Moe32_datastruct.mat

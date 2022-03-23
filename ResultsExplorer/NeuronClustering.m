@@ -58,6 +58,9 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
+% pull data and set to the handles structure
+handles.clusterData = load(fullfile('..','Analysis-Outputs',
+
 % UIWAIT makes NeuronClustering wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 

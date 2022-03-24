@@ -13,7 +13,7 @@ mObj = getappdata(handles.output,'clusterData');
 
 contrastStruct = mObj.contraststruct;
 
-whichArea    = get(handles.areaSelector,'Value');
+whichAreas   = get(handles.areaSelector,'Value');
 whichSession = get(handles.sessionSelector,'Value');
 
 contrastStruct = contrastStruct(whichSession); % this only gets active-passive indices
@@ -42,71 +42,159 @@ areaLabels     = areaLabels(~areNan);
 assert( all(contrastData == figureContrast),'error in data registration - this is my bad, not yours' ) % TODO: make a routine that registers everything correctly...
 congruenceData = figureCongruence;
 
-% select only the units with area ID matching your current selection
-areaStrings  = get(handles.areaSelector,'String');
-thisAreaName = areaStrings{whichArea};
-
-% pick color
-colorConvention = getappdata(handles.output,'colorConvention');
-whichColorInd   = ( cellfun(@(x) ...
-    ~isempty( regexpi( thisAreaName,x,'once' ) ),...
-    colorConvention.labels ) );
-thisColor       = colorConvention.colors( whichColorInd,: );
-
-% thought: should users have the option to select areas from a checklist,
-% instead of being pigeonholed into one?
-%
-% answer: uhhh yeah after testing it out that's exactly what I crave
-%
-% another thought: there's an awful lot happening in this script, you maybe
-% wanna abstract some of it out buddy?
-% 
-% answer: listen, Satan, Jesus, WHOEVER you are...
-% I've been stuck in refactoring hell (heaven?) for HOW long now?
-% And my codebase is STILL woefully cruddy in that regard?
-% let's get something up & running before circling back to that idea...
-
-if ~strcmpi(thisAreaName,'pooled') && ~strcmpi(thisAreaName,'pooled-split')
-    theseinds = cellfun(@(x) ~isempty( regexpi(x,thisAreaName,'once') ),...
-        areaLabels);
-    contrastData   = contrastData(theseinds);
-    congruenceData = congruenceData(theseinds);
-else
-    % pass
-end
-
+% reset plots
 axes( (handles.marginalPreference) );
-h=cdfplot(contrastData);
-set(h,'color',thisColor,'linewidth',1);
-xlabel('Active-Passive Index');
-ylabel('Cumulative fraction of units');
-title('');
-xlim([-1 1])
-ylim([0 1])
-box off, grid off
+cla;
 
 axes( (handles.marginalCongruence) );
-h=cdfplot(congruenceData);
-set(h,'color',thisColor,'linewidth',1);
-xlabel('Congruence (\rho)');
-ylabel('Cumulative fraction of units');
-title('');
-xlim([-1 1])
-ylim([0 1])
-box off, grid off
+cla;
 
 axes( (handles.jointMetrics) );
-scatter(contrastData,congruenceData,64,thisColor,'linewidth',1);
-axis equal
-xlim([-1 1])
-ylim([-1 1])
-box off, grid off
-xlabel('Active-Passive Index')
-ylabel('Congruence (\rho)')
+cla;
+
+% select only the units with area ID matching your current selection
+colorStack = [];
+areaStack  = {};
+
+% keep a running table of all the areas you collate (users will need to be
+% smart enough not to mix selections which consitute overlapping areas,
+% e.g., contrasting F5 against F5-lat)
+tableData  = [];
+tableAreas = {};
+
+for whichArea = whichAreas
+    areaStrings  = get(handles.areaSelector,'String');
+    thisAreaName = areaStrings{whichArea};
+    
+    % pick color
+    colorConvention = getappdata(handles.output,'colorConvention');
+    whichColorInd   = ( cellfun(@(x) ...
+        ~isempty( regexpi( thisAreaName,x,'once' ) ),...
+        colorConvention.labels ) );
+    thisColor       = colorConvention.colors( whichColorInd,: );
+    
+    % determine -lat or -med color
+    ismed = ~isempty( regexpi(thisAreaName,'-med','once') );
+    islat = ~isempty( regexpi(thisAreaName,'-lat','once') );
+    
+    if ismed
+        thisColor = 0.5 + 0.5*thisColor;
+    elseif islat
+        thisColor = 0.5*thisColor;
+    else
+        % pass
+    end
+    
+    colorStack = vertcat(colorStack,thisColor); %#ok<*AGROW>
+    areaStack  = vertcat(areaStack,{thisAreaName});
+    
+    
+    if ~strcmpi(thisAreaName,'pooled')
+        theseinds = cellfun(@(x) ~isempty( regexpi(x,thisAreaName,'once') ),...
+            areaLabels);
+        contrastData_   = contrastData(theseinds);
+        congruenceData_ = congruenceData(theseinds);
+    else
+        contrastData_   = contrastData;
+        congruenceData_ = congruenceData;
+    end
+    
+    axes( (handles.marginalPreference) ); %#ok<*LAXES>
+    hold all
+    h=cdfplot(contrastData_);
+    set(h,'color',thisColor,'linewidth',1);
+    xlabel('Active-Passive Index');
+    ylabel('Cumulative fraction of units');
+    title('');
+    xlim([-1 1])
+    ylim([0 1])
+    box off, grid off
+    
+    axes( (handles.marginalCongruence) );
+    hold all
+    h=cdfplot(congruenceData_);
+    set(h,'color',thisColor,'linewidth',1);
+    xlabel('Congruence (\rho)');
+    ylabel('Cumulative fraction of units');
+    title('');
+    xlim([-1 1])
+    ylim([0 1])
+    box off, grid off
+    
+    axes( (handles.jointMetrics) );
+    hold all
+    scatter(contrastData_,congruenceData_,64,thisColor,'linewidth',1);
+    axis equal
+    xlim([-1 1])
+    ylim([-1 1])
+    box off, grid off
+    xlabel('Active-Passive Index')
+    ylabel('Congruence (\rho)')
+    
+    % add to the tableData and tableAreas arrays
+    nneur      = numel(contrastData_);
+    tableData  = vertcat(tableData,[contrastData_,congruenceData_]);
+    tableAreas = vertcat(tableAreas,repmat({thisAreaName},nneur,1));
+end
+
+% add legends
+axes( (handles.marginalPreference) );
+customlegend(areaStack,'colors',colorStack)
+
+axes( (handles.marginalCongruence) );
+customlegend(areaStack,'colors',colorStack)
+
+axes( (handles.jointMetrics) );
+customlegend(areaStack,'colors',colorStack)
+
+% update tables
+% note: repeated-measures ANOVA is fucking BONKERS and makes NO sense. use
+% manova1 instead
+% you can tell this is where I stopped giving a hoot...
+[dManova,pManova,statsManova] = manova1(tableData,tableAreas);
+[~,tabContrast,statsContrast] = anova1(tableData(:,1),tableAreas,'off');
+[~,tabCongruence,statsCongruence] = anova1(tableData(:,2),tableAreas,'off');
 
 
-set(handles.manovaTable,'columnName',{'hello','world'})
-set(handles.manovaTable,'Data',randn(2))
+rowN = {'Preference','Congruence','MANOVA'};
+colN = horzcat({'(equivalent) df-groups','(equivalent) df-error','(equivalent) F','p','Wilks'' Lambda','dim'},...
+    strcat(statsManova.gnames(:),' neuron count')',...
+    strcat(statsManova.gnames(:),' marg. mean')');
+
+% marg means
+margMu = vertcat( num2cell( vertcat( statsContrast.means, statsCongruence.means ) ), repmat({''},1,numel(whichAreas)) );
+
+% n-stats
+nStats = vertcat( repmat({''},2,numel(whichAreas)), num2cell( statsContrast.n ) );
+
+% F-test stats
+whichInd = max(dManova,1);
+if ~isempty(dManova)
+    [manovaF,manovaDf1,manovaDf2] = wilkLambda2F(statsManova.lambda(whichInd),numel(whichAreas),2,numel(tableAreas),false); % lambda stat, # groups, # measures, # obs, toggle to display things to command window
+    
+    fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
+        horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
+        num2cell( horzcat( manovaDf1, manovaDf2, manovaF, pManova(whichInd) ) ) );
+else
+    fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
+        horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
+        repmat({''},1,4) );
+end
+
+% wilks' lambda, MANOVA-specific
+if ~isempty(dManova)
+    lambdaTable = vertcat( repmat({''},2,2),...
+        num2cell( [statsManova.lambda(whichInd),dManova] ) );
+else
+    lambdaTable = repmat({''},3,2);
+end
+
+bigData     = horzcat(fTable,lambdaTable,nStats,margMu);
+
+set(handles.manovaTable,'RowName',rowN)
+set( handles.manovaTable,'ColumnName', colN );
+set(handles.manovaTable,'Data',bigData);
+
 
 set(handles.pairsTable,'columnName',{'foo','bar'})
 set(handles.pairsTable,'Data',randn(2))

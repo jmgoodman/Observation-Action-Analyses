@@ -61,6 +61,7 @@ guidata(hObject, handles);
 % update current path
 mfd = mfilename('fullpath');
 [cd_,~,~] = fileparts(mfd);
+[cd_,~,~] = fileparts(cd_);
 addpath(genpath(cd_));
 
 % UIWAIT makes ResultsExplorer wait for user response (see UIRESUME)

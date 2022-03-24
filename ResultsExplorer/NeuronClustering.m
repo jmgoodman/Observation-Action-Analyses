@@ -22,7 +22,7 @@ function varargout = NeuronClustering(varargin)
 
 % Edit the above text to modify the response to help NeuronClustering
 
-% Last Modified by GUIDE v2.5 23-Mar-2022 14:59:08
+% Last Modified by GUIDE v2.5 24-Mar-2022 15:53:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -72,11 +72,11 @@ contrastStruct  = mObj.contraststruct; partialAreas = unique(contrastStruct(1).p
 nStruct         = mObj.Nstruct; wholeAreas = fieldnames(nStruct); wholeAreas = wholeAreas(:);
 uniqueAreaNames = vertcat(...
     wholeAreas,...
-    {'pooled-split'},...
     partialAreas...
     );
+set(handles.areaSelector,'Max',numel(uniqueAreaNames));
 set(handles.areaSelector,'String',uniqueAreaNames(:));
-set(handles.areaSelector,'Value',1);
+set(handles.areaSelector,'Value',2:4);
 
 setappdata(handles.output,'clusterDir',clusterDir);
 setappdata(handles.output,'clusterData',mObj);

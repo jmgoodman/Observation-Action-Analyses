@@ -16,6 +16,29 @@ contrastStruct = mObj.contraststruct;
 whichAreas   = get(handles.areaSelector,'Value');
 whichSession = get(handles.sessionSelector,'Value');
 
+if isempty(whichAreas)
+    % clear figures
+    axes( (handles.marginalPreference) );
+    cla;
+    
+    axes( (handles.marginalCongruence) );
+    cla;
+    
+    axes( (handles.jointMetrics) );
+    cla;
+    
+    % clear tables
+    set(handles.manovaTable,'RowName',{''})
+    set( handles.manovaTable,'ColumnName', {''} );
+    set(handles.manovaTable,'Data',{''});
+    
+    set(handles.pairsTable,'RowName',{''})
+    set( handles.pairsTable,'ColumnName', {''} );
+    set(handles.pairsTable,'Data',{''});
+    
+    return
+end
+
 contrastStruct = contrastStruct(whichSession); % this only gets active-passive indices
 
 % pull data from the figures that were generated
@@ -195,6 +218,46 @@ set(handles.manovaTable,'RowName',rowN)
 set( handles.manovaTable,'ColumnName', colN );
 set(handles.manovaTable,'Data',bigData);
 
+% ---
+% now, the PAIRS table
+pairsStruct = mObj.PAIRSstruct;
 
-set(handles.pairsTable,'columnName',{'foo','bar'})
-set(handles.pairsTable,'Data',randn(2))
+% take only this session
+sessionStruct = pairsStruct(whichSession);
+
+% sorry, we don't bother splitting areas for these!
+pairsFields = fieldnames(sessionStruct);
+
+% keep the ones which are members of the area selector
+keepFields  = ...
+cellfun(@(x) ...
+    any( ...
+        cellfun(@(y) ...
+            ~isempty( ...
+                regexpi( ...
+                    y,x,'once'...
+                )... 
+            ),...
+            statsManova.gnames(:)...
+        ) ...
+    ),...
+    pairsFields...
+);
+
+keepFields = pairsFields(keepFields);
+
+% now get the data
+pairsData = [];
+for fieldInd = 1:numel(keepFields)
+    tempStruct = sessionStruct.(keepFields{fieldInd});
+    delta      = tempStruct.dataPAIRS - tempStruct.nullPAIRS;
+    
+    % lower quartile - median delta-PAIRS - upper quartile - bootstrapped p < 0
+    pairsData = vertcat(pairsData,[...
+        prctile(delta,25:25:75),...
+        mean(delta<0)]);
+end
+
+set(handles.pairsTable,'ColumnName',{'lower quartile','median delta-PAIRS','upper quartile','bootstrapped p<0'});
+set(handles.pairsTable,'RowName',keepFields)
+set(handles.pairsTable,'Data',pairsData)

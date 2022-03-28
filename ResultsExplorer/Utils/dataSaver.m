@@ -49,4 +49,6 @@ end
 
 %% step 1: if a figure, bring up a new figure window which slaps the figure onto a US letter-size sheet
 
-% for previews
+% call the other gui
+h = plotPreview;
+

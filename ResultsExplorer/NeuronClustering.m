@@ -88,7 +88,6 @@ guidata(hObject, handles);
 % make plots
 plotRefresher_NeuronClustering(hObject,eventdata,handles);
 
-
 % UIWAIT makes NeuronClustering wait for user response (see UIRESUME)
 % uiwait(handles.NeuronClustering);
 
@@ -174,6 +173,8 @@ function saveMarginalPreference_Callback(hObject, eventdata, handles)
 % hObject    handle to saveMarginalPreference (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+dataSaver(hObject,eventdata,handles,'marginalPreference');
 
 
 % --- Executes on button press in saveMarginalCongruence.

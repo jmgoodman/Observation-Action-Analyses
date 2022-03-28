@@ -22,7 +22,7 @@ function varargout = plotPreview(varargin)
 
 % Edit the above text to modify the response to help plotPreview
 
-% Last Modified by GUIDE v2.5 28-Mar-2022 12:42:40
+% Last Modified by GUIDE v2.5 28-Mar-2022 16:17:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,6 +55,38 @@ function plotPreview_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for plotPreview
 handles.output = hObject;
 
+% do some other stuff
+set(handles.pageAxes,'xtick',[],'ytick',[],'box','on')
+% set(handles.plotAxes,'box','on')
+
+% test figure
+plot(handles.plotAxes,randn(5,1),randn(5,1),'k-o')
+
+% Min=0 by default
+set(handles.horizontalSizeSlider,'Max',7.5,'Value',3.75);
+set(handles.verticalSizeSlider,'Max',10,'Value',4.5);
+set(handles.textSizeSlider,'Max',32,'Value',10);
+
+% testing colorbars
+% handles.plotAxes = pairedColorBar(handles.plotAxes,'hello','fontsize',10);
+
+% replace "hObject" with these handles, since we're pretending we just
+% manually set these
+pairedSliderText(handles.horizontalSizeSlider, eventdata, handles, 'horizontalSizeSlider', 'horizontalSize');
+pairedSliderText(handles.verticalSizeSlider, eventdata, handles, 'verticalSizeSlider', 'verticalSize');
+pairedSliderText(handles.textSizeSlider, eventdata, handles, 'textSizeSlider', 'textSize');
+
+% now set the properties
+% note: while I would PREFER to set OuterPosition, I am stuck manipulating
+% Position
+% I suspect that what this shows is NOT exactly what you'll get, but merely an
+% approximation.
+% part of the issue is what I believe to be a miscalulation in MATLAB when
+% converting from pixels to real-world units.
+% ergo the text is probably not exactly the size it appears to be.
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -82,6 +114,12 @@ function verticalSizeSlider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
+pairedSliderText(hObject, eventdata, handles, 'verticalSizeSlider', 'verticalSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
 
 % --- Executes during object creation, after setting all properties.
 function verticalSizeSlider_CreateFcn(hObject, eventdata, handles)
@@ -103,6 +141,11 @@ function textSizeSlider_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+pairedSliderText(hObject, eventdata, handles, 'textSizeSlider', 'textSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -126,6 +169,11 @@ function horizontalSizeSlider_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'Value') returns position of slider
 %        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
 
+pairedSliderText(hObject, eventdata, handles, 'horizontalSizeSlider', 'horizontalSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
 
 % --- Executes during object creation, after setting all properties.
 function horizontalSizeSlider_CreateFcn(hObject, eventdata, handles)
@@ -147,6 +195,10 @@ function horizontalSize_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of horizontalSize as text
 %        str2double(get(hObject,'String')) returns contents of horizontalSize as a double
+pairedSliderText(hObject, eventdata, handles, 'horizontalSizeSlider', 'horizontalSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -170,6 +222,11 @@ function verticalSize_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of verticalSize as text
 %        str2double(get(hObject,'String')) returns contents of verticalSize as a double
+pairedSliderText(hObject, eventdata, handles, 'verticalSizeSlider', 'verticalSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
 
 
 % --- Executes during object creation, after setting all properties.
@@ -193,6 +250,10 @@ function textSize_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of textSize as text
 %        str2double(get(hObject,'String')) returns contents of textSize as a double
+pairedSliderText(hObject, eventdata, handles, 'textSizeSlider', 'textSize');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -213,3 +274,30 @@ function exportButton_Callback(hObject, eventdata, handles)
 % hObject    handle to exportButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+
+thisObj = handles.plotAxes;
+
+testName      = 'dingus';
+defaultFile   = fullfile(cd_,'Outputs',sprintf('%s.svg',testName));
+[fname,fpath] = uiputfile(defaultFile);
+
+if fname
+    fullfname = fullfile(fpath,fname);
+    axPos  = get(thisObj,'Position');
+    figPos = axPos;
+    figPos(1:2) = [0 0];
+    figPos(3:4) = figPos(3:4) + [1 1];
+    ff=figure('Visible','off'); set(ff,'Units','inches','Position',figPos,'renderer','painters'); % renderer needs to be manually set here... for some god-forsaken reason. In literally no other context has this given me a problem, but here? nah dude, can't let you do that!
+    axPos(1:2) = [0.5 0.5];
+    aa=copyobj(thisObj,ff);
+    set(aa,'Position',axPos);
+    set(ff,'paperposition',figPos,'paperunits','inches')
+    print(ff,fullfname,'-dsvg');
+    delete(ff)
+    delete(aa)
+else
+    warning('no file chosen, saving aborted')
+end

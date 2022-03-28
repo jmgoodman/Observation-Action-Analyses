@@ -22,7 +22,7 @@ function varargout = NeuronClustering(varargin)
 
 % Edit the above text to modify the response to help NeuronClustering
 
-% Last Modified by GUIDE v2.5 24-Mar-2022 15:53:52
+% Last Modified by GUIDE v2.5 28-Mar-2022 10:28:27
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -86,11 +86,11 @@ setappdata(handles.output,'colorConvention',defColorConvention);
 guidata(hObject, handles);
 
 % make plots
-plotRefresher(hObject,eventdata,handles);
+plotRefresher_NeuronClustering(hObject,eventdata,handles);
 
 
 % UIWAIT makes NeuronClustering wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
+% uiwait(handles.NeuronClustering);
 
 
 % --- Outputs from this function are returned to the command line.
@@ -114,7 +114,7 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
 % nevermind, this could get real annoying real fast
-% plotRefresher(hObject,eventdata,handles);
+% plotRefresher_NeuronClustering(hObject,eventdata,handles);
 
 
 
@@ -142,7 +142,7 @@ function areaSelector_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from areaSelector
 
 % nevermind, this could get real annoying real fast
-% plotRefresher(hObject,eventdata,handles);
+% plotRefresher_NeuronClustering(hObject,eventdata,handles);
 
 
 
@@ -196,6 +196,8 @@ function savePairsStats_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+dataSaver(hObject,eventdata,handles,'pairsTable');
+
 
 % --- Executes on button press in saveManovaStats.
 function saveManovaStats_Callback(hObject, eventdata, handles)
@@ -203,6 +205,7 @@ function saveManovaStats_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+dataSaver(hObject,eventdata,handles,'manovaTable');
 
 % --- Executes on button press in plotButton.
 function plotButton_Callback(hObject, eventdata, handles)
@@ -210,4 +213,4 @@ function plotButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-plotRefresher(hObject,eventdata,handles);
+plotRefresher_NeuronClustering(hObject,eventdata,handles);

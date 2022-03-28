@@ -1,4 +1,4 @@
-function plotRefresher(hObject, eventdata, handles)
+function plotRefresher_NeuronClustering(hObject, eventdata, handles)
 % hObject    handle to sessionSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -6,7 +6,7 @@ function plotRefresher(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
-% this is the common callback for the two dropdown selectors.
+% this is the callback for the refresh plot button
 
 % pull the clustering analysis data struct
 mObj = getappdata(handles.output,'clusterData');
@@ -214,9 +214,10 @@ end
 
 bigData     = horzcat(fTable,lambdaTable,nStats,margMu);
 
-set(handles.manovaTable,'RowName',rowN)
-set( handles.manovaTable,'ColumnName', colN );
-set(handles.manovaTable,'Data',bigData);
+% edit: transpose the table for better readability
+set(handles.manovaTable,'RowName',colN)
+set( handles.manovaTable,'ColumnName', rowN );
+set(handles.manovaTable,'Data',bigData');
 
 % ---
 % now, the PAIRS table

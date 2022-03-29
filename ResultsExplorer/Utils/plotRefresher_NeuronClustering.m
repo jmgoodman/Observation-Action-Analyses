@@ -259,6 +259,6 @@ for fieldInd = 1:numel(keepFields)
         mean(delta<0)]);
 end
 
-set(handles.pairsTable,'ColumnName',{'lower quartile','median delta-PAIRS','upper quartile','bootstrapped p<0'});
+set(handles.pairsTable,'ColumnName',{'lower_quartile','median_delta_PAIRS','upper_quartile','bootstrapped_p_lt_0'});
 set(handles.pairsTable,'RowName',keepFields)
 set(handles.pairsTable,'Data',pairsData)

@@ -183,12 +183,18 @@ function saveMarginalCongruence_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+dataSaver(hObject,eventdata,handles,'marginalCongruence');
+
+
 
 % --- Executes on button press in saveJointMetrics.
 function saveJointMetrics_Callback(hObject, eventdata, handles)
 % hObject    handle to saveJointMetrics (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+dataSaver(hObject,eventdata,handles,'jointMetrics');
+
 
 
 % --- Executes on button press in savePairsStats.

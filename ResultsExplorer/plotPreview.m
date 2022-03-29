@@ -22,7 +22,7 @@ function varargout = plotPreview(varargin)
 
 % Edit the above text to modify the response to help plotPreview
 
-% Last Modified by GUIDE v2.5 28-Mar-2022 16:17:54
+% Last Modified by GUIDE v2.5 29-Mar-2022 12:57:37
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,15 +52,37 @@ function plotPreview_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to plotPreview (see VARARGIN)
 
+% access global target axes, which should always, ALWAYS be set before
+% calling this GUI
+global axes2Copy
+
+if isempty(axes2Copy)
+    error('No axes selected for preview! Cannot continue...')
+else
+    % pass
+end
+
 % Choose default command line output for plotPreview
 handles.output = hObject;
 
 % do some other stuff
 set(handles.pageAxes,'xtick',[],'ytick',[],'box','on')
-% set(handles.plotAxes,'box','on')
+cla(handles.plotAxes); % cleanup
 
-% test figure
-plot(handles.plotAxes,randn(5,1),randn(5,1),'k-o')
+% store properties to keep
+tag2keep = get(handles.plotAxes,'Tag');
+oldPos = get(handles.plotAxes,'position');
+
+% copy axes over
+copyaxes(axes2Copy,handles.plotAxes);
+
+% properties that are super important to preserve
+set(handles.plotAxes,'Tag',tag2keep);
+set(handles.plotAxes,'units','inches')
+set(handles.plotAxes,'position',oldPos);
+set(handles.plotAxes,'PlotBoxAspectRatioMode','auto')
+set(handles.plotAxes,'DataAspectRatioMode','auto')
+
 
 % Min=0 by default
 set(handles.horizontalSizeSlider,'Max',7.5,'Value',3.75);
@@ -280,7 +302,7 @@ mfd = mfilename('fullpath');
 
 thisObj = handles.plotAxes;
 
-testName      = 'dingus';
+testName      = 'dataPlot';
 defaultFile   = fullfile(cd_,'Outputs',sprintf('%s.svg',testName));
 [fname,fpath] = uiputfile(defaultFile);
 
@@ -300,4 +322,70 @@ if fname
     delete(aa)
 else
     warning('no file chosen, saving aborted')
+end
+
+
+% --- Executes on button press in lockAspectRatio.
+function lockAspectRatio_Callback(hObject, eventdata, handles)
+% hObject    handle to lockAspectRatio (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of lockAspectRatio
+
+
+% --- Executes on button press in exportPngButton.
+function exportPngButton_Callback(hObject, eventdata, handles)
+% hObject    handle to exportPngButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+
+thisObj = handles.plotAxes;
+
+testName      = 'dataPlot';
+defaultFile   = fullfile(cd_,'Outputs',sprintf('%s.png',testName));
+[fname,fpath] = uiputfile(defaultFile);
+
+if fname
+    fullfname = fullfile(fpath,fname);
+    axPos  = get(thisObj,'Position');
+    figPos = axPos;
+    figPos(1:2) = [0 0];
+    figPos(3:4) = figPos(3:4) + [1 1];
+    ff=figure('Visible','off'); set(ff,'Units','inches','Position',figPos);
+    axPos(1:2) = [0.5 0.5];
+    aa=copyobj(thisObj,ff);
+    set(aa,'Position',axPos);
+    set(ff,'paperposition',figPos,'paperunits','inches')
+    print(ff,fullfname,'-dpng',['-r',get(handles.dpi,'String')]); % genuinely in units of dpi according to matlab documentation ("resolution" parameter of "print" function)
+    delete(ff)
+    delete(aa)
+else
+    warning('no file chosen, saving aborted')
+end
+
+
+
+function dpi_Callback(hObject, eventdata, handles)
+% hObject    handle to dpi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of dpi as text
+%        str2double(get(hObject,'String')) returns contents of dpi as a double
+
+
+% --- Executes during object creation, after setting all properties.
+function dpi_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to dpi (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
 end

@@ -47,8 +47,11 @@ else
     % pass
 end
 
-%% step 1: if a figure, bring up a new figure window which slaps the figure onto a US letter-size sheet
+%% step 1: if axes, bring up a new figure window which slaps the figure onto a US letter-size sheet
 
 % call the other gui
-h = plotPreview;
+global axes2Copy
+axes2Copy = thisObj;
+plotPreview;
 
+clearvars -global % nuclear hygiene. but to be fair, you shouldn't be using global variables either

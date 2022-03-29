@@ -5,9 +5,9 @@ function customlegend(legendnames,varargin)
 assert(iscellstr(legendnames),'legendnames needs to be a cell array of strings');
 
 % default parameter names for name-value pairs are given below
-opts.xoffset  = 0.02;
-opts.yoffset  = 0.02;
-opts.ystep    = 0.08;
+opts.xoffset  = 0.025;
+opts.yoffset  = 0.000;
+opts.ystep    = 0.1; %0.3 / numel(legendnames);
 opts.colors   = zeros(numel(legendnames),3);
 opts.fontname = get(0,'defaultaxesfontname');
 opts.fontsize = get(0,'defaultaxesfontsize');
@@ -26,17 +26,21 @@ end
 
 % first, establish the location of your legend
 % it will be just outside your plot, top-right corner
-xl = get(gca,'xlim');
-yl = get(gca,'ylim');
+% xl = get(gca,'xlim');
+% yl = get(gca,'ylim');
 
-xpos = xl(2) + opts.xoffset*range(xl);
-ypos = yl(2) - opts.yoffset*range(yl);
+% xpos = xl(2) + opts.xoffset*range(xl);
+% ypos = yl(2) - opts.yoffset*range(yl);
+
+xpos = 1 + opts.xoffset; % for normalized coordinates
+ypos = 1 - opts.yoffset;
 
 for stringind = 1:numel(legendnames)
-    text(xpos,ypos - opts.ystep*(stringind-1)*range(yl),...
+    text(xpos,ypos - opts.ystep*(stringind-1),...
         legendnames{stringind},'fontname',opts.fontname,...
         'fontsize',opts.fontsize,'color',opts.colors(stringind,:),...
-        'horizontalalign','left','verticalalign','top')
+        'horizontalalign','left','verticalalign','top',...
+        'units','normalized');
 end
 
 return

@@ -39,21 +39,62 @@ if isempty(whichAreas)
     return
 end
 
-contrastStruct = contrastStruct(whichSession); % this only gets active-passive indices
-
-% pull data from the figures that were generated
-clusterDir = getappdata(handles.output,'clusterDir');
-
-figNumber   = 6 + (whichSession-1)*7;
-fileName    = sprintf('clustfigure%0.2i.fig',figNumber);
-fullFigPath = fullfile( clusterDir,fileName );
-        
-fig_   = openfig(fullFigPath,'invisible');
-child_ = get(fig_,'Children'); % dataObjs = findobj(fig_,'-property','YData')
-figureContrast   = child_.Children.XData(:);
-figureCongruence = child_.Children.YData(:);
-close(fig_)
-clear fig_
+if whichSession <= numel(mObj.seshnames)
+    contrastStruct = contrastStruct(whichSession); % this only gets active-passive indices
+    doTable        = true; % debug only
+else
+    theseStrings   = get(handles.sessionSelector,'string');
+    pooledStrings  = cellfun(@(x) ~isempty( ...
+        regexpi(x,'\-pooled$','once') ),...
+        theseStrings);
+    theseStrings   = regexp(theseStrings,'\-pooled$','split');
+    theseStrings   = cellfun(@(x) x{1},theseStrings,'uniformoutput',false);
+    sessionStrings = theseStrings(~pooledStrings);
+    thisAnimal     = theseStrings{whichSession};
+    theseSessions  = cellfun(@(x) ...
+                        ~isempty(...
+                            regexpi(...
+                                x,thisAnimal,'once'...
+                            )...
+                        ), ...
+                        sessionStrings...
+                     );
+                 
+    tempStruct     = contrastStruct(theseSessions);
+    
+    fnames         = fieldnames(tempStruct);
+    
+    for fieldind = 1:numel(fnames)
+        fieldName             = fnames{fieldind};
+        tempcell              = arrayfun(@(x) x.(fieldName),tempStruct,'uniformoutput',false);
+        newStruct.(fieldName) = vertcat( tempcell{:} );
+    end
+    
+    contrastStruct = newStruct;
+    doTable        = false; % debug only
+end
+                    
+% pull data from the figures that were generated (if possible)
+if doTable
+    clusterDir = getappdata(handles.output,'clusterDir');
+    
+    figNumber   = 6 + (whichSession-1)*7;
+    fileName    = sprintf('clustfigure%0.2i.fig',figNumber);
+    fullFigPath = fullfile( clusterDir,fileName );
+    
+    fig_   = openfig(fullFigPath,'invisible');
+    child_ = get(fig_,'Children'); % dataObjs = findobj(fig_,'-property','YData')
+    figureContrast   = child_.Children.XData(:);
+    figureCongruence = child_.Children.YData(:);
+    close(fig_)
+    clear fig_
+else
+    % debug only
+    figureContrast   = contrastStruct.pooled;
+    figureContrast   = figureContrast(~isnan(figureContrast));
+    figureCongruence = figureContrast;
+end
+    
 
 % register figure data to struct data
 contrastData   = contrastStruct.pooled;
@@ -171,94 +212,99 @@ axes( (handles.jointMetrics) );
 customlegend(areaStack,'colors',colorStack)
 
 % update tables
-% note: repeated-measures ANOVA is fucking BONKERS and makes NO sense. use
-% manova1 instead
-% you can tell this is where I stopped giving a hoot...
-[dManova,pManova,statsManova] = manova1(tableData,tableAreas);
-[~,tabContrast,statsContrast] = anova1(tableData(:,1),tableAreas,'off');
-[~,tabCongruence,statsCongruence] = anova1(tableData(:,2),tableAreas,'off');
-
-
-rowN = {'Preference','Congruence','MANOVA'};
-colN = horzcat({'(equivalent) df-groups','(equivalent) df-error','(equivalent) F','p','Wilks'' Lambda','dim'},...
-    strcat(statsManova.gnames(:),' neuron count')',...
-    strcat(statsManova.gnames(:),' marg. mean')');
-
-% marg means
-margMu = vertcat( num2cell( vertcat( statsContrast.means, statsCongruence.means ) ), repmat({''},1,numel(whichAreas)) );
-
-% n-stats
-nStats = vertcat( repmat({''},2,numel(whichAreas)), num2cell( statsContrast.n ) );
-
-% F-test stats
-whichInd = max(dManova,1);
-if ~isempty(dManova)
-    [manovaF,manovaDf1,manovaDf2] = wilkLambda2F(statsManova.lambda(whichInd),numel(whichAreas),2,numel(tableAreas),false); % lambda stat, # groups, # measures, # obs, toggle to display things to command window
+if doTable % debug only
+    % note: repeated-measures ANOVA is fucking BONKERS and makes NO sense. use
+    % manova1 instead
+    % you can tell this is where I stopped giving a hoot...
+    [dManova,pManova,statsManova] = manova1(tableData,tableAreas);
+    [~,tabContrast,statsContrast] = anova1(tableData(:,1),tableAreas,'off');
+    [~,tabCongruence,statsCongruence] = anova1(tableData(:,2),tableAreas,'off');
     
-    fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
-        horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
-        num2cell( horzcat( manovaDf1, manovaDf2, manovaF, pManova(whichInd) ) ) );
-else
-    fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
-        horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
-        repmat({''},1,4) );
-end
-
-% wilks' lambda, MANOVA-specific
-if ~isempty(dManova)
-    lambdaTable = vertcat( repmat({''},2,2),...
-        num2cell( [statsManova.lambda(whichInd),dManova] ) );
-else
-    lambdaTable = repmat({''},3,2);
-end
-
-bigData     = horzcat(fTable,lambdaTable,nStats,margMu);
-
-% edit: transpose the table for better readability
-set(handles.manovaTable,'RowName',colN)
-set( handles.manovaTable,'ColumnName', rowN );
-set(handles.manovaTable,'Data',bigData');
-
-% ---
-% now, the PAIRS table
-pairsStruct = mObj.PAIRSstruct;
-
-% take only this session
-sessionStruct = pairsStruct(whichSession);
-
-% sorry, we don't bother splitting areas for these!
-pairsFields = fieldnames(sessionStruct);
-
-% keep the ones which are members of the area selector
-keepFields  = ...
-cellfun(@(x) ...
-    any( ...
+    
+    rowN = {'Preference','Congruence','MANOVA'};
+    colN = horzcat({'(equivalent) df-groups','(equivalent) df-error','(equivalent) F','p','Wilks'' Lambda','dim'},...
+        strcat(statsManova.gnames(:),' neuron count')',...
+        strcat(statsManova.gnames(:),' marg. mean')');
+    
+    % marg means
+    margMu = vertcat( num2cell( vertcat( statsContrast.means, statsCongruence.means ) ), repmat({''},1,numel(whichAreas)) );
+    
+    % n-stats
+    nStats = vertcat( repmat({''},2,numel(whichAreas)), num2cell( statsContrast.n ) );
+    
+    % F-test stats
+    whichInd = max(dManova,1);
+    if ~isempty(dManova)
+        [manovaF,manovaDf1,manovaDf2] = wilkLambda2F(statsManova.lambda(whichInd),numel(whichAreas),2,numel(tableAreas),false); % lambda stat, # groups, # measures, # obs, toggle to display things to command window
+        
+        fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
+            horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
+            num2cell( horzcat( manovaDf1, manovaDf2, manovaF, pManova(whichInd) ) ) );
+    else
+        fTable   = vertcat( horzcat( tabContrast(2:3,3)',tabContrast(2,5:6) ),...
+            horzcat( tabCongruence(2:3,3)',tabCongruence(2,5:6) ),...
+            repmat({''},1,4) );
+    end
+    
+    % wilks' lambda, MANOVA-specific
+    if ~isempty(dManova)
+        lambdaTable = vertcat( repmat({''},2,2),...
+            num2cell( [statsManova.lambda(whichInd),dManova] ) );
+    else
+        lambdaTable = repmat({''},3,2);
+    end
+    
+    bigData     = horzcat(fTable,lambdaTable,nStats,margMu);
+    
+    % edit: transpose the table for better readability
+    set(handles.manovaTable,'RowName',colN)
+    set( handles.manovaTable,'ColumnName', rowN );
+    set(handles.manovaTable,'Data',bigData');
+    
+    % ---
+    % now, the PAIRS table
+    pairsStruct = mObj.PAIRSstruct;
+    
+    % take only this session
+    sessionStruct = pairsStruct(whichSession);
+    
+    % sorry, we don't bother splitting areas for these!
+    pairsFields = fieldnames(sessionStruct);
+    
+    % keep the ones which are members of the area selector
+    keepFields  = ...
+        cellfun(@(x) ...
+        any( ...
         cellfun(@(y) ...
-            ~isempty( ...
-                regexpi( ...
-                    y,x,'once'...
-                )... 
-            ),...
-            statsManova.gnames(:)...
+        ~isempty( ...
+        regexpi( ...
+        y,x,'once'...
+        )...
+        ),...
+        statsManova.gnames(:)...
         ) ...
-    ),...
-    pairsFields...
-);
-
-keepFields = pairsFields(keepFields);
-
-% now get the data
-pairsData = [];
-for fieldInd = 1:numel(keepFields)
-    tempStruct = sessionStruct.(keepFields{fieldInd});
-    delta      = tempStruct.dataPAIRS - tempStruct.nullPAIRS;
+        ),...
+        pairsFields...
+        );
     
-    % lower quartile - median delta-PAIRS - upper quartile - bootstrapped p < 0
-    pairsData = vertcat(pairsData,[...
-        prctile(delta,25:25:75),...
-        mean(delta<0)]);
+    keepFields = pairsFields(keepFields);
+    
+    % now get the data
+    pairsData = [];
+    for fieldInd = 1:numel(keepFields)
+        tempStruct = sessionStruct.(keepFields{fieldInd});
+        delta      = tempStruct.dataPAIRS - tempStruct.nullPAIRS;
+        
+        % lower quartile - median delta-PAIRS - upper quartile - bootstrapped p < 0
+        pairsData = vertcat(pairsData,[...
+            prctile(delta,25:25:75),...
+            mean(delta<0)]);
+    end
+    
+    set(handles.pairsTable,'ColumnName',{'lower_quartile','median_delta_PAIRS','upper_quartile','bootstrapped_p_lt_0'});
+    set(handles.pairsTable,'RowName',keepFields)
+    set(handles.pairsTable,'Data',pairsData)
+    
+else
+    % pass
 end
-
-set(handles.pairsTable,'ColumnName',{'lower_quartile','median_delta_PAIRS','upper_quartile','bootstrapped_p_lt_0'});
-set(handles.pairsTable,'RowName',keepFields)
-set(handles.pairsTable,'Data',pairsData)

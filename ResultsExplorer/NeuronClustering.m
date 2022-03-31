@@ -64,8 +64,15 @@ clusterDir = fullfile(cd_,'Analysis-Outputs','clustfiles');
 mObj       = matfile( fullfile( clusterDir,'clustout_stats.mat' ),'Writable',false );
 
 % write data to some fields
-seshNames = mObj.seshnames;
-set(handles.sessionSelector,'String',seshNames(:))
+seshNames   = mObj.seshnames;
+
+animalNames = cellfun(@(x) regexpi(x,'[a-z,A-Z]*','match'),seshNames,'uniformoutput',false);
+animalNames = cellfun(@(x) x{1},animalNames,'uniformoutput',false);
+uniqueAnimalNames = unique( char( animalNames ),'rows' );
+uniqueAnimalNames = cellstr(uniqueAnimalNames);
+uniqueAnimalNames = strcat(uniqueAnimalNames,'-pooled');
+
+set( handles.sessionSelector,'String',vertcat( seshNames(:), uniqueAnimalNames(:) ) )
 set(handles.sessionSelector,'Value',1);
 
 contrastStruct  = mObj.contraststruct; partialAreas = unique(contrastStruct(1).pooledareanames); partialAreas = partialAreas(:);

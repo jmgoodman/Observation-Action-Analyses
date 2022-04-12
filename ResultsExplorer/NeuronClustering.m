@@ -89,6 +89,18 @@ setappdata(handles.output,'clusterDir',clusterDir);
 setappdata(handles.output,'clusterData',mObj);
 setappdata(handles.output,'colorConvention',defColorConvention);
 
+% one last appdata field: pooledClusterData
+pooledPairsFile = fullfile( clusterDir,'pooled_pairs_stats.mat' );
+
+if exist(pooledPairsFile,'file') == 2
+    mObjPooled      = matfile( pooledPairsFile,'Writable',false );
+    setappdata(handles.output,'pooledClusterData',mObjPooled);
+else
+    % run a routine to create the pooled pairs struct
+    pooledPairsStructMaker(hObject, eventdata, handles);
+end
+
+
 % Update handles structure
 guidata(hObject, handles);
 

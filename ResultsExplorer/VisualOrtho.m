@@ -55,6 +55,32 @@ function VisualOrtho_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for VisualOrtho
 handles.output = hObject;
 
+% pull data and set to the handles structure as appdata
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+[cd_,~,~] = fileparts(cd_);
+
+mirrorDataDir      = fullfile(cd_,'MirrorData');
+analysisOutputsDir = fullfile(cd_,'Analysis-Outputs');
+
+setappdata(handles.output,'mirrorDataDir',mirrorDataDir)
+setappdata(handles.output,'analysisOutputsDir',analysisOutputsDir);
+
+sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara68';'Zara70'};
+set(handles.sessionSelector,'String',sessions2analyze);
+
+arrays2analyze = {'pooled';'AIP';'F5';'M1'};
+set(handles.sessionSelector,'String',arrays2analyze)
+
+% note: variancePlot will always show ALL the data, won't change with
+% session or area
+%
+% so, just make it here & get it over with
+
+% if the core data file isn't there (which defines some scatterplots of X =
+% source variance kept and Y = destination variance kept)
+
+
 % Update handles structure
 guidata(hObject, handles);
 

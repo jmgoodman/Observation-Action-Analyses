@@ -80,6 +80,65 @@ set(handles.sessionSelector,'String',arrays2analyze)
 % if the core data file isn't there (which defines some scatterplots of X =
 % source variance kept and Y = destination variance kept)
 
+colorStruct = defColorConvention(); 
+monkeyinds  = {'M','M','Z','Z','Z'};
+for ii = 1:numel(sessions2analyze)
+    commonSpaceFile = fullfile(analysisOutputsDir,sessions2analyze{ii},...
+        sprintf('sustainspace_results_%s.mat',sessions2analyze{ii}));
+    load(commonSpaceFile);
+    
+    sessionDataFile = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',...
+        sessions2analyze{ii}) );
+    load(sessionDataFile);
+    [pooledarraydatacell,arraynames] = poolarrays(datastruct.cellform);
+    
+    triallabels = extractlabels(datastruct.cellform);
+    targetcontexts = {'active','passive'}; % look at active, passive, and control separately
+    keeptrials     = ismember(triallabels.trialcontexts.names,targetcontexts);
+    
+    gottenPreMovement  = cellfun(@(x) vertcat( x{2}.Data(51:end,:,keeptrials), ...
+        x{4}.Data(1:50,:,keeptrials) ), pooledarraydatacell,'uniformoutput',false);
+    gottenPeriMovement = cellfun(@(x) vertcat( x{5}.Data(:,:,keeptrials), ...
+        x{6}.Data(:,:,keeptrials) ), pooledarraydatacell,'uniformoutput',false);
+    
+    gottenPreMovement  = vertcat( gottenPreMovement,  {horzcat(gottenPreMovement{:})} );
+    gottenPeriMovement = vertcat( gottenPeriMovement, {horzcat(gottenPeriMovement{:})} );
+    
+    gottenPreMovement  = cellfun(@(x) permute(x,[2,1,3]),gottenPreMovement,...
+        'uniformoutput',false);
+    gottenPeriMovement = cellfun(@(x) permute(x,[2,1,3]),gottenPeriMovement,...
+        'uniformoutput',false);
+    
+    gottenPreMovement  = cellfun(@(x) x(:,:)',gottenPreMovement,...
+        'uniformoutput',false);
+    gottenPeriMovement = cellfun(@(x) x(:,:)',gottenPeriMovement,...
+        'uniformoutput',false);
+    
+    % de-mean
+    mu                 = cellfun(@(x) mean(x),gottenPreMovement,'uniformoutput',false);
+    gottenPreMovement  = cellfun(@(x) bsxfun(@minus,x,mean(x)),gottenPreMovement,...
+        'uniformoutput',false);
+    gottenPeriMovement = cellfun(@(x) bsxfun(@minus,x,mean(x)),gottenPeriMovement,...
+        'uniformoutput',false);
+    
+    % get PC coefficients
+    PCcoeff            = arrayfun(@(x) x.regular.coeff,sustainspace(:),'uniformoutput',false);
+    PCcoeff_           = cellfun(@(x) pca(x),gottenPreMovement,'uniformoutput',false);
+    
+    % calc variance of projections
+    varPreMovement     = cellfun(@(x,C) var( x*C ),gottenPreMovement, PCcoeff_,'uniformoutput',false);
+    varPreMovement_    = cellfun(@(x,C) var( x*C ),gottenPreMovement, PCcoeff,'uniformoutput',false);
+    varPeriMovement    = cellfun(@(x,C) var( x*C ),gottenPeriMovement,PCcoeff_,'uniformoutput',false);
+    
+    % hmmmm the coefs I cook up by hand here don't match what my analysis
+    % had found earlier
+    %
+    % it's not the experimental conditions
+    % so... what's going on??
+end
+    
+    
+
 
 % Update handles structure
 guidata(hObject, handles);

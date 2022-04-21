@@ -23,7 +23,7 @@ for aind = 1:max(uainds)
     
     % for each alignment
     for alignind = 1:numel(keptarrays{1})
-        pooledarrays{alignind} = keptarrays{1}{1}; % from here, you move on
+        pooledarrays{alignind} = keptarrays{1}{alignind}; % from here, you move on
         
         kd = cellfun(@(x) x{alignind}.Data,keptarrays,'uniformoutput',false);
         pooledarrays{alignind}.Data = cat(2,kd{:});

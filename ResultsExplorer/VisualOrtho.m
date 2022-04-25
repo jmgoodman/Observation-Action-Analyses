@@ -135,6 +135,18 @@ for ii = 1:numel(sessions2analyze)
     %
     % it's not the experimental conditions
     % so... what's going on??
+    % FUCK
+    % is there some preprocessing that I've neglected? subsampling? what
+    % the FUCK is the deal??? why are these coefficients SO
+    % different?!?!?!?!?!?!?!?!?!?!?!?!?!
+    %
+    % maybe I should try calling the method per se and popping open the
+    % hood
+    %
+    % just to understand what's going on
+    %
+    % because I cannot proceed until I know why I'm getting different
+    % results...
 end
     
     

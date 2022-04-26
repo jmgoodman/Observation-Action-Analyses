@@ -82,8 +82,6 @@ set(handles.areaSelector,'String',arrays2analyze)
 
 colorStruct = defColorConvention(); 
 setappdata(handles.output,'colorStruct',colorStruct)
-monkeyinds  = {'M','M','Z','Z','Z'};
-setappdata(handles.output,'monkeyinds',monkeyinds)
 
 % check if sustain data are created
 file2check4 = fullfile(cd_,'ResultsExplorer','Data','sustainData.mat');

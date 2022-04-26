@@ -8,12 +8,16 @@ function compileSustainData(hObject, eventdata, handles)
 
 % this collects data to then make a plot
 
-colorStruct = defColorConvention(); 
+colorStruct = defColorConvention();
+colorStruct.colors = colorStruct.colors([2:4,1],:);
+colorStruct.labels = colorStruct.labels([2:4,1]);
 
 mirrorDataDir      = getappdata(handles.output,'mirrorDataDir');
 analysisOutputsDir = getappdata(handles.output,'analysisOutputsDir');
 
 sessions2analyze = get(handles.sessionSelector,'String');
+
+seshcell = cell(numel(sessions2analyze),2); % col 1 = allTT, col2 = allcontext
 for ii = 1:numel(sessions2analyze)
     commonSpaceFile = fullfile(analysisOutputsDir,sessions2analyze{ii},...
         sprintf('sustainspace_results_%s.mat',sessions2analyze{ii})); % loads sustainspace into file
@@ -147,19 +151,20 @@ for ii = 1:numel(sessions2analyze)
             mean(x))*y,...
             staMegaCell{cellInd}.data,coef,'uniformoutput',false);
         
-        % remove context-specific means, so that totalvar doesn't account
-        % for that variance
-        for contextind_ = 1:max(contextind)
-            keepinds = contextind == contextind_;
-            for areaind = 1:numel(totalproj)
-                thismat = totalproj{areaind};
-                thismu   = mean( thismat(keepinds,:) );
-                totalproj{areaind}(keepinds,:) = ...
-                    bsxfun(@minus,...
-                    totalproj{areaind}(keepinds,:),...
-                    thismu);
-            end
-        end
+        %         % remove context-specific means, so that totalvar doesn't account
+        %         % for that variance (or keep it in, so we know how much modulation
+        %         % is actually dependent on things other than shifted contexts)
+        %         for contextind_ = 1:max(contextind)
+        %             keepinds = contextind == contextind_;
+        %             for areaind = 1:numel(totalproj)
+        %                 thismat = totalproj{areaind};
+        %                 thismu   = mean( thismat(keepinds,:) );
+        %                 totalproj{areaind}(keepinds,:) = ...
+        %                     bsxfun(@minus,...
+        %                     totalproj{areaind}(keepinds,:),...
+        %                     thismu);
+        %             end
+        %         end
         
         totalvar  = cellfun(@(x) sum(x(:).^2),totalproj,'uniformoutput',false);
         
@@ -169,7 +174,7 @@ for ii = 1:numel(sessions2analyze)
                 mean(x(keepinds,:)))*y,...
                 staMegaCell{cellInd}.data,coef,'uniformoutput',false);
             var_ = cellfun(@(x) sum(x.^2),proj,'uniformoutput',false);
-            normvar_ = cellfun(@(x,y) cumsum(x)./sum(y),var_,totalvar,'uniformoutput',false);
+            normvar_ = cellfun(@(x,y) cumsum(x)./sum(y),var_,var_,'uniformoutput',false); % second input can be totalvar if you want to get a sense of relative variance captured by one context vs. another
             projcell{contextind_}.scree      = normvar_;
             projcell{contextind_}.context    = contextNames{contextind_};
         end
@@ -179,64 +184,161 @@ for ii = 1:numel(sessions2analyze)
         projMegaCell{cellInd}.dataKept   = dataKept;
     end
     
-    % now make a series of plots
-    alabs = vertcat(arraynames,'pooled');
-    for cellInd = 1:numel(projMegaCell)
-        figure
-        thisCell = projMegaCell{cellInd};
-        epochAlign = thisCell.epochAlign;
-        dataKept   = thisCell.dataKept;
-        thisData   = thisCell.data;
-        
-        nsubplots = numel(thisData);
-        
-        ylab = sprintf('Fraction of %s %smovement variance captured (%s)',dataKept,epochAlign,sessions2analyze{ii});
-        
-        for subPlotInd = 1:nsubplots
-            subplot(1,nsubplots,subPlotInd)
-            thisScree   = thisData{subPlotInd}.scree;
-            thisContext = thisData{subPlotInd}.context;
-            
-            for areaInd = 1:numel(thisScree)
-                thisAreaScree = thisScree{areaInd};
-                whichColor = ismember( colorStruct.labels, alabs{areaInd} );
-                whichColor = colorStruct.colors(whichColor,:);
-                hold all
-                plot(0:numel(thisAreaScree),[0,thisAreaScree(:)'],'linewidth',1,'color',whichColor)
-                hold all
-                plot([0,numel(thisAreaScree)],thisAreaScree(end)*[1 1],'linewidth',1,'linestyle','--','color',whichColor)
-            end
-            
-            xlim([0 30])
-            ylim([0 1])
-            title(thisContext)
-            if subPlotInd == 1
-                xlabel('Number of Principal Components')
-                ylabel(ylab)
-            else
-                % pass
-            end
-            
-            if subPlotInd == nsubplots
-                customlegend( colorStruct.labels, 'colors', colorStruct.colors )
-            else
-                % pass
-            end
-        end
-    end  
+    %     % now make a series of plots
+    %     alabs = vertcat(arraynames,'pooled');
+    %     for cellInd = 1:numel(projMegaCell)
+    %         figure
+    %         thisCell = projMegaCell{cellInd};
+    %         epochAlign = thisCell.epochAlign;
+    %         dataKept   = thisCell.dataKept;
+    %         thisData   = thisCell.data;
+    %
+    %         nsubplots = numel(thisData);
+    %
+    %         ylab = sprintf('Fraction of %s %smovement variance captured (%s)',dataKept,epochAlign,sessions2analyze{ii});
+    %
+    %         for subPlotInd = 1:nsubplots
+    %             subplot(1,nsubplots,subPlotInd)
+    %             thisScree   = thisData{subPlotInd}.scree;
+    %             thisContext = thisData{subPlotInd}.context;
+    %
+    %             for areaInd = 1:numel(thisScree)
+    %                 thisAreaScree = thisScree{areaInd};
+    %                 whichColor = ismember( colorStruct.labels, alabs{areaInd} );
+    %                 whichColor = colorStruct.colors(whichColor,:);
+    %                 hold all
+    %                 plot(0:numel(thisAreaScree),[0,thisAreaScree(:)'],'linewidth',1,'color',whichColor)
+    %                 % only need to include these lines if you're computing each context's contribution to the total variance and not just the fraction of variance captured within each context
+    %                 hold all
+    %                 plot([0,numel(thisAreaScree)],thisAreaScree(end)*[1 1],'linewidth',1,'linestyle','--','color',whichColor)
+    %             end
+    %
+    %             xlim([0 30])
+    %             ylim([0 1])
+    %             title(thisContext)
+    %             if subPlotInd == 1
+    %                 xlabel('Number of Principal Components')
+    %                 ylabel(ylab)
+    %             else
+    %                 % pass
+    %             end
+    %
+    %             if subPlotInd == nsubplots
+    %                 customlegend( colorStruct.labels, 'colors', colorStruct.colors )
+    %             else
+    %                 % pass
+    %             end
+    %         end
+    %     end
                 
-% TODO:
-% remember the point you're trying to make here
-
-% forget about distribution of variance across contexts (which you just
-% wasted a BUNCH of time visualizing...) (and which tells the exact story
-% you expected it to anyway - yeah, AIP has more explicit vision than the other two,
-% big whoop, the point is to see how ORTHOGONAL that visual component is
-% w.r.t. the movement component, which these plots do NOT address!)
-
-% just report how much is preserved after orthogonalization at both
-% alignments
-            
-        
+    % remember the point you're trying to make here
     
+    % forget about distribution of variance across contexts (which you just
+    % wasted a BUNCH of time visualizing...) (and which tells the exact story
+    % you expected it to anyway - yeah, AIP has more explicit vision than the other two,
+    % big whoop, the point is to see how ORTHOGONAL that visual component is
+    % w.r.t. the movement component, which these plots do NOT address!)
+    
+    % just report how much is preserved after orthogonalization at both
+    % alignments
+    
+    % so we split it by epoch:
+    % we'll have # sessions curves for each area
+    % we will KEEP the bounding by total (explainable) variance at first
+    % and if the message is too hard to glean we can mess with that
+            
+    % col 1 = pre, col 2 = peri
+    % row 1 = allobj, row 2 = allcontext
+    allObjCell     = cellfun(@(x) cellfun(@(y) y.scree,x.data,'uniformoutput',false),...
+        projMegaCell(1,:),'uniformoutput',false);
+    allContextCell = cellfun(@(x) cellfun(@(y) y.scree,x.data,'uniformoutput',false),...
+        projMegaCell(2,:),'uniformoutput',false);
+    % pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
+    
+    seshcell{ii,1} = allObjCell;
+    seshcell{ii,2} = allContextCell;
 end
+
+% (session,allobj/allcontext) -> pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
+x = cellfun(@(x) x{1},seshcell,'uniformoutput',false); % pre  = x
+y = cellfun(@(x) x{2},seshcell,'uniformoutput',false); % peri = y
+
+% for each data type AND animal:
+animalNames = cellfun(@(x) x(1:(end-2)),sessions2analyze,'uniformoutput',false);
+
+[uniqueAnimalNames,~,uniqueAnimalInds] = ...
+    unique(char(animalNames),'rows');
+
+for animalInd = 1:max(uniqueAnimalInds)
+    keepInds = uniqueAnimalInds == animalInd;
+    for dataTypeInd = 1:size(x,2) % allobj vs allcontext
+        figure
+        x_thisDataType = x(keepInds,dataTypeInd);
+        y_thisDataType = y(keepInds,dataTypeInd);
+        nContexts = numel(x_thisDataType{1});
+        
+        if dataTypeInd == 1
+            contextNames = {'active','passive'};
+            typeName     = 'all objects';
+        else
+            contextNames = {'active','control','passive'};
+            typeName     = 'all contexts';
+        end
+        
+        for contextInd = 1:nContexts
+            x_thisContext = cellfun(@(x) x{contextInd},x_thisDataType,'uniformoutput',false);
+            y_thisContext = cellfun(@(x) x{contextInd},y_thisDataType,'uniformoutput',false);
+            
+            subplot(1,nContexts,contextInd)
+            nAreas = numel(colorStruct.labels);
+            
+            for areaInd = 1:nAreas
+                x_thisArea = cellfun(@(x) x{areaInd},x_thisContext,'uniformoutput',false);
+                y_thisArea = cellfun(@(x) x{areaInd},y_thisContext,'uniformoutput',false);
+                thisColor  = colorStruct.colors(areaInd,:);
+                
+                for sessionInd = 1:numel(x_thisArea)
+                    hold all
+                    x_thisSession = x_thisArea{sessionInd};
+                    y_thisSession = y_thisArea{sessionInd};
+                    scatter(x_thisSession,y_thisSession,16,thisColor)
+                end
+            end
+            
+            xlab = sprintf('%s | %s | FVE pre-movement',...
+                strtrim( uniqueAnimalNames(animalInd,:) ),...
+                typeName);
+            ylab = sprintf('%s | %s | FVE peri-movement',...
+                strtrim( uniqueAnimalNames(animalInd,:) ),...
+                typeName);
+            
+            xlabel(xlab)
+            ylabel(ylab)
+            title( contextNames{contextInd} )
+            customlegend( colorStruct.labels,'colors',colorStruct.colors )
+            
+            % plot unity line
+            hold all
+            xl = get(gca,'xlim');
+            yl = get(gca,'ylim');
+            combinedLims = [0, min(max(xl),max(yl))];
+            line(combinedLims,combinedLims,'linewidth',1,'color',[0 0 0],'linestyle','--')
+            axis square
+        end
+    end
+end
+
+
+pause(1)
+
+% TODO: null models, and consider re-merging the contexts (the "control"
+% context doesn't really tell us anything super interesting, honestly... it
+% just looks like the "active" condition, meaning the main effect in our
+% data is the difference between active & passive) (this might control for
+% SOMETHING, but idk what, so may as well not burden the reader with it)
+
+% to make a null model:
+% take the scree plot of the NATIVE PCA of the peri-movement data, then
+% generate a hyperspherically random orthonormal projection, then generate
+% a covariance matrix and compute projections along the NON-NATIVE PCA
+% space

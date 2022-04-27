@@ -89,10 +89,19 @@ file2check4 = fullfile(cd_,'ResultsExplorer','Data','sustainData.mat');
 if ~exist(file2check4,'file')
     compileSustainData(hObject,eventdata,handles);
 else
-    load(file2check4);
+    load(file2check4); %#ok<LOAD>
+    % seshCell
+    % trialAverageCell
+    % ncompsConservative
+    % ncompsAggressive
+    setappdata(handles.output,'seshCell',seshCell)
+    setappdata(handles.output,'trialAverageCell',trialAverageCell)
+    setappdata(handles.output,'ncompsConservative',ncompsConservative)
+    setappdata(handles.output,'ncompsAggressive',ncompsAggressive)
 end
     
-
+plotVarianceCaptured(hObject,eventdata,handles);
+plotProjections(hObject, eventdata, handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -120,6 +129,7 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
+plotProjections(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -143,6 +153,7 @@ function areaSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from areaSelector
+plotProjections(hObject, eventdata, handles)
 
 
 % --- Executes during object creation, after setting all properties.
@@ -174,6 +185,7 @@ function saveProjectionPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to saveProjectionPlot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+dataSaver(hObject,eventdata,handles,'projectionPlot');
 
 
 % --- Executes on button press in saveVariancePlot.
@@ -181,6 +193,7 @@ function saveVariancePlot_Callback(hObject, eventdata, handles)
 % hObject    handle to saveVariancePlot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+dataSaver(hObject,eventdata,handles,'variancePlot');
 
 
 % --- Executes on button press in saveStats.
@@ -188,3 +201,4 @@ function saveStats_Callback(hObject, eventdata, handles)
 % hObject    handle to saveStats (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('nothing here buddy!')

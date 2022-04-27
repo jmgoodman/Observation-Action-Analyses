@@ -18,7 +18,8 @@ analysisOutputsDir = getappdata(handles.output,'analysisOutputsDir');
 sessions2analyze = get(handles.sessionSelector,'String');
 
 tic
-seshcell = cell(numel(sessions2analyze),2); % col 1 = allTT, col2 = allcontext
+seshCell         = cell(numel(sessions2analyze),2); % col 1 = allTT, col2 = allcontext
+trialAverageCell = cell(numel(sessions2analyze),1);
 
 ncompsConservative = zeros( numel(sessions2analyze),4 );
 ncompsAggressive   = zeros( numel(sessions2analyze),4 );
@@ -203,101 +204,115 @@ for ii = 1:numel(sessions2analyze)
     % row 1 = allobj, row 2 = allcontext
     % pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
     
-    seshcell{ii,1} = projMegaCell(1,:);
-    seshcell{ii,2} = projMegaCell(2,:);
+    seshCell{ii,1} = projMegaCell(1,:);
+    seshCell{ii,2} = projMegaCell(2,:);
+    trialAverageCell{ii} = staMegaCell;
     toc
 end
 
-% (session,allobj/allcontext) -> pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
-x = cellfun(@(x) x{1},seshcell,'uniformoutput',false); % pre  = x
-y = cellfun(@(x) x{2},seshcell,'uniformoutput',false); % peri = y
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+[cd_,~,~] = fileparts(cd_);
+file2save = fullfile(cd_,'Data','sustainData.mat');
+save(file2save,'seshCell','trialAverageCell','ncompsConservative',...
+    'ncompsAggressive','-v7.3')
 
-% for each data type AND animal:
-animalNames = cellfun(@(x) x(1:(end-2)),sessions2analyze,'uniformoutput',false);
+setappdata(handles.output,'seshCell',seshCell)
+setappdata(handles.output,'trialAverageCell',trialAverageCell)
+setappdata(handles.output,'ncompsConservative',ncompsConservative)
+setappdata(handles.output,'ncompsAggressive',ncompsAggressive)
 
-[uniqueAnimalNames,~,uniqueAnimalInds] = ...
-    unique(char(animalNames),'rows');
-
-for animalInd = 1:max(uniqueAnimalInds)
-    keepInds = uniqueAnimalInds == animalInd;
-    for dataTypeInd = 1:size(x,2) % allobj vs allcontext
-        figure
-        x_thisDataType = x(keepInds,dataTypeInd);
-        y_thisDataType = y(keepInds,dataTypeInd);
-        
-        nC = ncompsConservative(keepInds,:);
-        nA = ncompsAggressive(keepInds,:);
-        
-        if dataTypeInd == 1
-            typeName     = 'all objects';
-        else
-            typeName     = 'all contexts';
-        end
-        
-        nAreas = numel(colorStruct.labels);
-        for areaInd = 1:nAreas
-            x_thisArea = cellfun(@(x) x.data{areaInd},x_thisDataType,'uniformoutput',false);
-            y_thisArea = cellfun(@(x) x.data{areaInd},y_thisDataType,'uniformoutput',false);
-            nullModel_thisArea = cellfun(@(x) x.nullModel{areaInd},y_thisDataType,'uniformoutput',false); % no need to check pre- vs- pre: we know for a fact that's gonna ALIGN better than chance
-            thisColor  = colorStruct.colors(areaInd,:);
-            
-            for sessionInd = 1:numel(x_thisArea)
-                nCons = nC(sessionInd,areaInd);
-                nAgg  = nA(sessionInd,areaInd);
-                hold all
-                x_thisSession = x_thisArea{sessionInd};
-                y_thisSession = y_thisArea{sessionInd};
-                null_thisSession = mean( nullModel_thisArea{sessionInd} );
-                scatter(x_thisSession,y_thisSession,16,thisColor)
-                hold all
-                plot(x_thisSession,null_thisSession,'linewidth',1,'color',0.5*thisColor+0.5)
-                hold all
-                plot(x_thisSession([nCons,nAgg]),y_thisSession([nCons,nAgg]),...
-                    'ko','markersize',12,'linewidth',1.5,'color',thisColor)
-            end
-        end
-        
-        xlab = sprintf('%s | %s | FVE pre-movement',...
-            strtrim( uniqueAnimalNames(animalInd,:) ),...
-            typeName);
-        ylab = sprintf('%s | %s | FVE peri-movement',...
-            strtrim( uniqueAnimalNames(animalInd,:) ),...
-            typeName);
-        
-        xlabel(xlab)
-        ylabel(ylab)
-        customlegend( colorStruct.labels,'colors',colorStruct.colors )
-        
-        % plot unity line
-        hold all
-        xl = get(gca,'xlim');
-        yl = get(gca,'ylim');
-        combinedLims = [0, min(max(xl),max(yl))];
-        line(combinedLims,combinedLims,'linewidth',1,'color',[0 0 0],'linestyle','--')
-        axis square
-    end
-end
-
-
-% TODO: null models, and consider re-merging the contexts (the "control"
-% context doesn't really tell us anything super interesting, honestly... it
-% just looks like the "active" condition, meaning the main effect in our
-% data is the difference between active & passive) (this might control for
-% SOMETHING, but idk what, so may as well not burden the reader with it)
-
-% to make a null model:
-% take the scree plot of the NATIVE PCA of the peri-movement data, then
-% generate a hyperspherically random orthonormal projection, then generate
-% a covariance matrix and compute projections along the NON-NATIVE PCA
-% space
-
-% okay so:
-% NOT more orthogonal than random
-% but way closer to orthogonal than aligned
-% (control: test vision vs. preCue, contrast with vision vs. periMove?) (I
-% need a win here... a way to say that we're more orthogonal than SOMETHING
-% here... since our random surrogate is actually MORE orthogonal than our
-% data are) (OR we just report the data as they are, forget about a point
-% of comparison, and simply point to the chasm of variance between our
-% curve and the unity line, with a throwaway mention of how it's more
-% aligned than chance but that's frankly expected?)
+%% test plots
+% % (session,allobj/allcontext) -> pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
+% x = cellfun(@(x) x{1},seshCell,'uniformoutput',false); % pre  = x
+% y = cellfun(@(x) x{2},seshCell,'uniformoutput',false); % peri = y
+% 
+% % for each data type AND animal:
+% animalNames = cellfun(@(x) x(1:(end-2)),sessions2analyze,'uniformoutput',false);
+% 
+% [uniqueAnimalNames,~,uniqueAnimalInds] = ...
+%     unique(char(animalNames),'rows');
+% 
+% for animalInd = 1:max(uniqueAnimalInds)
+%     keepInds = uniqueAnimalInds == animalInd;
+%     for dataTypeInd = 1:size(x,2) % allobj vs allcontext
+%         figure
+%         x_thisDataType = x(keepInds,dataTypeInd);
+%         y_thisDataType = y(keepInds,dataTypeInd);
+%         
+%         nC = ncompsConservative(keepInds,:);
+%         nA = ncompsAggressive(keepInds,:);
+%         
+%         if dataTypeInd == 1
+%             typeName     = 'all objects';
+%         else
+%             typeName     = 'all contexts';
+%         end
+%         
+%         nAreas = numel(colorStruct.labels);
+%         for areaInd = 1:nAreas
+%             x_thisArea = cellfun(@(x) x.data{areaInd},x_thisDataType,'uniformoutput',false);
+%             y_thisArea = cellfun(@(x) x.data{areaInd},y_thisDataType,'uniformoutput',false);
+%             nullModel_thisArea = cellfun(@(x) x.nullModel{areaInd},y_thisDataType,'uniformoutput',false); % no need to check pre- vs- pre: we know for a fact that's gonna ALIGN better than chance
+%             thisColor  = colorStruct.colors(areaInd,:);
+%             
+%             for sessionInd = 1:numel(x_thisArea)
+%                 nCons = nC(sessionInd,areaInd);
+%                 nAgg  = nA(sessionInd,areaInd);
+%                 hold all
+%                 x_thisSession = x_thisArea{sessionInd};
+%                 y_thisSession = y_thisArea{sessionInd};
+%                 null_thisSession = mean( nullModel_thisArea{sessionInd} );
+%                 scatter(x_thisSession,y_thisSession,16,thisColor)
+%                 hold all
+%                 plot(x_thisSession,null_thisSession,'linewidth',1,'color',0.5*thisColor+0.5)
+%                 hold all
+%                 plot(x_thisSession([nCons,nAgg]),y_thisSession([nCons,nAgg]),...
+%                     'ko','markersize',12,'linewidth',1.5,'color',thisColor)
+%             end
+%         end
+%         
+%         xlab = sprintf('%s | %s | FVE pre-movement',...
+%             strtrim( uniqueAnimalNames(animalInd,:) ),...
+%             typeName);
+%         ylab = sprintf('%s | %s | FVE peri-movement',...
+%             strtrim( uniqueAnimalNames(animalInd,:) ),...
+%             typeName);
+%         
+%         xlabel(xlab)
+%         ylabel(ylab)
+%         customlegend( colorStruct.labels,'colors',colorStruct.colors )
+%         
+%         % plot unity line
+%         hold all
+%         xl = get(gca,'xlim');
+%         yl = get(gca,'ylim');
+%         combinedLims = [0, min(max(xl),max(yl))];
+%         line(combinedLims,combinedLims,'linewidth',1,'color',[0 0 0],'linestyle','--')
+%         axis square
+%     end
+% end
+% 
+% 
+% % TODO: null models, and consider re-merging the contexts (the "control"
+% % context doesn't really tell us anything super interesting, honestly... it
+% % just looks like the "active" condition, meaning the main effect in our
+% % data is the difference between active & passive) (this might control for
+% % SOMETHING, but idk what, so may as well not burden the reader with it)
+% 
+% % to make a null model:
+% % take the scree plot of the NATIVE PCA of the peri-movement data, then
+% % generate a hyperspherically random orthonormal projection, then generate
+% % a covariance matrix and compute projections along the NON-NATIVE PCA
+% % space
+% 
+% % okay so:
+% % NOT more orthogonal than random
+% % but way closer to orthogonal than aligned
+% % (control: test vision vs. preCue, contrast with vision vs. periMove?) (I
+% % need a win here... a way to say that we're more orthogonal than SOMETHING
+% % here... since our random surrogate is actually MORE orthogonal than our
+% % data are) (OR we just report the data as they are, forget about a point
+% % of comparison, and simply point to the chasm of variance between our
+% % curve and the unity line, with a throwaway mention of how it's more
+% % aligned than chance but that's frankly expected?)

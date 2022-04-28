@@ -23,6 +23,7 @@ trialAverageCell = cell(numel(sessions2analyze),1);
 
 ncompsConservative = zeros( numel(sessions2analyze),4 );
 ncompsAggressive   = zeros( numel(sessions2analyze),4 );
+objectNames        = cell( numel(sessions2analyze),1 );
 
 for ii = 1:numel(sessions2analyze)
     commonSpaceFile = fullfile(analysisOutputsDir,sessions2analyze{ii},...
@@ -97,9 +98,22 @@ for ii = 1:numel(sessions2analyze)
             end
             
             % use TT x object x context to make the sorted trial average for each area
-            [~,~,trialsortlabels] = unique( [keptlabels.trialcontexts.uniqueinds,...
+            [trialsortinds,~,trialsortlabels] = unique( [keptlabels.trialcontexts.uniqueinds,...
                 keptlabels.turntablelabels.uniqueinds,...
                 keptlabels.objects.uniqueinds],'rows' );
+            
+            tinds  = trialsortinds(1:(size(trialsortinds,1)/2),2:3);
+            if dataType == 1 && epochAlign == 1
+                onames = cell(6,max(tinds(:,1)));
+                for rowind = 1:size(tinds,1)
+                    oname = keptlabels.objects.uniquenames{ tinds(rowind,2) };
+                    onames{ mod(rowind-1,6)+1, tinds(rowind,1)} = oname;
+                end
+                
+                objectNames{ii} = onames;
+            else
+                % pass
+            end
             
             stacell = cell(size(keptdata));
             for aind = 1:numel(keptdata)
@@ -215,13 +229,13 @@ mfd = mfilename('fullpath');
 [cd_,~,~] = fileparts(cd_);
 file2save = fullfile(cd_,'Data','sustainData.mat');
 save(file2save,'seshCell','trialAverageCell','ncompsConservative',...
-    'ncompsAggressive','-v7.3')
+    'ncompsAggressive','objectNames','-v7.3')
 
 setappdata(handles.output,'seshCell',seshCell)
 setappdata(handles.output,'trialAverageCell',trialAverageCell)
 setappdata(handles.output,'ncompsConservative',ncompsConservative)
 setappdata(handles.output,'ncompsAggressive',ncompsAggressive)
-
+setappdata(handles.output,'objectNames',objectNames)
 %% test plots
 % % (session,allobj/allcontext) -> pre / peri -> active / (control) / passive -> AIP / F5 / M1 / pooled
 % x = cellfun(@(x) x{1},seshCell,'uniformoutput',false); % pre  = x

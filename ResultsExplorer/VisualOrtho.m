@@ -98,6 +98,7 @@ else
     setappdata(handles.output,'trialAverageCell',trialAverageCell)
     setappdata(handles.output,'ncompsConservative',ncompsConservative)
     setappdata(handles.output,'ncompsAggressive',ncompsAggressive)
+    setappdata(handles.output,'objectNames',objectNames)
 end
     
 plotVarianceCaptured(hObject,eventdata,handles);

@@ -52,7 +52,7 @@ for seshInd = 1:size(Xvals,1)
         
         hold all
         text(x,y,textLabel,'horizontalalign','center','verticalalign','middle',...
-            'fontname','helvetica','fontsize',12,'color',colorStruct.colors(arrayInd,:))
+            'fontname','helvetica','fontsize',20,'color',colorStruct.colors(arrayInd,:))
     end
 end
 

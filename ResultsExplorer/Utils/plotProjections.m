@@ -346,10 +346,10 @@ for objInd = 1:2
                     addMe = 0;
                 case 2
                     inds  = 51:150;
-                    addMe = 10;
+                    addMe = 15;
                 case 3
                     inds  = 151:250;
-                    addMe = 20;
+                    addMe = 30;
             end
             
             hold all
@@ -362,24 +362,37 @@ for objInd = 1:2
         end
     end
 end
+
+olabs = oNames{seshIdx}(indices_);
+hasSpace = cellfun(@(x) ~isempty(regexpi(x,'(\s|\d)','once')),olabs);
+
+if any(hasSpace)
+    olabs(hasSpace) = cellfun(@(x) regexpi(x,'(\s|\d)','split'),...
+        olabs(hasSpace),'uniformoutput',false);
+    olabs(hasSpace) = cellfun(@(x) x{1},olabs(hasSpace),'uniformoutput',false);
+end
+
+areSpecial = cellfun(@(x) strcmpi(x,'Special'),olabs);
+olabs(areSpecial) = cellfun(@(x) 'Abstract',olabs(areSpecial),'uniformoutput',false);
+
 axes(handles.projectionPlot0)
 axis tight
 ylim(yl_pre)
-xlabel('time')
-ylabel('preSpace')
-customlegend(oNames{seshIdx}(indices_),'colors',[contextClors(1,:);0.7 0.7 0.7])
-set(gca,'xtick',[1 50 60 110.5 160 170 220.5 270],'xticklabel',{'Object Illumination',...
-    '+500','-500','Go cue','+500','-500','Object Lift','+500 ms'},...
+xlabel('Time (ms)')
+ylabel('First visual principal component')
+customlegend(olabs,'colors',[contextClors(1,:);0.7 0.7 0.7])
+set(gca,'xtick',[1 50 115.5 165 230.5 280],'xticklabel',{'Object Illumination',...
+    '+500','Go cue','+500','Object Lift','+500'},...
     'xticklabelrotation',-45)
 
 axes(handles.projectionPlot1)
 axis tight
 ylim(yl_pre)
-xlabel('time')
-ylabel('preSpace')
-customlegend(oNames{seshIdx}(indices_),'colors',[contextClors(2,:);0.7 0.7 0.7])
-set(gca,'xtick',[1 50 60 110.5 160 170 220.5 270],'xticklabel',{'Object Illumination',...
-    '+500','-500','Go cue','+500','-500','Object Lift','+500 ms'},...
+xlabel('Time (ms)')
+ylabel('First visual principal component')
+customlegend(olabs,'colors',[contextClors(2,:);0.7 0.7 0.7])
+set(gca,'xtick',[1 50 115.5 165 230.5 280],'xticklabel',{'Object Illumination',...
+    '+500','Go cue','+500','Object Lift','+500'},...
     'xticklabelrotation',-45)
 
 axes(handles.projectionPlot2)
@@ -409,10 +422,10 @@ for objInd = 1:2
                     addMe = 0;
                 case 2
                     inds  = 51:150;
-                    addMe = 10;
+                    addMe = 15;
                 case 3
                     inds  = 151:250;
-                    addMe = 20;
+                    addMe = 30;
             end
             
             hold all
@@ -425,14 +438,27 @@ for objInd = 1:2
         end
     end
 end
+
+olabs = oNames{seshIdx}(indices);
+hasSpace = cellfun(@(x) ~isempty(regexpi(x,'(\s|\d)','once')),olabs);
+
+if any(hasSpace)
+    olabs(hasSpace) = cellfun(@(x) regexpi(x,'(\s|\d)','split'),...
+        olabs(hasSpace),'uniformoutput',false);
+    olabs(hasSpace) = cellfun(@(x) x{1},olabs(hasSpace),'uniformoutput',false);
+end
+
+areSpecial = cellfun(@(x) strcmpi(x,'Special'),olabs);
+olabs(areSpecial) = cellfun(@(x) 'Abstract',olabs(areSpecial),'uniformoutput',false);
+
 axes(handles.projectionPlot2)
 axis tight
 ylim(yl_post)
 xlabel('Time (ms)')
-ylabel('First visual principal component')
-customlegend(oNames{seshIdx}(indices),'colors',[contextClors(1,:);0.7 0.7 0.7])
-set(gca,'xtick',[1 50 60 110.5 160 170 220.5 270],'xticklabel',{'Object Illumination',...
-    '+500','-500','Go cue','+500','-500','Object Lift','+500 ms'},...
+ylabel('First movement principal component')
+customlegend(olabs,'colors',[contextClors(1,:);0.7 0.7 0.7])
+set(gca,'xtick',[1 50 115.5 165 230.5 280],'xticklabel',{'Object Illumination',...
+    '+500','Go cue','+500','Object Lift','+500'},...
     'xticklabelrotation',-45)
 
 axes(handles.projectionPlot3)
@@ -440,8 +466,8 @@ axis tight
 ylim(yl_post)
 xlabel('Time (ms)')
 ylabel('First movement principal component')
-customlegend(oNames{seshIdx}(indices),'colors',[contextClors(2,:);0.7 0.7 0.7])
-set(gca,'xtick',[1 50 60 110.5 160 170 220.5 270],'xticklabel',{'Object Illumination',...
-    '+500','-500','Go cue','+500','-500','Object Lift','+500 ms'},...
+customlegend(olabs,'colors',[contextClors(2,:);0.7 0.7 0.7])
+set(gca,'xtick',[1 50 115.5 165 230.5 280],'xticklabel',{'Object Illumination',...
+    '+500','Go cue','+500','Object Lift','+500'},...
     'xticklabelrotation',-45)
 %% now put it in the gui

@@ -22,7 +22,7 @@ function varargout = plotPreview(varargin)
 
 % Edit the above text to modify the response to help plotPreview
 
-% Last Modified by GUIDE v2.5 29-Mar-2022 12:57:37
+% Last Modified by GUIDE v2.5 28-Apr-2022 17:55:25
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -88,6 +88,8 @@ set(handles.plotAxes,'DataAspectRatioMode','auto')
 set(handles.horizontalSizeSlider,'Max',7.5,'Value',3.75);
 set(handles.verticalSizeSlider,'Max',10,'Value',4.5);
 set(handles.textSizeSlider,'Max',32,'Value',10);
+set(handles.xRotationSlider,'Min',-90,'Max',90,'Value',0)
+set(handles.yRotationSlider,'Min',-90,'Max',90,'Value',0)
 
 % testing colorbars
 % handles.plotAxes = pairedColorBar(handles.plotAxes,'hello','fontsize',10);
@@ -97,6 +99,8 @@ set(handles.textSizeSlider,'Max',32,'Value',10);
 pairedSliderText(handles.horizontalSizeSlider, eventdata, handles, 'horizontalSizeSlider', 'horizontalSize');
 pairedSliderText(handles.verticalSizeSlider, eventdata, handles, 'verticalSizeSlider', 'verticalSize');
 pairedSliderText(handles.textSizeSlider, eventdata, handles, 'textSizeSlider', 'textSize');
+pairedSliderText(handles.xRotationSlider, eventdata, handles, 'xRotationSlider', 'xRotation');
+pairedSliderText(handles.yRotationSlider, eventdata, handles, 'yRotationSlider', 'yRotation');
 
 % now set the properties
 % note: while I would PREFER to set OuterPosition, I am stuck manipulating
@@ -388,4 +392,114 @@ function dpi_CreateFcn(hObject, eventdata, handles)
 %       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
+end
+
+
+
+function xRotation_Callback(hObject, eventdata, handles)
+% hObject    handle to xRotation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of xRotation as text
+%        str2double(get(hObject,'String')) returns contents of xRotation as a double
+
+pairedSliderText(hObject, eventdata, handles, 'xRotationSlider', 'xRotation');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function xRotation_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to xRotation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function yRotation_Callback(hObject, eventdata, handles)
+% hObject    handle to yRotation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of yRotation as text
+%        str2double(get(hObject,'String')) returns contents of yRotation as a double
+
+pairedSliderText(hObject, eventdata, handles, 'yRotationSlider', 'yRotation');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function yRotation_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to yRotation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on slider movement.
+function xRotationSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to xRotationSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+pairedSliderText(hObject, eventdata, handles, 'xRotationSlider', 'xRotation');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function xRotationSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to xRotationSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+% --- Executes on slider movement.
+function yRotationSlider_Callback(hObject, eventdata, handles)
+% hObject    handle to yRotationSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+
+pairedSliderText(hObject, eventdata, handles, 'yRotationSlider', 'yRotation');
+
+% now set the properties
+setPlotAxesProperties(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function yRotationSlider_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to yRotationSlider (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
 end

@@ -62,8 +62,8 @@ line([0 1],[0 1],'linewidth',1,'linestyle','--','color',[0 0 0])
 xlim([0 1])
 ylim([0 1])
 
-xlabel('FVE pre-go')
-ylabel('FVE peri-movement')
+xlabel('FVE visual')
+ylabel('FVE movement')
 axis square
 
 colorStruct = defColorConvention(); % get back to this order to maintain consistency with other plots

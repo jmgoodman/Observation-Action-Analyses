@@ -186,7 +186,10 @@ function saveProjectionPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to saveProjectionPlot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-dataSaver(hObject,eventdata,handles,'projectionPlot');
+for ii = 0:3
+    dataSaver(hObject,eventdata,handles,['projectionPlot',num2str(ii)]);
+    uiwait;
+end
 
 
 % --- Executes on button press in saveVariancePlot.

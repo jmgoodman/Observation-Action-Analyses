@@ -96,4 +96,8 @@ for objInd = 1:numel(textObjs)
     set(textObjs(objInd),'fontsize',newFontSize)
 end
 
+% now set axis label rotations
+set(gca,'xticklabelrotation',get( handles.xRotationSlider,'Value' ),...
+    'yticklabelrotation',get( handles.yRotationSlider,'Value' ) )
+
 return

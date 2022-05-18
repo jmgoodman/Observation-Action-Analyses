@@ -6,3 +6,5 @@
  Code here should work across a wide variety of MATLAB versions, spanning from MATLAB 2015a to MATLAB 2018b to MATLAB 2020b.
 
  A step-by-step guide to reproducing my results using this codebase is forthcoming. It will require datasets which are planned to be hosted elsewhere.
+
+ Most recent analysis version: 10. Mar. 2022

@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 13:32:16
+% Last Modified by GUIDE v2.5 18-May-2022 10:40:03
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -144,8 +144,31 @@ function saveDimSweep_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on button press in saveStats.
-function saveStats_Callback(hObject, eventdata, handles)
-% hObject    handle to saveStats (see GCBO)
+% --- Executes on button press in saveClassify.
+function saveClassify_Callback(hObject, eventdata, handles)
+% hObject    handle to saveClassify (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on selection change in listbox1.
+function listbox1_Callback(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from listbox1
+
+
+% --- Executes during object creation, after setting all properties.
+function listbox1_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to listbox1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

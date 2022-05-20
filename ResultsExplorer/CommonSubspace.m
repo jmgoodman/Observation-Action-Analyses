@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 18-May-2022 10:40:03
+% Last Modified by GUIDE v2.5 19-May-2022 10:29:51
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,6 +55,49 @@ function CommonSubspace_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for CommonSubspace
 handles.output = hObject;
 
+% pull data and set to the handles structure as appdata
+mfd = mfilename('fullpath');
+[cd_,~,~] = fileparts(mfd);
+[cd_,~,~] = fileparts(cd_);
+
+mirrorDataDir      = fullfile(cd_,'MirrorData');
+analysisOutputsDir = fullfile(cd_,'Analysis-Outputs');
+
+setappdata(handles.output,'mirrorDataDir',mirrorDataDir)
+setappdata(handles.output,'analysisOutputsDir',analysisOutputsDir);
+
+sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara68';'Zara70'};
+set(handles.sessionSelector,'String',sessions2analyze);
+
+arrays2analyze = {'pooled';'AIP';'F5';'M1'};
+set(handles.areaSelector,'String',arrays2analyze)
+
+colorStruct = defColorConvention(); 
+setappdata(handles.output,'colorStruct',colorStruct)
+
+% load in data
+seshNames = get(handles.sessionSelector,'String');
+seshInd   = get(handles.sessionSelector,'Value');
+thisSesh  = seshNames{seshInd};
+seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+    sprintf('commonspace_results_%s.mat',thisSesh) );
+commonSpaceData = load(seshFullFileName);
+setappdata(handles.output,'commonSpaceData',commonSpaceData);
+
+dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
+dataStruct      = load(dataStructFile);
+dataLabels      = extractlabels(dataStruct.datastruct.cellform);
+setappdata(handles.output,'dataStruct',dataStruct);
+setappdata(handles.output,'dataLabels',dataLabels);
+
+currentAnimal = regexpi(thisSesh,'[A-Z,a-z]*','match');
+setappdata(handles.output,'currentAnimal',currentAnimal);
+
+% make plots
+plotCommonProjection(hObject,eventdata,handles);
+% plotCommonDimSweep(hObject,eventdata,handles);
+% plotCommonClassify(hObject,eventdata,handles); % subsample x context1 x context2 x align1 x align2 x subalign1 x subalign2
+
 % Update handles structure
 guidata(hObject, handles);
 
@@ -82,6 +125,25 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
+% load in data
+disp('LOADING...')
+analysisOutputsDir = getappdata(handles.output,'analysisOutputsDir');
+seshNames = get(handles.sessionSelector,'String');
+seshInd   = get(handles.sessionSelector,'Value');
+thisSesh  = seshNames{seshInd};
+seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+    sprintf('commonspace_results_%s.mat',thisSesh) );
+commonSpaceData = load(seshFullFileName);
+setappdata(handles.output,'commonSpaceData',commonSpaceData);
+
+mirrorDataDir   = getappdata(handles.output,'mirrorDataDir');
+dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
+dataStruct      = load(dataStructFile);
+dataLabels      = extractlabels(dataStruct.datastruct.cellform);
+setappdata(handles.output,'dataStruct',dataStruct);
+setappdata(handles.output,'dataLabels',dataLabels);
+disp('...DONE')
+plotCommonProjection(hObject,eventdata,handles);
 
 % --- Executes during object creation, after setting all properties.
 function sessionSelector_CreateFcn(hObject, eventdata, handles)
@@ -104,7 +166,7 @@ function areaSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from areaSelector
-
+plotCommonProjection(hObject,eventdata,handles);
 
 % --- Executes during object creation, after setting all properties.
 function areaSelector_CreateFcn(hObject, eventdata, handles)
@@ -151,19 +213,19 @@ function saveClassify_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --- Executes on selection change in listbox1.
+% --- Executes on selection change in areaSelector.
 function listbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
+% hObject    handle to areaSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox1
+% Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from areaSelector
 
 
 % --- Executes during object creation, after setting all properties.
 function listbox1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
+% hObject    handle to areaSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -172,3 +234,10 @@ function listbox1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% --- Executes on button press in saveCommonStats.
+function saveCommonStats_Callback(hObject, eventdata, handles)
+% hObject    handle to saveCommonStats (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)

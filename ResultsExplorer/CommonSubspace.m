@@ -75,14 +75,31 @@ set(handles.areaSelector,'String',arrays2analyze)
 colorStruct = defColorConvention(); 
 setappdata(handles.output,'colorStruct',colorStruct)
 
-% load in data
-seshNames = get(handles.sessionSelector,'String');
-seshInd   = get(handles.sessionSelector,'Value');
-thisSesh  = seshNames{seshInd};
-seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
-    sprintf('commonspace_results_%s.mat',thisSesh) );
-commonSpaceData = load(seshFullFileName);
-setappdata(handles.output,'commonSpaceData',commonSpaceData);
+% load in data (sorry for all the comments, I should really get around to
+% not being a code hoarder!)
+seshNames = sessions2analyze; %get(handles.sessionSelector,'String');
+% seshInd   = get(handles.sessionSelector,'Value');
+% thisSesh  = seshNames{seshInd};
+% seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+%     sprintf('commonspace_results_%s.mat',thisSesh) );
+% commonSpaceData = load(seshFullFileName);
+% setappdata(handles.output,'commonSpaceData',commonSpaceData);
+
+% load in all data for all sessions of this animal
+% thisAnimal = regexpi( thisSesh,'\d*','split' );
+% thisAnimal = thisAnimal{1};
+% sessions2load = cellfun(@(x) ~isempty( regexpi(x,thisAnimal,'once') ),...
+%     sessions2analyze);
+% sessions2load = sessions2analyze(sessions2load);
+commonSpaceCell = cell(size(seshNames));
+for seshind = 1:numel(commonSpaceCell)
+    thisSesh  = seshNames{seshind};
+    seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+        sprintf('commonspace_results_%s.mat',thisSesh) );
+    temp             = load(seshFullFileName);
+    commonSpaceCell{seshind} = temp.commonspace_FXVE_mov;
+end
+setappdata(handles.output,'allSessionsCommonSpace',commonSpaceCell)
 
 dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
 dataStruct      = load(dataStructFile);
@@ -95,7 +112,7 @@ setappdata(handles.output,'currentAnimal',currentAnimal);
 
 % make plots
 plotCommonProjection(hObject,eventdata,handles);
-% plotCommonDimSweep(hObject,eventdata,handles);
+plotCommonDimSweep(hObject,eventdata,handles);
 % plotCommonClassify(hObject,eventdata,handles); % subsample x context1 x context2 x align1 x align2 x subalign1 x subalign2
 
 % Update handles structure
@@ -126,24 +143,25 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
 % load in data
-disp('LOADING...')
-analysisOutputsDir = getappdata(handles.output,'analysisOutputsDir');
-seshNames = get(handles.sessionSelector,'String');
-seshInd   = get(handles.sessionSelector,'Value');
-thisSesh  = seshNames{seshInd};
-seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
-    sprintf('commonspace_results_%s.mat',thisSesh) );
-commonSpaceData = load(seshFullFileName);
-setappdata(handles.output,'commonSpaceData',commonSpaceData);
-
-mirrorDataDir   = getappdata(handles.output,'mirrorDataDir');
-dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
-dataStruct      = load(dataStructFile);
-dataLabels      = extractlabels(dataStruct.datastruct.cellform);
-setappdata(handles.output,'dataStruct',dataStruct);
-setappdata(handles.output,'dataLabels',dataLabels);
-disp('...DONE')
+% disp('LOADING...')
+% analysisOutputsDir = getappdata(handles.output,'analysisOutputsDir');
+% seshNames = get(handles.sessionSelector,'String');
+% seshInd   = get(handles.sessionSelector,'Value');
+% thisSesh  = seshNames{seshInd};
+% seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+%     sprintf('commonspace_results_%s.mat',thisSesh) );
+% commonSpaceData = load(seshFullFileName);
+% setappdata(handles.output,'commonSpaceData',commonSpaceData);
+% 
+% mirrorDataDir   = getappdata(handles.output,'mirrorDataDir');
+% dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
+% dataStruct      = load(dataStructFile);
+% dataLabels      = extractlabels(dataStruct.datastruct.cellform);
+% setappdata(handles.output,'dataStruct',dataStruct);
+% setappdata(handles.output,'dataLabels',dataLabels);
+% disp('...DONE')
 plotCommonProjection(hObject,eventdata,handles);
+plotCommonDimSweep(hObject,eventdata,handles);
 
 % --- Executes during object creation, after setting all properties.
 function sessionSelector_CreateFcn(hObject, eventdata, handles)

@@ -22,7 +22,9 @@ function plotCommonProjection(hObject, eventdata, handles)
 %     sprintf('commonspace_results_%s.mat',thisSesh) );
 
 % commonSpaceData = load(seshFullFileName);
-commonSpaceData = getappdata(handles.output,'commonSpaceData');
+allSessionData  = getappdata(handles.output,'allSessionsCommonSpace');
+sessionIndex    = get(handles.sessionSelector,'Value');
+commonSpaceData = allSessionData{sessionIndex};
 
 % mirrorDataDir   = getappdata(handles.output,'mirrorDataDir');
 % dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
@@ -35,20 +37,22 @@ dataLabels = getappdata(handles.output,'dataLabels');
 areaNames = get(handles.areaSelector,'String');
 areaInd   = get(handles.areaSelector,'Value');
 thisArea  = areaNames{areaInd};
+thisAreaName = thisArea;
 
 if strcmpi(thisArea,'pooled')
     thisArea = 'all';
+    thisAreaName = 'Pooled';
 else
     % pass
 end
 
-whichDataIn = find( ismember(commonSpaceData.commonspace_FXVE_mov.arraynames,...
+whichDataIn = find( ismember(commonSpaceData.arraynames,...
     thisArea) );
 
 % use the full data, not a subsample iteration (the latter is for stats!)
 % also make it a projection on the optimal plane
-execData = commonSpaceData.commonspace_FXVE_mov.subsamples{end}.exec{whichDataIn,2};
-obsData  = commonSpaceData.commonspace_FXVE_mov.subsamples{end}.obs{whichDataIn,2};
+execData = commonSpaceData.subsamples{end}.exec{whichDataIn,2};
+obsData  = commonSpaceData.subsamples{end}.obs{whichDataIn,2};
 
 % concatenated movement onset + hold onset alignments
 % extract just the stuff centered on movement onset
@@ -92,8 +96,8 @@ theseObjects = dataLabels.objects.uniquenames(bestpair);
 disp(theseObjects);
 
 % print out the variance captured by this plane
-edata = commonSpaceData.commonspace_FXVE_mov.subsamples{end}.exec_{whichDataIn};
-odata = commonSpaceData.commonspace_FXVE_mov.subsamples{end}.obs_{whichDataIn};
+edata = commonSpaceData.subsamples{end}.exec_{whichDataIn};
+odata = commonSpaceData.subsamples{end}.obs_{whichDataIn};
 evar  = sum(var(edata));
 ovar  = sum(var(odata));
 evar_proj = sum(var(execData));
@@ -104,7 +108,7 @@ disp(evar_proj / evar);
 disp('observation variance captured:')
 disp(ovar_proj / ovar);
 
-deltavar = commonSpaceData.commonspace_FXVE_mov.subsamples{end}.lossfunction(whichDataIn,2);
+deltavar = commonSpaceData.subsamples{end}.lossfunction(whichDataIn,2);
 totalvar = norm(edata,'fro')^2 + norm(odata,'fro')^2;
 disp('FVE across contexts by common manifold');
 disp( 1 - deltavar / totalvar );
@@ -151,9 +155,23 @@ for objInd = 1:2
     plot(bestObs(50,1,objInd),bestObs(50,2,objInd),'k>','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
 end
 
+axis tight
 axis equal
 axis square
+xl = [ min(get(gca,'xlim')), max(get(gca,'xlim')) ]; xl = xl + [-1 1]*0.1*range(xl);
+yl = [ min(get(gca,'ylim')), max(get(gca,'ylim')) ]; yl = yl + [-1 1]*0.1*range(yl);
 
+minlim = min([xl,yl]);
+maxlim = max([xl,yl]);
+
+% center on 0
+totalmaxlim = max(abs(minlim),abs(maxlim));
+
+xlim(totalmaxlim*[-1,1])
+ylim(totalmaxlim*[-1,1])
+
+xlabel(sprintf('%s Common Subspace Factor 1',thisAreaName))
+ylabel(sprintf('%s Common Subspace Factor 2',thisAreaName))
 
 
 

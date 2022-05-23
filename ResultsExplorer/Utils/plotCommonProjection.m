@@ -7,7 +7,8 @@ function plotCommonProjection(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
 % this makes a phase-space plot onto the 2D commonspace projection
-% plot 2 contexts (VGG vs Obs) and 2 objects (maximally different)
+% plot 2 contexts (VGG vs Obs) and 2 objects (maximally different). 
+% Panel A!
 
 % step 1: get the target session
 

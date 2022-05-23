@@ -6,5 +6,7 @@ function plotCommonDimSweep(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
-% this makes a phase-space plot onto the 2D commonspace projection
-% plot 2 contexts (VGG vs Obs) and 2 objects (maximally different)
+% this makes a by-area breakdown of the loss function as a function of
+% dimensionality. 
+% Panel B!
+

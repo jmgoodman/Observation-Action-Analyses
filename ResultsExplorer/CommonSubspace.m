@@ -117,7 +117,7 @@ for seshind = 1:numel(commonSpaceCell)
     temp             = load(seshFullFileName);
     classifyCell{seshind}.regularpreortho   = temp.cstruct.normal.preortho;
     classifyCell{seshind}.regularpostortho  = temp.cstruct.normal.postortho;
-    classifyCell{seshind}.commonspace       = temp.cstruct.commonspace.postortho; % subsamp x context x context x align x align x subalign x subalign
+    classifyCell{seshind}.commonspace       = temp.cstruct.commonspace.postortho;
     % within: fold
     % within-within: area (with chance level appended)
 end
@@ -130,7 +130,7 @@ setappdata(handles.output,'currentAnimal',currentAnimal);
 % make plots
 plotCommonProjection(hObject,eventdata,handles);
 plotCommonDimSweep(hObject,eventdata,handles);
-% plotCommonClassify(hObject,eventdata,handles); % subsample x context1 x context2 x align1 x align2 x subalign1 x subalign2
+plotCommonClassify(hObject,eventdata,handles); % subsample x context1 x context2 x align1 x align2 x subalign1 x subalign2
 
 % Update handles structure
 guidata(hObject, handles);

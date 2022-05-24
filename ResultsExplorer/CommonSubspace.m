@@ -101,11 +101,28 @@ for seshind = 1:numel(commonSpaceCell)
 end
 setappdata(handles.output,'allSessionsCommonSpace',commonSpaceCell)
 
+% pull in datastructs
 dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
 dataStruct      = load(dataStructFile);
 dataLabels      = extractlabels(dataStruct.datastruct.cellform);
 setappdata(handles.output,'dataStruct',dataStruct);
 setappdata(handles.output,'dataLabels',dataLabels);
+
+% pull in classification results
+classifyCell = cell(size(seshNames));
+for seshind = 1:numel(commonSpaceCell)
+    thisSesh = seshNames{seshind};
+    seshFullFileName = fullfile( analysisOutputsDir,thisSesh,...
+        sprintf('classification_results_%s.mat',thisSesh) );
+    temp             = load(seshFullFileName);
+    classifyCell{seshind}.regularpreortho   = temp.cstruct.normal.preortho;
+    classifyCell{seshind}.regularpostortho  = temp.cstruct.normal.postortho;
+    classifyCell{seshind}.commonspace       = temp.cstruct.commonspace.postortho; % subsamp x context x context x align x align x subalign x subalign
+    % within: fold
+    % within-within: area (with chance level appended)
+end
+
+setappdata(handles.output,'classifyCell',classifyCell);
 
 currentAnimal = regexpi(thisSesh,'[A-Z,a-z]*','match');
 setappdata(handles.output,'currentAnimal',currentAnimal);

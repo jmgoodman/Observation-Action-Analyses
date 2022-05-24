@@ -25,20 +25,25 @@ thisSesh  = seshNames{seshInd};
 
 classifyCell  = getappdata(handles.output,'classifyCell');
 
-% find all with the same animal
-thisAnimal = regexpi( thisSesh,'\d*','split' );
-thisAnimal = thisAnimal{1};
-sessions2select = cellfun(@(x) ~isempty( regexpi(x,thisAnimal,'once') ),...
-    seshNames);
+% % find all with the same animal
+% thisAnimal = regexpi( thisSesh,'\d*','split' );
+% thisAnimal = thisAnimal{1};
+% sessions2select = cellfun(@(x) ~isempty( regexpi(x,thisAnimal,'once') ),...
+%     seshNames);
 
-if strcmpi(thisAnimal,'Zara')
-    sessions2select(4) = false; % ignore the session with way fewer units than the others (<30 per subsample!) & which therefore tells a muddier story
-end
+% actually pool all animals for this analysis
+sessions2select = true(size(classifyCell));
+sessions2select(4) = false; % ignore the session with way fewer units than the others (<30 per subsample!) & which therefore tells a muddier story
+
+% DO extract the first letter of each name tho
+firstLetters = cellfun(@(x) x(1),seshNames,'uniformoutput',false);
 
 classifyData  = classifyCell(sessions2select);
+firstLetters  = firstLetters(sessions2select);
 
 %% step 2: arrange into matrices
 
+newCell = cell(size(classifyData));
 % step 2.1: cat
 for seshind = 1:numel(classifyData)
     cD = classifyData{seshind};
@@ -121,7 +126,9 @@ for seshind = 1:numel(classifyData)
         end
         
     end
+    newCell{seshind} = newStruct;
 end
+
 
 
 
@@ -144,4 +151,34 @@ end
 % (so a 2x2 grid, context x alignment)
 % (maybe even show that the commonspace doesn't really affect residual
 % visual classification?)
+
+%% alright time to plot
+% pre- and post-commonspace
+prepost = {'regularpostortho','commonspace'};
+ap      = {'active','passive'};
+
+prepostnames = {'Fullspace','Subspace'};
+
+cstruct = defColorConvention();
+
+axind = 0;
+for prepostID = 1:2
+    thisprepost = prepost{prepostID};
+    for apID = 1:2
+        thisap = ap{apID};
+        
+        thisplot = sprintf('classifyPlot%i',axind);
+        axes( get(handles,thisplot) )
+        
+        thisCell = cellfun(@(x) x.(thisprepost).(thisap),newCell,...
+            'uniformoutput',false);
+        
+        
+    end
+end
+        
+        
+
+
+
 

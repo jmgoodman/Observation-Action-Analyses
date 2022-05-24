@@ -154,26 +154,97 @@ end
 
 %% alright time to plot
 % pre- and post-commonspace
-prepost = {'regularpostortho','commonspace'};
-ap      = {'active','passive'};
+cross_self = {'cross','self'};
+ap         = {'active','passive'};
 
-prepostnames = {'Fullspace','Subspace'};
+cross_self_names = {'Visual','Movement'};
+ap_names         = {'Active','Passive'};
 
 cstruct = defColorConvention();
 
+% row 1: visual training
+% row 2: movement training
+
+% col 1: active
+% col 2: passive
+
+inds2plot = [4,1:3];
+chanceind = 5;
 axind = 0;
-for prepostID = 1:2
-    thisprepost = prepost{prepostID};
+for cross_selfID = 1:2
+    thiscross_self = cross_self{cross_selfID};
     for apID = 1:2
         thisap = ap{apID};
         
         thisplot = sprintf('classifyPlot%i',axind);
-        axes( get(handles,thisplot) )
+        axes( handles.(thisplot) )
+        cla
         
-        thisCell = cellfun(@(x) x.(thisprepost).(thisap),newCell,...
-            'uniformoutput',false);
+        mu_ = [thiscross_self,'mu'];
+        sd_ = [thiscross_self,'sd'];
         
+        fullspacemu = cellfun(@(x) x.regularpostortho.(thisap).(mu_),...
+            newCell,'uniformoutput',false);
+        fullspacemu = vertcat(fullspacemu{:});
+        fullspacesd = cellfun(@(x) x.regularpostortho.(thisap).(sd_),...
+            newCell,'uniformoutput',false);
+        fullspacesd = vertcat(fullspacesd{:});
         
+        subspacemu = cellfun(@(x) x.commonspace.(thisap).(mu_),...
+            newCell,'uniformoutput',false);
+        subspacemu = vertcat(subspacemu{:});
+        subspacesd = cellfun(@(x) x.commonspace.(thisap).(sd_),...
+            newCell,'uniformoutput',false);
+        subspacesd = vertcat(subspacesd{:});
+        
+        % averaged chance level & unity line
+        xchance = mean(fullspacemu(:,chanceind));
+        ychance = mean(subspacemu(:,chanceind));
+        
+        hold all
+        line(xchance*[1 1],[0 1],'linewidth',1.5,'linestyle','--',...
+            'color',[0.7 0.7 0.7])
+        hold all
+        line([0 1],ychance*[1 1],'linewidth',1.5,'linestyle','--',...
+            'color',[0.7 0.7 0.7])
+        hold all
+        line([0 1],[0 1],'linewidth',1.5,'linestyle','-',...
+            'color',[0.7 0.7 0.7])
+        
+        % now make the errorbarxy plot
+        for areaInd = 1:4
+            thisind = inds2plot(areaInd);
+            xpos = fullspacemu(:,thisind) + fullspacesd(:,thisind)*[-1 1];
+            ypos = subspacemu(:,thisind)  + subspacesd(:,thisind)*[-1 1];
+            
+            % x errorbars
+            hold all
+            line(xpos',repmat(subspacemu(:,thisind),1,2)','linewidth',1.5,'color',...
+                0.7 + 0.3*cstruct.colors(areaInd,:))
+            
+            % y errorbars
+            hold all
+            line(repmat(fullspacemu(:,thisind),1,2)',ypos','linewidth',1.5,'color',...
+                0.7 + 0.3*cstruct.colors(areaInd,:))
+            
+            hold all
+            for whichLetter = 1:numel(firstLetters)
+                thisLetter = firstLetters{whichLetter};
+                text(fullspacemu(whichLetter,thisind), subspacemu(whichLetter,thisind), ...
+                    thisLetter,'color',cstruct.colors(areaInd,:),'fontsize',12,...
+                    'horizontalalignment','center','verticalalignment','middle')
+            end
+        end
+        
+        axis equal
+        xlim([0 1])
+        ylim([0 1])
+        
+        xlabel('Fullspace')
+        ylabel('Subspace')
+        title(sprintf('%s | %s',cross_self_names{cross_selfID},ap_names{apID}))
+        
+        axind = axind + 1;
     end
 end
         

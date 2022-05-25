@@ -120,7 +120,7 @@ FVEmu = cat(3,FVEmu{:});
 FVEsd = cat(3,FVEsd{:});
 
 %% step 3: plot
-axes(handles.dimSweep)
+axes(handles.varPartition)
 cla
 
 cstruct = defColorConvention();

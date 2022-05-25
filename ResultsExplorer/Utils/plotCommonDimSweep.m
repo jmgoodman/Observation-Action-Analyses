@@ -110,6 +110,6 @@ disp( char( ucountscell ) )
 disp('------------------------------------------------------------------------------------------------------------------------------------------------')
 
 % put it in the table
-set(handles.commonStats,'ColumnName',{'Session subsample size','Session population size'})
+set(handles.commonStats,'ColumnName',{'Subsample_size','Population_size'})
 set(handles.commonStats,'RowName',cstruct.labels)
 set(handles.commonStats,'Data',[ subsampcounts(:), ucounts(:) ])

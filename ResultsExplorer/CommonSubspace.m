@@ -232,13 +232,14 @@ function saveProjection_Callback(hObject, eventdata, handles)
 % hObject    handle to saveProjection (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+dataSaver(hObject,eventdata,handles,'projectionPlot');
 
 % --- Executes on button press in saveDimSweep.
 function saveDimSweep_Callback(hObject, eventdata, handles)
 % hObject    handle to saveDimSweep (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+dataSaver(hObject,eventdata,handles,'projectionPlot');
 
 
 % --- Executes on button press in saveClassify.
@@ -246,7 +247,10 @@ function saveClassify_Callback(hObject, eventdata, handles)
 % hObject    handle to saveClassify (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+for ii = 0:3
+    dataSaver(hObject,eventdata,handles,['classifyPlot',num2str(ii)]);
+    uiwait;
+end
 
 % --- Executes on selection change in areaSelector.
 function listbox1_Callback(hObject, eventdata, handles)
@@ -276,3 +280,5 @@ function saveCommonStats_Callback(hObject, eventdata, handles)
 % hObject    handle to saveCommonStats (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+dataSaver(hObject,eventdata,handles,'commonStats');

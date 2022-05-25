@@ -55,27 +55,39 @@ execData = commonSpaceData.subsamples{end}.exec{whichDataIn,2};
 obsData  = commonSpaceData.subsamples{end}.obs{whichDataIn,2};
 
 % concatenated movement onset + hold onset alignments
-% extract just the stuff centered on movement onset
-movementOnsetIdx = 1:200:size(execData,1);
+% extract BOTH ALIGNMENTS and plot both!
+    
+movementOnsetIdx = 1:200:size(execData,1); % 1 = movement onset, 101 = hold
+holdOnsetIdx     = 101:200:size(execData,1);
 objCount         = numel(movementOnsetIdx);
-execExtracted    = zeros(100,size(execData,2),numel(movementOnsetIdx));
-obsExtracted     = zeros(100,size(obsData,2),numel(movementOnsetIdx));
+execExtracted    = zeros(100,2,size(execData,2),numel(movementOnsetIdx));
+obsExtracted     = zeros(100,2,size(obsData,2),numel(movementOnsetIdx));
+
+% pool them too
+ex               = zeros(200,size(obsData,2),numel(movementOnsetIdx));
+obs              = zeros(200,size(obsData,2),numel(movementOnsetIdx));
 
 for ii = 1:objCount
     thisObjectAlignedOnMovementOnset = movementOnsetIdx(ii) + (0:99);
-    execExtracted(:,:,ii) = execData(thisObjectAlignedOnMovementOnset,:);
-    obsExtracted(:,:,ii)  = obsData(thisObjectAlignedOnMovementOnset,:);
+    thisObjectAlignedOnHoldOnset     = holdOnsetIdx(ii) + (0:99);
+    thisObjectAlignedOnBoth          = movementOnsetIdx(ii) + (0:199);
+    execExtracted(:,1,:,ii) = execData(thisObjectAlignedOnMovementOnset,:);
+    obsExtracted(:,1,:,ii)  = obsData(thisObjectAlignedOnMovementOnset,:);
+    execExtracted(:,2,:,ii) = execData(thisObjectAlignedOnHoldOnset,:);
+    obsExtracted(:,2,:,ii)  = obsData(thisObjectAlignedOnHoldOnset,:);
+    ex(:,:,ii)  = execData(thisObjectAlignedOnBoth,:);
+    obs(:,:,ii) = obsData(thisObjectAlignedOnBoth,:);
 end
 
 % find the pair of objects which *maximize* the peak difference between the
 % two contexts
 bestpair  = [2,1];
-maxdelta  = @(pairinds) max( sum( diff( execExtracted(:,:,pairinds),1,3 ).^2,2 ) + ...
-    sum( diff( obsExtracted(:,:,pairinds),1,3 ).^2,2 ) );
-contextdelta = @(pairinds) max( sum( ( execExtracted(:,:,pairinds(1)) - ...
-    obsExtracted(:,:,pairinds(1)) ).^2,2 ) + ...
-    sum( ( execExtracted(:,:,pairinds(2)) - ...
-    obsExtracted(:,:,pairinds(2)) ).^2,2 ) );
+maxdelta  = @(pairinds) max( sum( diff( ex(:,:,pairinds),1,3 ).^2,2 ) + ...
+    sum( diff( obs(:,:,pairinds),1,3 ).^2,2 ) );
+contextdelta = @(pairinds) max( sum( ( ex(:,:,pairinds(1)) - ...
+    obs(:,:,pairinds(1)) ).^2,2 ) + ...
+    sum( ( ex(:,:,pairinds(2)) - ...
+    obs(:,:,pairinds(2)) ).^2,2 ) );
 bestdelta = maxdelta(bestpair) - contextdelta(bestpair);
 
 for pairInd1 = 3:objCount
@@ -113,66 +125,82 @@ totalvar = norm(edata,'fro')^2 + norm(odata,'fro')^2;
 disp('FVE across contexts by common manifold');
 disp( 1 - deltavar / totalvar );
 
-bestExec = execExtracted(:,:,bestpair);
-bestObs  = obsExtracted(:,:,bestpair);
+bestExec_ = execExtracted(:,:,:,bestpair);
+bestObs_  = obsExtracted(:,:,:,bestpair);
 
 % theseinds = round( linspace(1,objCount,7) );
 % bestExec = execExtracted(:,:,theseinds);
 % bestObs  = obsExtracted(:,:,theseinds);
 
-contextClors  = lines(2);
-% objClors      = lines(7);
+for alignInd = 1:2
+    axesString = sprintf('projectionPlot%i',alignInd-1);
+    axes(handles.(axesString)); %#ok<LAXES>
+    bestExec = squeeze( bestExec_(:,alignInd,:,:) );
+    bestObs  = squeeze( bestObs_(:,alignInd,:,:) );
 
-axes(handles.projectionPlot);
-cla
-for objInd = 1:2
-    if objInd == 1
-        eclor = contextClors(1,:);
-        oclor = contextClors(2,:);
-    else
-        eclor = 0.7 + 0.3*contextClors(1,:);
-        oclor = 0.7 + 0.3*contextClors(2,:);
+    contextClors  = lines(2);
+    % objClors      = lines(7);
+    
+    
+    cla
+    for objInd = 1:2
+        if objInd == 1
+            eclor = contextClors(1,:);
+            oclor = contextClors(2,:);
+        else
+            eclor = 0.7 + 0.3*contextClors(1,:);
+            oclor = 0.7 + 0.3*contextClors(2,:);
+        end
+        
+        %     eclor = objClors(objInd,:);
+        %     oclor = objClors(objInd,:)*0.3 + 0.7;
+        
+        hold all
+        plot(bestExec(:,1,objInd),bestExec(:,2,objInd),'color',eclor,'linewidth',2)
+        hold all
+        plot(bestObs(:,1,objInd),bestObs(:,2,objInd),'color',oclor,'linewidth',2)
+        hold all
+        plot(bestExec(1,1,objInd),bestExec(1,2,objInd),'ko','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
+        hold all
+        plot(bestObs(1,1,objInd),bestObs(1,2,objInd),'ko','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
+        hold all
+        plot(bestExec(end,1,objInd),bestExec(end,2,objInd),'ks','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
+        hold all
+        plot(bestObs(end,1,objInd),bestObs(end,2,objInd),'ks','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
+        hold all
+        plot(bestExec(50,1,objInd),bestExec(50,2,objInd),'k>','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
+        hold all
+        plot(bestObs(50,1,objInd),bestObs(50,2,objInd),'k>','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
     end
     
-    %     eclor = objClors(objInd,:);
-    %     oclor = objClors(objInd,:)*0.3 + 0.7;
+    axis tight
+    axis equal
+    axis square
+    xl = [ min(get(gca,'xlim')), max(get(gca,'xlim')) ]; xl = xl + [-1 1]*0.1*range(xl);
+    yl = [ min(get(gca,'ylim')), max(get(gca,'ylim')) ]; yl = yl + [-1 1]*0.1*range(yl);
     
+    minlim = min([xl,yl]);
+    maxlim = max([xl,yl]);
+    
+    % center on 0
+    totalmaxlim = max(abs(minlim),abs(maxlim));
+    
+    xlim(totalmaxlim*[-1,1])
+    ylim(totalmaxlim*[-1,1])
+    
+    xlabel(sprintf('%s Common Subspace Factor 1',thisAreaName))
+    ylabel(sprintf('%s Common Subspace Factor 2',thisAreaName))
+    
+    % now generate a legend
+    customlegend(vertcat(theseObjects),'colors',[0 0 0;0.7 0.7 0.7])
+    
+    % mark center & disable axis
+    crosshairlen = 0.01*range(get(gca,'xlim'));
     hold all
-    plot(bestExec(:,1,objInd),bestExec(:,2,objInd),'color',eclor,'linewidth',2)
+    line([-1 1]*crosshairlen,[0 0],'linewidth',1,'color',[0 0 0])
     hold all
-    plot(bestObs(:,1,objInd),bestObs(:,2,objInd),'color',oclor,'linewidth',2)
-    hold all
-    plot(bestExec(1,1,objInd),bestExec(1,2,objInd),'ko','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
-    hold all
-    plot(bestObs(1,1,objInd),bestObs(1,2,objInd),'ko','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
-    hold all
-    plot(bestExec(end,1,objInd),bestExec(end,2,objInd),'ks','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
-    hold all
-    plot(bestObs(end,1,objInd),bestObs(end,2,objInd),'ks','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
-    hold all
-    plot(bestExec(50,1,objInd),bestExec(50,2,objInd),'k>','color',eclor,'markerfacecolor',eclor,'linewidth',1,'markersize',10)
-    hold all
-    plot(bestObs(50,1,objInd),bestObs(50,2,objInd),'k>','color',oclor,'markerfacecolor',oclor,'linewidth',1,'markersize',10)
+    line([0 0],[-1 1]*crosshairlen,'linewidth',1,'color',[0 0 0])
+    axis off
 end
-
-axis tight
-axis equal
-axis square
-xl = [ min(get(gca,'xlim')), max(get(gca,'xlim')) ]; xl = xl + [-1 1]*0.1*range(xl);
-yl = [ min(get(gca,'ylim')), max(get(gca,'ylim')) ]; yl = yl + [-1 1]*0.1*range(yl);
-
-minlim = min([xl,yl]);
-maxlim = max([xl,yl]);
-
-% center on 0
-totalmaxlim = max(abs(minlim),abs(maxlim));
-
-xlim(totalmaxlim*[-1,1])
-ylim(totalmaxlim*[-1,1])
-
-xlabel(sprintf('%s Common Subspace Factor 1',thisAreaName))
-ylabel(sprintf('%s Common Subspace Factor 2',thisAreaName))
-
-
 
 return

@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 19-May-2022 10:29:51
+% Last Modified by GUIDE v2.5 25-May-2022 11:20:19
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -56,6 +56,8 @@ function CommonSubspace_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 
 % pull data and set to the handles structure as appdata
+disp('This one requires a lot of data to be loaded. Patience!')
+
 mfd = mfilename('fullpath');
 [cd_,~,~] = fileparts(mfd);
 [cd_,~,~] = fileparts(cd_);
@@ -102,6 +104,7 @@ end
 setappdata(handles.output,'allSessionsCommonSpace',commonSpaceCell)
 
 % pull in datastructs
+thisSesh        = seshNames{ get(handles.sessionSelector,'Value') };
 dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
 dataStruct      = load(dataStructFile);
 dataLabels      = extractlabels(dataStruct.datastruct.cellform);
@@ -177,6 +180,17 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 % setappdata(handles.output,'dataStruct',dataStruct);
 % setappdata(handles.output,'dataLabels',dataLabels);
 % disp('...DONE')
+% pull in datastructs
+disp('Loading some data, be patient...')
+mirrorDataDir   = getappdata(handles.output,'mirrorDataDir');
+seshNames       = get(handles.sessionSelector,'String');
+seshInd         = get(handles.sessionSelector,'Value');
+thisSesh        = seshNames{seshInd};
+dataStructFile  = fullfile( mirrorDataDir,sprintf('%s_datastruct.mat',thisSesh) );
+dataStruct      = load(dataStructFile);
+dataLabels      = extractlabels(dataStruct.datastruct.cellform);
+setappdata(handles.output,'dataStruct',dataStruct);
+setappdata(handles.output,'dataLabels',dataLabels);
 plotCommonProjection(hObject,eventdata,handles);
 plotCommonDimSweep(hObject,eventdata,handles);
 
@@ -239,15 +253,21 @@ function saveDimSweep_Callback(hObject, eventdata, handles)
 % hObject    handle to saveDimSweep (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-dataSaver(hObject,eventdata,handles,'projectionPlot');
-
+printables = {'move-aligned','hold-aligned'};
+for ii = 0:1
+    disp(printables{ii+1})
+    dataSaver(hObject,eventdata,handles,['projectionPlot',num2str(ii)]);
+    uiwait;
+end
 
 % --- Executes on button press in saveClassify.
 function saveClassify_Callback(hObject, eventdata, handles)
 % hObject    handle to saveClassify (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+printables = {'visActive','visPassive','movActive','movPassive'};
 for ii = 0:3
+    disp(printables{ii+1})
     dataSaver(hObject,eventdata,handles,['classifyPlot',num2str(ii)]);
     uiwait;
 end

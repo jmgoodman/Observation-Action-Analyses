@@ -240,9 +240,9 @@ for cross_selfID = 1:2
         xlim([0 1])
         ylim([0 1])
         
-        xlabel('Fullspace')
-        ylabel('Subspace')
-        title(sprintf('%s | %s',cross_self_names{cross_selfID},ap_names{apID}))
+        xlabel('Fullspace classification accuracy')
+        ylabel('Subspace classification accuracy')
+        %         title(sprintf('%s | %s',cross_self_names{cross_selfID},ap_names{apID}))
         
         axind = axind + 1;
     end

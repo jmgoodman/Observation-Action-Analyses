@@ -94,6 +94,12 @@ for areaInd = 1:numel(cstruct.labels)
     end
 end
 
+xlabel('Dimensionality')
+ylabel('FVE by the Common Subspace')
+box off, axis tight
+hold all
+line(get(gca,'xlim'),[0 0],'linewidth',1,'color',[0 0 0],'linestyle','--')
+
 customlegend(cstruct.labels,'colors',cstruct.colors)
 
 % print unit counts and subsample sizes

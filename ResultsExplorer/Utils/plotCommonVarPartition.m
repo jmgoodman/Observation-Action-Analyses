@@ -59,10 +59,33 @@ byObjectTraces = cellfun(@(sesh) ... % for each session
 contextIndependentMeans = cellfun(@(sesh) ... % for each session
     cellfun(@(x) ... % for each subsample
     cellfun(@(y) ... % for each dimensionality
-    mean(y,3),...
+    mean(y,3),... % average across all (object x context), gives (time x alignment) x dimension
     x,'uniformoutput',false),...
     sesh,'uniformoutput',false),...
     byObjectTraces,'uniformoutput',false);
+
+% note: instead of comparing to TOTAL variance in the subspace, compare
+% instead to the variance captured by the mean across contexts (which tends
+% to be a pretty high fraction of the total variance anyway, by design)
+% (you end up uniformly shaving 10 percentage points off the denominator by
+% doing it this way)
+% (indeed, this helps motivate the decision to treat each context
+% separately instead of trying to force cross-classification through: the
+% kinematics are just too different, and maybe our attempts to find a
+% common space are failing to find grip specificity for that reason!)
+meansAcrossContextsButNotObjects = cellfun(@(sesh) ... % for each session
+    cellfun(@(x) ... % for each subsample
+    cellfun(@(y,z) ... % for each dimensionality (consider both contexts, y and z)
+    mean( ...
+    permute( cat( 4,...
+    reshape(y,200,[],size(y,2)),...
+    reshape(z,200,[],size(z,2)) ...
+    ),... % concatenates different contexts, (time x alignment) x object x dimension x context
+    [1,3,2,4] ),... % reorders dimensions, (time x alignment) x dimension x object x context
+    4 ), ... % mean across dim 4, gives (time x alignment) x dimension x object
+    x.exec,x.obs,'uniformoutput',false),...
+    sesh.subsamples(1:(end-1)),'uniformoutput',false ),...
+    commonSpaceData,'uniformoutput',false);
 
 contextResiduals = cellfun(@(sesh0,sesh1) ... % for each session
     cellfun(@(x0,x1) ... % for each subsample
@@ -70,7 +93,7 @@ contextResiduals = cellfun(@(sesh0,sesh1) ... % for each session
     bsxfun(@minus,y0,y1),...
     x0,x1,'uniformoutput',false),...
     sesh0,sesh1,'uniformoutput',false),...
-    byObjectTraces,contextIndependentMeans,'uniformoutput',false);
+    meansAcrossContextsButNotObjects,contextIndependentMeans,'uniformoutput',false);
 
 totalVar = cellfun(@(sesh) ... % for each session
     cellfun(@(x) ... % for each subsample
@@ -78,7 +101,7 @@ totalVar = cellfun(@(sesh) ... % for each session
     sum(y(:).^2),...
     x),...
     sesh,'uniformoutput',false),...
-    byObjectTraces,'uniformoutput',false);
+    meansAcrossContextsButNotObjects,'uniformoutput',false);
 
 residVar = cellfun(@(sesh) ... % for each session
     cellfun(@(x) ... % for each subsample
@@ -133,9 +156,8 @@ for areaInd = 1:numel(cstruct.labels)
 end
 
 xlabel('Dimensionality')
-ylabel('FVE by by Condition-Independent Component')
+ylabel('FVE by Condition-Independent Component')
 box off, axis tight
-hold all
-line(get(gca,'xlim'),[0 0],'linewidth',1,'color',[0 0 0],'linestyle','--')
+ylim([0 1])
 
 customlegend(cstruct.labels,'colors',cstruct.colors)

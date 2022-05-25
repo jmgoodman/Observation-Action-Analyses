@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 25-May-2022 11:20:19
+% Last Modified by GUIDE v2.5 25-May-2022 14:39:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -134,6 +134,7 @@ setappdata(handles.output,'currentAnimal',currentAnimal);
 plotCommonProjection(hObject,eventdata,handles);
 plotCommonDimSweep(hObject,eventdata,handles);
 plotCommonClassify(hObject,eventdata,handles); % subsample x context1 x context2 x align1 x align2 x subalign1 x subalign2
+plotCommonVarPartition(hObject,eventdata,handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -193,6 +194,7 @@ setappdata(handles.output,'dataStruct',dataStruct);
 setappdata(handles.output,'dataLabels',dataLabels);
 plotCommonProjection(hObject,eventdata,handles);
 plotCommonDimSweep(hObject,eventdata,handles);
+plotCommonVarPartition(hObject,eventdata,handles);
 
 % --- Executes during object creation, after setting all properties.
 function sessionSelector_CreateFcn(hObject, eventdata, handles)
@@ -302,3 +304,12 @@ function saveCommonStats_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 dataSaver(hObject,eventdata,handles,'commonStats');
+
+
+% --- Executes on button press in saveVarPartition.
+function saveVarPartition_Callback(hObject, eventdata, handles)
+% hObject    handle to saveVarPartition (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+dataSaver(hObject,eventdata,handles,'varPartition');

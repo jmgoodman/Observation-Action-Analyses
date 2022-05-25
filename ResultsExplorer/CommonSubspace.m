@@ -22,7 +22,7 @@ function varargout = CommonSubspace(varargin)
 
 % Edit the above text to modify the response to help CommonSubspace
 
-% Last Modified by GUIDE v2.5 25-May-2022 14:39:54
+% Last Modified by GUIDE v2.5 25-May-2022 17:34:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -248,19 +248,20 @@ function saveProjection_Callback(hObject, eventdata, handles)
 % hObject    handle to saveProjection (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-dataSaver(hObject,eventdata,handles,'projectionPlot');
-
-% --- Executes on button press in saveDimSweep.
-function saveDimSweep_Callback(hObject, eventdata, handles)
-% hObject    handle to saveDimSweep (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 printables = {'move-aligned','hold-aligned'};
 for ii = 0:1
     disp(printables{ii+1})
     dataSaver(hObject,eventdata,handles,['projectionPlot',num2str(ii)]);
     uiwait;
 end
+
+% --- Executes on button press in saveDimSweep.
+function saveDimSweep_Callback(hObject, eventdata, handles)
+% hObject    handle to saveDimSweep (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+dataSaver(hObject,eventdata,handles,'dimSweep');
+
 
 % --- Executes on button press in saveClassify.
 function saveClassify_Callback(hObject, eventdata, handles)

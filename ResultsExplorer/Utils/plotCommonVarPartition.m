@@ -156,7 +156,7 @@ for areaInd = 1:numel(cstruct.labels)
 end
 
 xlabel('Dimensionality')
-ylabel('FVE by Condition-Independent Component')
+ylabel('FVE by the Condition-Independent Component')
 box off, axis tight
 ylim([0 1])
 

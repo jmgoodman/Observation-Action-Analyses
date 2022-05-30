@@ -104,6 +104,22 @@ fullPCASpace = cellfun(@(sesh) ... % for each session
 % okay so here's how we do it:
 % denominator = <y>_c, i.e. y_to + y_t + y_o
 % numerator   = y_t = <y>_co
+%
+% WAIT NO
+% we want to IGNORE the context-independent component!
+% and just look at the object coding that is SHARED!!!
+% the claim we want to make isn't "it preferentially captures the
+% context-independent component"
+% but rather
+% "whatever object info it happens to capture, it sure as shit ain't
+% shared"
+% HERE is what we compute:
+% numerator: y_o + y_to = <y>_c - <y>_co
+% denominator: y_o + y_to + y_co + y_tco = y - <y>_o
+%
+% hmmmm but when this comprises so little of the variance...
+% ...ughhh what's the point?!?!?
+% AGAIN, you ain't in ANY position to be thinkin' bout this! go home!
 
 commonSpaceMeanAcrossObjects = cellfun(@(sesh) ... % for each session
     cellfun(@(x) ... % for each subsample

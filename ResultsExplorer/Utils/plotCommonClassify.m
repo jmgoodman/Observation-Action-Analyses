@@ -168,7 +168,7 @@ cstruct = defColorConvention();
 % col 1: active
 % col 2: passive
 
-inds2plot = [4,1:3];
+inds2plot = [4,1:3]; % matches the color convention: pooled - aip - f5 - m1
 chanceind = 5;
 axind = 0;
 for cross_selfID = 1:2

@@ -77,6 +77,23 @@ set(handles.areaSelector,'String',arrays2analyze)
 colorStruct = defColorConvention(); 
 setappdata(handles.output,'colorStruct',colorStruct)
 
+% open up cstructs and pull the relevant data
+% there are normally 3 levels deep:
+% analysis type
+% ortho (pre- or post-)
+% context
+% the latter two are pulled into a single context x ortho selector
+%
+% from there, we have:
+% 1. # of subsamples (pool across these for ALL analyses)
+% 2,3. context x context (normally 1D, but in cases where contexts are contrasted, these get collected into the "subcontext" selector, really subcontext x subcontext)
+% 4,5. align x align (pooled into an align x align selector)
+% 6,7. subalign x subalign (pooled into a subalign x subalign selector)
+%
+% within each cell are two levels of subcell:
+% level 1: 5-fold
+% level 2: areas (AIP-F5-M1-pooled-chance)
+
 
 % Update handles structure
 guidata(hObject, handles);

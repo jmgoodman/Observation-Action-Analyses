@@ -22,7 +22,7 @@ function varargout = GripClassification(varargin)
 
 % Edit the above text to modify the response to help GripClassification
 
-% Last Modified by GUIDE v2.5 06-Jun-2022 13:30:32
+% Last Modified by GUIDE v2.5 22-Mar-2022 13:33:49
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,6 +55,9 @@ function GripClassification_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for GripClassification
 handles.output = hObject;
 
+% Choose default command line output for CommonSubspace
+handles.output = hObject;
+
 % pull data and set to the handles structure as appdata
 disp('This one requires a lot of data to be loaded. Patience!')
 
@@ -68,7 +71,7 @@ analysisOutputsDir = fullfile(cd_,'Analysis-Outputs');
 setappdata(handles.output,'mirrorDataDir',mirrorDataDir)
 setappdata(handles.output,'analysisOutputsDir',analysisOutputsDir);
 
-sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara68';'Zara70'};
+sessions2analyze = {'Moe46';'Moe50';'Zara68';'Zara70'};
 set(handles.sessionSelector,'String',sessions2analyze);
 
 arrays2analyze = {'pooled';'AIP';'F5';'M1'};
@@ -77,23 +80,9 @@ set(handles.areaSelector,'String',arrays2analyze)
 colorStruct = defColorConvention(); 
 setappdata(handles.output,'colorStruct',colorStruct)
 
-% open up cstructs and pull the relevant data
-% there are normally 3 levels deep:
-% analysis type
-% ortho (pre- or post-)
-% context
-% the latter two are pulled into a single context x ortho selector
-%
-% from there, we have:
-% 1. # of subsamples (pool across these for ALL analyses)
-% 2,3. context x context (normally 1D, but in cases where contexts are contrasted, these get collected into the "subcontext" selector, really subcontext x subcontext)
-% 4,5. align x align (pooled into an align x align selector)
-% 6,7. subalign x subalign (pooled into a subalign x subalign selector)
-%
-% within each cell are two levels of subcell:
-% level 1: 5-fold
-% level 2: areas (AIP-F5-M1-pooled-chance)
+seshNames = sessions2analyze;
 
+% load in the animal-specific data
 
 % Update handles structure
 guidata(hObject, handles);
@@ -159,19 +148,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in controlSelector.
-function controlSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to controlSelector (see GCBO)
+% --- Executes on selection change in level1Selector.
+function level1Selector_Callback(hObject, eventdata, handles)
+% hObject    handle to level1Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns controlSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from controlSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns level1Selector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from level1Selector
 
 
 % --- Executes during object creation, after setting all properties.
-function controlSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to controlSelector (see GCBO)
+function level1Selector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to level1Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -182,19 +171,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in contextSelector.
-function contextSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to contextSelector (see GCBO)
+% --- Executes on selection change in level2Selector.
+function level2Selector_Callback(hObject, eventdata, handles)
+% hObject    handle to level2Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns contextSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from contextSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns level2Selector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from level2Selector
 
 
 % --- Executes during object creation, after setting all properties.
-function contextSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to contextSelector (see GCBO)
+function level2Selector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to level2Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -205,19 +194,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in subContextSelector.
-function subContextSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to subContextSelector (see GCBO)
+% --- Executes on selection change in level3Selector.
+function level3Selector_Callback(hObject, eventdata, handles)
+% hObject    handle to level3Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns subContextSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from subContextSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns level3Selector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from level3Selector
 
 
 % --- Executes during object creation, after setting all properties.
-function subContextSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to subContextSelector (see GCBO)
+function level3Selector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to level3Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -228,19 +217,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in alignmentSelector.
-function alignmentSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to alignmentSelector (see GCBO)
+% --- Executes on selection change in level4Selector.
+function level4Selector_Callback(hObject, eventdata, handles)
+% hObject    handle to level4Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns alignmentSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from alignmentSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns level4Selector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from level4Selector
 
 
 % --- Executes during object creation, after setting all properties.
-function alignmentSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to alignmentSelector (see GCBO)
+function level4Selector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to level4Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -251,19 +240,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in subAlignmentSelector.
-function subAlignmentSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to subAlignmentSelector (see GCBO)
+% --- Executes on selection change in level5Selector.
+function level5Selector_Callback(hObject, eventdata, handles)
+% hObject    handle to level5Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns subAlignmentSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from subAlignmentSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns level5Selector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from level5Selector
 
 
 % --- Executes during object creation, after setting all properties.
-function subAlignmentSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to subAlignmentSelector (see GCBO)
+function level5Selector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to level5Selector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

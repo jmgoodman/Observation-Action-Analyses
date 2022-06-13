@@ -22,7 +22,7 @@ function varargout = GripClassification(varargin)
 
 % Edit the above text to modify the response to help GripClassification
 
-% Last Modified by GUIDE v2.5 22-Mar-2022 13:33:49
+% Last Modified by GUIDE v2.5 13-Jun-2022 17:45:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -83,6 +83,7 @@ setappdata(handles.output,'colorStruct',colorStruct)
 seshNames = sessions2analyze;
 
 % load in the animal-specific data
+loadClassifyData(hObject, eventdata, handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -111,6 +112,10 @@ function sessionSelector_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from sessionSelector
 
+% this is going to be HELLA unoptimized
+% load data anew for changing this value
+loadClassifyData(hObject, eventdata, handles);
+
 
 % --- Executes during object creation, after setting all properties.
 function sessionSelector_CreateFcn(hObject, eventdata, handles)
@@ -133,6 +138,7 @@ function areaSelector_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from areaSelector
+updateFields(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -339,3 +345,122 @@ function saveStats_Callback(hObject, eventdata, handles)
 % hObject    handle to saveStats (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on selection change in controlSelector.
+function controlSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to controlSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns controlSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from controlSelector
+updateFields(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function controlSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to controlSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in contextSelector.
+function contextSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to contextSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns contextSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from contextSelector
+updateFields(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function contextSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to contextSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in subContextSelector.
+function subContextSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to subContextSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns subContextSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from subContextSelector
+updateFields(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function subContextSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to subContextSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in alignmentSelector.
+function alignmentSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to alignmentSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns alignmentSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from alignmentSelector
+updateFields(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function alignmentSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to alignmentSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in subAlignmentSelector.
+function subAlignmentSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to subAlignmentSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns subAlignmentSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from subAlignmentSelector
+updateFields(hObject, eventdata, handles);
+
+
+% --- Executes during object creation, after setting all properties.
+function subAlignmentSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to subAlignmentSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

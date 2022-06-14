@@ -145,7 +145,7 @@ subAlignCrosses = strcat(subAlignTrain(:),'-train/',subAlignTest(:),'-test');
 currentValue = get(handles.subAlignmentSelector,'Value');
 if currentValue > numel(subAlignCrosses)
     currentValue = 1;
-    set(handles.alignmentSelector,'Value',currentValue)
+    set(handles.subAlignmentSelector,'Value',currentValue)
 else
     % pass
 end

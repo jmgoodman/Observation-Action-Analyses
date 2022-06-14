@@ -36,7 +36,11 @@ set(handles.controlSelector,'String',analysisTypes);
 analysisType         = analysisTypes{currentValue};
 
 %% context
-contextNames = fieldnames( cellThisSesh.data.copts.(analysisType) );
+if ~strcmpi(analysisType,'kinematics')
+    contextNames = fieldnames( cellThisSesh.data.copts.(analysisType) );
+else
+    contextNames = fieldnames( cellThisSesh.data.cstruct.(analysisType) ); % no subcontext to wade through...
+end
 
 currentValue = get(handles.contextSelector,'Value');
 if currentValue > numel(contextNames)
@@ -73,7 +77,7 @@ thisSubContext = subContextNames{currentValue};
 % if subcontext = kinematics, reset context according to the kinematic
 % classifier
 if strcmpi(thisSubContext,'kinematics')
-    contextNames = fieldnames( cellThisSesh.data.copts.kinematics );
+    contextNames = fieldnames( cellThisSesh.data.cstruct.kinematics );
     
     currentValue = get(handles.contextSelector,'Value');
     if currentValue > numel(contextNames)
@@ -102,6 +106,9 @@ end
 
 set(handles.contextComparisonSelector,'String',alignCrosses)
 
+setappdata(handles.output,'contextTest',contextTest)
+setappdata(handles.output,'contextTrain',contextTrain)
+
 %% alignment
 
 [alignTest,alignTrain] = meshgrid( cellThisSesh.data.copts.(analysisType).(thisContext).alignment );
@@ -117,6 +124,10 @@ else
 end
     
 set(handles.alignmentSelector,'String',alignCrosses);
+
+% save to appdata
+setappdata(handles.output,'alignTest',alignTest)
+setappdata(handles.output,'alignTrain',alignTrain)
 
 % thisAlign = alignCrosses{currentValue};
 
@@ -140,6 +151,10 @@ else
 end
     
 set(handles.subAlignmentSelector,'String',subAlignCrosses);
+
+% save to appdata
+setappdata(handles.output,'subAlignTest',subAlignTest)
+setappdata(handles.output,'subAlignTrain',subAlignTrain)
 
 %% area
 if strcmpi(analysisType,'kinematics') || strcmpi(thisSubContext,'kinematics')

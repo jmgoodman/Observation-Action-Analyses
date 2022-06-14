@@ -87,7 +87,7 @@ loadClassifyData(hObject, eventdata, handles);
 updatePeakAccuracy(hObject, eventdata, handles);
 
 % pull in some kinematic classification numbers
-
+% TODO
 
 % Update handles structure
 guidata(hObject, handles);
@@ -342,7 +342,7 @@ function savePeakAccuracyPlot_Callback(hObject, eventdata, handles)
 % hObject    handle to savePeakAccuracyPlot (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
+dataSaver(hObject,eventdata,handles,'peakAccuracyPlot');
 
 % --- Executes on button press in saveStats.
 function saveStats_Callback(hObject, eventdata, handles)

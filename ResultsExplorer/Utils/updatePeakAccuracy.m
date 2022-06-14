@@ -86,9 +86,12 @@ subAlignSize     = sqrt(subAlignmentCount)*[1 1]; % same size as alignTrain
 % illustrative plots and call it a day.
 
 %%
+
+% for some reason this STILL works if you don't slice dims 4-7 and just squeeze the sliced dimensions. 
+% question: WHY
 data_ = cellfun(@(x) squeeze( x(:,trainContextComparison,testContextComparison,...
-    :,:,:,:) ),...
-    data_,'uniformoutput',false); % align 
+    trainAlign,testAlign,trainSubAlign,testSubAlign) ),...
+    data_,'uniformoutput',false);
 
 % now we have:
 % level 1: sessions
@@ -178,6 +181,7 @@ line(xl,chanceLevel*[1 1],'linewidth',0.75,'color',[0 0 0],'linestyle','--')
 
 % adjust margins & stuff
 ylim([0 1])
+ylabel('Classification accuracy')
 
 % add legend
 customlegend(colorStruct.labels,'colors',colorStruct.colors);

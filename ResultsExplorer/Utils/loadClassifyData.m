@@ -35,6 +35,14 @@ end
 
 setappdata(handles.output,'classifyCell',classifyCell)
 
+% save the names of the seleted sessions too
+setappdata(handles.output,'thisAnimalSessionNames',thisAnimalSessionNames);
+
+%% step 2.5: load all_classmats
+allClassmatsFile = fullfile(analysisOutputsDir,'all-sessions-classmats.mat');
+allClassmats = load(allClassmatsFile);
+setappdata(handles.output,'allClassmats',allClassmats.classmats);
+
 %% step 3: set the levels
 analysisTypes = fieldnames( classifyCell{1}.data.copts );
 set(handles.controlSelector,'String',analysisTypes);

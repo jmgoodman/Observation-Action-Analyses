@@ -86,6 +86,9 @@ seshNames = sessions2analyze;
 loadClassifyData(hObject, eventdata, handles);
 updatePeakAccuracy(hObject, eventdata, handles);
 
+% pull in some kinematic classification numbers
+
+
 % Update handles structure
 guidata(hObject, handles);
 

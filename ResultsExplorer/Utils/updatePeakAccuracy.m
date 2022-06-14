@@ -65,9 +65,30 @@ end
 
 data_ = cellfun(@(x) x.(contextName),data_,'uniformoutput',false);
 
-data_ = cellfun(@(x) x(:,trainContextComparison,testContextComparison,...
-    trainAlign,testAlign,trainSubAlign,testSubAlign),...
-    data_,'uniformoutput',false);
+%%
+% alternative selection of alignments and subalignments
+% pull it from allclassmats
+allClassmats     = getappdata(handles.output,'allClassmats');
+alignTest        = getappdata(handles.output,'alignTest');
+alignTrain       = getappdata(handles.output,'alignTrain');
+subAlignTest     = getappdata(handles.output,'subAlignTest');
+subAlignTrain    = getappdata(handles.output,'subAlignTrain');
+contextTest      = getappdata(handles.output,'contextTest');
+contextTrain     = getappdata(handles.output,'contextTrain'); % these give the full array of ind-2-sub vals. the stuff in the cell above is giving the currently-selected one.
+
+testAlignName    = alignTest{trainAlign,testAlign};
+trainAlignName   = alignTrain{trainAlign,testAlign};
+alignSize        = size(alignTest); % same size as alignTrain
+
+subAlignSize     = sqrt(subAlignmentCount)*[1 1]; % same size as alignTrain
+
+% hmm my brain is too fried to handle this atm. maybe just generate some
+% illustrative plots and call it a day.
+
+%%
+data_ = cellfun(@(x) squeeze( x(:,trainContextComparison,testContextComparison,...
+    :,:,:,:) ),...
+    data_,'uniformoutput',false); % align 
 
 % now we have:
 % level 1: sessions

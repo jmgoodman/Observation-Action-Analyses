@@ -70,6 +70,20 @@ set(handles.subContextSelector,'String',subContextNames);
 
 thisSubContext = subContextNames{currentValue};
 
+%% context comparison
+[contextTest,contextTrain] = meshgrid( classifyCell{1}.data.copts.(analysisType).(thisContext).targetcontexts );
+alignCrosses = strcat( contextTrain(:),'-train/',contextTest(:),'-test' );
+
+currentValue = get(handles.contextComparisonSelector,'Value');
+if currentValue > numel(alignCrosses)
+    currentValue = 1;
+    set(handles.contextComparisonSelector,'Value',currentValue)
+else
+    % pass
+end
+
+set(handles.contextComparisonSelector,'String',alignCrosses)
+
 %% alignment
 
 [alignTest,alignTrain] = meshgrid( cellThisSesh.data.copts.(analysisType).(thisContext).alignment );
@@ -107,7 +121,7 @@ else
     % pass
 end
     
-set(handles.subAlignmentSelector,'String',alignCrosses);
+set(handles.subAlignmentSelector,'String',subAlignCrosses);
 
 %% area
 if strcmpi(analysisType,'kinematics') || strcmpi(thisSubContext,'kinematics')
@@ -117,5 +131,8 @@ else
     set(handles.areaSelector,'String',fieldnames( cellThisSesh.data.cstruct.Nstruct ) );
     set(handles.areaSelector,'Value',1);
 end
+
+%% update plots
+updatePeakAccuracy(hObject, eventdata, handles);
 
 return

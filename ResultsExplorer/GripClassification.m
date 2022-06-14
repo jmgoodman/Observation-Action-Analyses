@@ -22,7 +22,7 @@ function varargout = GripClassification(varargin)
 
 % Edit the above text to modify the response to help GripClassification
 
-% Last Modified by GUIDE v2.5 13-Jun-2022 17:45:05
+% Last Modified by GUIDE v2.5 14-Jun-2022 11:39:26
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -84,6 +84,7 @@ seshNames = sessions2analyze;
 
 % load in the animal-specific data
 loadClassifyData(hObject, eventdata, handles);
+updatePeakAccuracy(hObject, eventdata, handles);
 
 % Update handles structure
 guidata(hObject, handles);
@@ -456,6 +457,42 @@ updateFields(hObject, eventdata, handles);
 % --- Executes during object creation, after setting all properties.
 function subAlignmentSelector_CreateFcn(hObject, eventdata, handles)
 % hObject    handle to subAlignmentSelector (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in text100.
+function contextComparisonSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to text100 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns text100 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from text100
+updateFields(hObject, eventdata, handles);
+
+% --- Executes during object creation, after setting all properties.
+function text100_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to text100 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes during object creation, after setting all properties.
+function contextComparisonSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to contextComparisonSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

@@ -60,6 +60,14 @@ end
 
 thisSubContext = subContextNames{1};
 
+% collect contexts (only 1 cross-context comparison, but still, we should
+% support it)
+[contextTest,contextTrain] = meshgrid( classifyCell{1}.data.copts.(thisType).(thisContext).targetcontexts );
+alignCrosses = strcat( contextTrain(:),'-train/',contextTest(:),'-test' );
+
+set(handles.contextComparisonSelector,'String',alignCrosses)
+set(handles.contextComparisonSelector,'Value',1)
+
 % subsample x context x context x align x align x subalign x subalign
 % collect alignments
 [alignTest,alignTrain] = meshgrid( classifyCell{1}.data.copts.(thisType).(thisContext).alignment );

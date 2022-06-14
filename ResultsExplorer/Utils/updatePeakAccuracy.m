@@ -110,8 +110,10 @@ end
 axes( (handles.peakAccuracyPlot) );
 cla;
 barx = 0;
+sessionMids = zeros(nsesh,1);
 for seshind = 1:nsesh
     % barx   = seshind - 1; % group by session, not by area
+    beginSession = barx;
     foldav = foldaverage{seshind};
     
     for areaind = 1:narea
@@ -136,7 +138,8 @@ for seshind = 1:nsesh
         
         barx = barx+1;
     end
-    
+    endSession = barx - 1;
+    sessionMids(seshind) = (beginSession + endSession)/2;
     barx = barx+1; % group by session, not by area (since different sessions have different subsample sizes!)
 end
     
@@ -158,4 +161,6 @@ ylim([0 1])
 % add legend
 customlegend(colorStruct.labels,'colors',colorStruct.colors);
 
-
+% adjust tick marks
+sessionLabels = cellfun(@(x) x.seshID,classifyCell,'uniformoutput',false);
+set(gca,'xtick',sessionMids,'xticklabel',sessionLabels)

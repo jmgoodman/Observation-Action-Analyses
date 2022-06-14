@@ -71,7 +71,7 @@ analysisOutputsDir = fullfile(cd_,'Analysis-Outputs');
 setappdata(handles.output,'mirrorDataDir',mirrorDataDir)
 setappdata(handles.output,'analysisOutputsDir',analysisOutputsDir);
 
-sessions2analyze = {'Moe46';'Moe50';'Zara68';'Zara70'};
+sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara70'};
 set(handles.sessionSelector,'String',sessions2analyze);
 
 arrays2analyze = {'pooled';'AIP';'F5';'M1'};

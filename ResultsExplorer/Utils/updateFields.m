@@ -70,6 +70,24 @@ set(handles.subContextSelector,'String',subContextNames);
 
 thisSubContext = subContextNames{currentValue};
 
+% if subcontext = kinematics, reset context according to the kinematic
+% classifier
+if strcmpi(thisSubContext,'kinematics')
+    contextNames = fieldnames( cellThisSesh.data.copts.kinematics );
+    
+    currentValue = get(handles.contextSelector,'Value');
+    if currentValue > numel(contextNames)
+        currentValue = 1;
+        set(handles.contextSelector,'Value',currentValue)
+    else
+        % pass
+    end
+    
+    set(handles.contextSelector,'String',contextNames);
+    
+    thisContext = contextNames{currentValue};
+end
+
 %% context comparison
 [contextTest,contextTrain] = meshgrid( classifyCell{1}.data.copts.(analysisType).(thisContext).targetcontexts );
 alignCrosses = strcat( contextTrain(:),'-train/',contextTest(:),'-test' );

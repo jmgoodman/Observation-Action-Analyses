@@ -98,4 +98,7 @@ else
     set(handles.areaSelector,'Value',1);
 end
 
+% update fields after loading the data
+updateFields(hObject, eventdata, handles)
+
 return

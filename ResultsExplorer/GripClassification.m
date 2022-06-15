@@ -71,7 +71,7 @@ load(classmatfile); %#ok<LOAD> % sole variable set to "classmats": see "classify
 setappdata(handles.output,'classmats',classmats);
 
 % set the names of the epochs
-epochNames = {'Pre-illumination','Post-illumination','Pre-movement','Post-movement','Pre-lift','Post-lift'};
+epochNames = {'Pre-illumination','Peri-illumination','Post-illumination','Pre-movement','Peri-movement','Post-movement','Pre-lift','Peri-lift','Post-lift'};
 setappdata(handles.output,'epochNames',epochNames);
 
 %%%%%%%% NOT NEEDED %%%%%%%%

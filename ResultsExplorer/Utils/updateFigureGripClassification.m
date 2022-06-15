@@ -112,9 +112,11 @@ switch analysisIdx
             classmatCell,'uniformoutput',false); % training (context x align x subalign) x testing (context x align x subalign) x array x subsample x fold
     
     case 2
-        % restricted to all those trained on the object viewing epoch
+        % restricted to all those trained on the object viewing epochs,
+        % i.e., those aligned to illumination onset (take max across all
+        % cross-trainings as your "canonical" value)
         theseMats = cellfun(@(session) ...
-            session.(analysisTypeField).(preprocessingField).(contextField).stack(2:3,:,:,:,:),...
+            session.(analysisTypeField).(preprocessingField).(contextField).stack(1:3,:,:,:,:),...
             classmatCell,'uniformoutput',false);
         
     case 3 % special TT, overrides task selection
@@ -199,66 +201,79 @@ sd = squeeze( std(newMat,0,3) );
 
 epochNames = getappdata(handles.output,'epochNames');
 
-newmu = zeros( numel(epochNames), size(mu,2), size(mu,3) );
-newsd = zeros( numel(epochNames), size(mu,2), size(mu,3) );
+%% NEW: keep distinct subalignments, just give them reasonable names
+newmu = mu;
+newsd = sd;
 
-for epochInd = 1:numel(epochNames)
-    epochName = epochNames{epochInd};
-    switch epochInd
-        case 1
-            newmu(epochInd,:,:) = mu(1,:,:);
-            newsd(epochInd,:,:) = sd(1,:,:);
-        case 2
-            keepinds = 2:3;
-            [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
-            % okay matlab requires very particular shit to avoid edge cases
-            % that arise from all the bullshit it's doing under the hood
-            % so here we go
-            idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
-            for ii = 1:numel(idx)
-                idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
-            end
-            sz  = size(idx);
-            for ii = 1:numel(idx)
-                [area,session] = ind2sub(sz,ii);
-                newsd(epochInd,area,session) = ...
-                    sd( idx(ii),area,session );
-            end
-        case 3
-            newmu(epochInd,:,:) = mu(4,:,:);
-            newsd(epochInd,:,:) = sd(4,:,:);
-        case 4
-            keepinds = 5:6;
-            [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
-            idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
-            for ii = 1:numel(idx)
-                idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
-            end
-            sz  = size(idx);
-            for ii = 1:numel(idx)
-                [area,session] = ind2sub(sz,ii);
-                newsd(epochInd,area,session) = ...
-                    sd( idx(ii),area,session );
-            end
-        case 5
-            newmu(epochInd,:,:) = mu(7,:,:);
-            newsd(epochInd,:,:) = sd(7,:,:);
-        case 6
-            keepinds = 8:9;
-            [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
-            idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
-            for ii = 1:numel(idx)
-                idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
-            end
-            sz  = size(idx);
-            for ii = 1:numel(idx)
-                [area,session] = ind2sub(sz,ii);
-                newsd(epochInd,area,session) = ...
-                    sd( idx(ii),area,session );
-            end
-    end
-end
+%% OLD: from when I wanted to pool subalignments.
+% newmu = zeros( numel(epochNames), size(mu,2), size(mu,3) );
+% newsd = zeros( numel(epochNames), size(mu,2), size(mu,3) );
+% 
+% % almost certainly a better way to do this but whatever
+% for epochInd = 1:numel(epochNames)
+%     %     epochName = epochNames{epochInd};
+%     switch epochInd
+%         case 1
+%             newmu(epochInd,:,:) = mu(1,:,:);
+%             newsd(epochInd,:,:) = sd(1,:,:);
+%         case 2
+%             %             keepinds = 2:3;
+%             %             [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
+%             %             % okay matlab requires very particular shit to avoid edge cases
+%             %             % that arise from all the bullshit it's doing under the hood
+%             %             % so here we go
+%             %             idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
+%             %             for ii = 1:numel(idx)
+%             %                 idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
+%             %             end
+%             %             sz  = size(idx);
+%             %             for ii = 1:numel(idx)
+%             %                 [area,session] = ind2sub(sz,ii);
+%             %                 newsd(epochInd,area,session) = ...
+%             %                     sd( idx(ii),area,session );
+%             %             end
+%             newmu(epochInd,:,:) = mu(3,:,:); % make it truly post-alignment and don't include aynthing centered on the alignment
+%             newsd(epochInd,:,:) = sd(3,:,:);
+%         case 3
+%             newmu(epochInd,:,:) = mu(4,:,:);
+%             newsd(epochInd,:,:) = sd(4,:,:);
+%         case 4
+%             %             keepinds = 5:6;
+%             %             [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
+%             %             idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
+%             %             for ii = 1:numel(idx)
+%             %                 idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
+%             %             end
+%             %             sz  = size(idx);
+%             %             for ii = 1:numel(idx)
+%             %                 [area,session] = ind2sub(sz,ii);
+%             %                 newsd(epochInd,area,session) = ...
+%             %                     sd( idx(ii),area,session );
+%             %             end
+%             newmu(epochInd,:,:) = mu(6,:,:); % make it truly post-alignment and don't include aynthing centered on the alignment
+%             newsd(epochInd,:,:) = sd(6,:,:);
+%         case 5
+%             newmu(epochInd,:,:) = mu(7,:,:);
+%             newsd(epochInd,:,:) = sd(7,:,:);
+%         case 6
+%             %             keepinds = 8:9;
+%             %             [newmu(epochInd,:,:),idx] = max(mu(keepinds,:,:),[],1);
+%             %             idx = permute(idx,[2,3,1]); % squeeze like this to avoid weird edge cases
+%             %             for ii = 1:numel(idx)
+%             %                 idx(ii) = keepinds(idx(ii)); % preserve shape when indexing like this
+%             %             end
+%             %             sz  = size(idx);
+%             %             for ii = 1:numel(idx)
+%             %                 [area,session] = ind2sub(sz,ii);
+%             %                 newsd(epochInd,area,session) = ...
+%             %                     sd( idx(ii),area,session );
+%             %             end
+%             newmu(epochInd,:,:) = mu(9,:,:); % make it truly post-alignment and don't include aynthing centered on the alignment
+%             newsd(epochInd,:,:) = sd(9,:,:);
+%     end
+% end
 
+%%
 % now make a plot
 colorStruct = getappdata(handles.output,'colorStruct');
 areamu = newmu(:,[4,1:3],:); % pooled-AIP-F5-M1 convention\
@@ -275,9 +290,9 @@ for areaind = 1:size(areamu,2)
         sdtrace = areasd(:,areaind,seshind);
         
         % split up by alignment
-        mutrace = [mutrace(1:2);nan;mutrace(3:4);nan;mutrace(5:6)];
-        sdtrace = [sdtrace(1:2);nan;sdtrace(3:4);nan;sdtrace(5:6)];
-        xtrace  = [1:2,2.5,3:4,4.5,5:6]';
+        mutrace = [mutrace(1:3);nan;mutrace(4:6);nan;mutrace(7:9)];
+        sdtrace = [sdtrace(1:3);nan;sdtrace(4:6);nan;sdtrace(7:9)];
+        xtrace  = [1:3,3.5,4:6,6.5,7:9]';
         
         hold all
         errorbar( xtrace + shiftval*0.02,mutrace,sdtrace,...

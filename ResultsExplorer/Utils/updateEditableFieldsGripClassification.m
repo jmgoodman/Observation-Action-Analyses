@@ -31,7 +31,7 @@ switch analysisIdx
     case 2 
         set(handles.testContextSelector,'String',{'VGG'});
         set(handles.trainingContextIndicator,'String',{'Same'});
-        set(handles.trainingEpochIndicator,'String',{'Object Viewing'});
+        set(handles.trainingEpochIndicator,'String',{'Illumination'});
         set(handles.preprocessingSelector,'String',{'none','orthogonal','aggressively orthogonal','mirror metric median split'});
         set(handles.gripClusteringSelector,'String',{'none','clustered'});
     case 3

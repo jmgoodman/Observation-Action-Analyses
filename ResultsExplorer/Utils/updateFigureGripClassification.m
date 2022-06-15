@@ -316,6 +316,9 @@ ylabel('Accuracy')
 xlabel('Epoch')
 set(gca,'xtick',1:numel(epochNames),'xticklabel',epochNames,'xticklabelrotation',45)
 
+% add legend
+customlegend(colorStruct.labels,'colors',colorStruct.colors);
+
 % todo: add in the kinematic classification accuracy at hold as a point of
 % comparison
 % I don't want anyone eyein' these plots thinkin' the effect is one of

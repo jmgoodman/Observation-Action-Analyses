@@ -1,4 +1,4 @@
-function updateFigureGripClassification(hObject, eventdata, handles)
+function updateFigureGripClassification(hObject, eventdata, handles) %#ok<INUSL>
 % hObject    handle to sessionSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -124,7 +124,7 @@ switch analysisIdx
         for sessionIdx = 1:numel(classmatCell)
             if isfield(classmatCell{sessionIdx},'special')
                 thisCell = classmatCell{sessionIdx}.special.(preprocessingField).(contextField).stack;
-                theseMats = vertcat(theseMats,thisCell);
+                theseMats = vertcat(theseMats,thisCell); %#ok<AGROW>
             else
                 % pass
             end

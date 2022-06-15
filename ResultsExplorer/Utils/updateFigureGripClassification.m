@@ -134,6 +134,11 @@ switch analysisIdx
         analysisTypeField = 'withMGG'; % override for this context, too
         % restricted to all those trained on MGG ("control", which comes
         % second) and tested on VGG ("active", which comes first)
+        % TODO: consider that cross-training may fail due to slight timing
+        % differences across the contexts
+        % (Okay, I considered it, but the movement epochs that I care about
+        % actually have very little difference in timing. Certainly too
+        % small to be picked up by the large bin jumps that I've used.)
         theseMats = cellfun(@(session) ...
             session.(analysisTypeField).(preprocessingField).(contextField).stack(10:end,1:9,:,:,:),...
             classmatCell,'uniformoutput',false);

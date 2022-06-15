@@ -65,127 +65,186 @@ end
 
 data_ = cellfun(@(x) x.(contextName),data_,'uniformoutput',false);
 
-%%
-% alternative selection of alignments and subalignments
-% pull it from allclassmats
-allClassmats     = getappdata(handles.output,'allClassmats');
-alignTest        = getappdata(handles.output,'alignTest');
-alignTrain       = getappdata(handles.output,'alignTrain');
-subAlignTest     = getappdata(handles.output,'subAlignTest');
-subAlignTrain    = getappdata(handles.output,'subAlignTrain');
-contextTest      = getappdata(handles.output,'contextTest');
-contextTrain     = getappdata(handles.output,'contextTrain'); % these give the full array of ind-2-sub vals. the stuff in the cell above is giving the currently-selected one.
+%% pull the data
+% if no overrides, handle it like this
 
-testAlignName    = alignTest{trainAlign,testAlign};
-trainAlignName   = alignTrain{trainAlign,testAlign};
-alignSize        = size(alignTest); % same size as alignTrain
+trainOverrideString = get(handles.trainPoolOverride,'String');
+testOverrideString = get(handles.testPoolOverride,'String');
+trainOverrideValue = get(handles.trainPoolOverride,'Value');
+testOverrideValue = get(handles.testPoolOverride,'Value');
 
-subAlignSize     = sqrt(subAlignmentCount)*[1 1]; % same size as alignTrain
+trainOverride = trainOverrideString{trainOverrideValue};
+testOverride  = testOverrideString{testOverrideValue};
 
-% hmm my brain is too fried to handle this atm. maybe just generate some
-% illustrative plots and call it a day.
-
-%%
-
-% for some reason this STILL works if you don't slice dims 4-7 and just squeeze the sliced dimensions. 
-% question: WHY
-data_ = cellfun(@(x) squeeze( x(:,trainContextComparison,testContextComparison,...
-    trainAlign,testAlign,trainSubAlign,testSubAlign) ),...
-    data_,'uniformoutput',false);
-
-% now we have:
-% level 1: sessions
-% level 2: subsamples
-% level 3: kfold
-% level 4: (double, not cell) pool - AIP - F5 - M1 - chance
-
-% take the average across folds within each subsample
-foldaverage = cellfun(@(session) ...
-    cellfun(@(subsample) ...
-    mean(horzcat(subsample{:}),2),session,'uniformoutput',false),...
-    data_,'uniformoutput',false);
-
-% level 1: sessions
-% level 2: subsamples
-% level 3: (double, not cell) AIP - F5 - M1 - pooled - chance
-% (crossclassify_refactor confirms this)
-
-% turn subsamples into columns
-foldaverage = cellfun(@(session) ...
-    horzcat(session{:}),foldaverage,'uniformoutput',false);
-
-% count sessions and areas
-nsesh = numel(foldaverage);
-narea = size( foldaverage{1},1 ) - 1;
-
-% and rearrange the rows to match the color convention
-colorStruct = getappdata(handles.output,'colorStruct');
-if narea == numel(colorStruct.labels)
-    foldaverage = cellfun(@(session) ...
-        session([4,1:3,5],:),foldaverage,'uniformoutput',false);
-else
-    colorStruct.colors = zeros(narea,3);
-    colorStruct.labels = repmat({'kinematics'},1,narea);
-end
-
-% okay, now we make a grouped bar plot
-% with scatter
-
-axes( (handles.peakAccuracyPlot) );
-cla;
-barx = 0;
-sessionMids = zeros(nsesh,1);
-for seshind = 1:nsesh
-    % barx   = seshind - 1; % group by session, not by area
-    beginSession = barx;
-    foldav = foldaverage{seshind};
+if strcmpi(trainOverride,'None') && strcmpi(testOverride,'None')
+    % for some reason this STILL works if you don't slice dims 4-7 and just squeeze the sliced dimensions.
+    % question: WHY
+    data_ = cellfun(@(x) squeeze( x(:,trainContextComparison,testContextComparison,...
+        trainAlign,testAlign,trainSubAlign,testSubAlign) ),...
+        data_,'uniformoutput',false);
     
-    for areaind = 1:narea
-        foldavrow = foldav(areaind,:);
-        barht     = mean(foldavrow); % average across subsamples
-        xscatter  = barx - 0.05 + 0.1*rand(size(foldavrow));
-        hold all
-        b = bar(barx,barht,1);
-        thisColor = colorStruct.colors(areaind,:);
-        set(b,'facecolor',thisColor)
+    % now we have:
+    % level 1: sessions
+    % level 2: subsamples
+    % level 3: kfold
+    % level 4: (double, not cell) pool - AIP - F5 - M1 - chance
+    
+    % take the average across folds within each subsample
+    foldaverage = cellfun(@(session) ...
+        cellfun(@(subsample) ...
+        mean(horzcat(subsample{:}),2),session,'uniformoutput',false),...
+        data_,'uniformoutput',false);
+    
+    % level 1: sessions
+    % level 2: subsamples
+    % level 3: (double, not cell) AIP - F5 - M1 - pooled - chance
+    % (crossclassify_refactor confirms this)
+    
+    % turn subsamples into columns
+    foldaverage = cellfun(@(session) ...
+        horzcat(session{:}),foldaverage,'uniformoutput',false);
+    
+    % count sessions and areas
+    nsesh = numel(foldaverage);
+    narea = size( foldaverage{1},1 ) - 1;
+    
+    % and rearrange the rows to match the color convention
+    colorStruct = getappdata(handles.output,'colorStruct');
+    if narea == numel(colorStruct.labels)
+        foldaverage = cellfun(@(session) ...
+            session([4,1:3,5],:),foldaverage,'uniformoutput',false);
+    else
+        colorStruct.colors = zeros(narea,3);
+        colorStruct.labels = repmat({'kinematics'},1,narea);
+    end
+    
+    % okay, now we make a grouped bar plot
+    % with scatter
+    
+    axes( (handles.peakAccuracyPlot) );
+    cla;
+    barx = 0;
+    sessionMids = zeros(nsesh,1);
+    for seshind = 1:nsesh
+        % barx   = seshind - 1; % group by session, not by area
+        beginSession = barx;
+        foldav = foldaverage{seshind};
         
-        %         if max(thisColor) < 0.3
-        %             outlineColor = [1 1 1];
-        %         else
-        %             outlineColor = [0 0 0];
-        %         end
-        
-        hold all
-        scatter(xscatter,foldavrow,36,0.5+0.5*thisColor);% ,...
+        for areaind = 1:narea
+            foldavrow = foldav(areaind,:);
+            barht     = mean(foldavrow); % average across subsamples
+            xscatter  = barx - 0.05 + 0.1*rand(size(foldavrow));
+            hold all
+            b = bar(barx,barht,1);
+            thisColor = colorStruct.colors(areaind,:);
+            set(b,'facecolor',thisColor)
+            
+            %         if max(thisColor) < 0.3
+            %             outlineColor = [1 1 1];
+            %         else
+            %             outlineColor = [0 0 0];
+            %         end
+            
+            hold all
+            scatter(xscatter,foldavrow,36,0.5+0.5*thisColor);% ,...
             % 'markeredgecolor',outlineColor,...
             % 'markerfacecolor',thisColor)
-        
-        barx = barx+1;
+            
+            barx = barx+1;
+        end
+        endSession = barx - 1;
+        sessionMids(seshind) = (beginSession + endSession)/2;
+        barx = barx+1; % group by session, not by area (since different sessions have different subsample sizes!)
     end
-    endSession = barx - 1;
-    sessionMids(seshind) = (beginSession + endSession)/2;
-    barx = barx+1; % group by session, not by area (since different sessions have different subsample sizes!)
-end
     
-% plot the chance level
-% (use a white-outlined black dashed line)
-chanceLevel = cellfun(@(x) x(end,:),foldaverage,'uniformoutput',false);
-chanceLevel = mean( horzcat(chanceLevel{:}) );
+    % plot the chance level
+    % (use a white-outlined black dashed line)
+    chanceLevel = cellfun(@(x) x(end,:),foldaverage,'uniformoutput',false);
+    chanceLevel = mean( horzcat(chanceLevel{:}) );
+    
+    axis tight
+    xl = get(gca,'xlim');
+    hold all
+    line(xl,chanceLevel*[1 1],'linewidth',1,'color',[1 1 1])
+    hold all
+    line(xl,chanceLevel*[1 1],'linewidth',0.75,'color',[0 0 0],'linestyle','--')
+    
+    % adjust margins & stuff
+    ylim([0 1])
+    ylabel('Classification accuracy')
+    
+    % add legend
+    customlegend(colorStruct.labels,'colors',colorStruct.colors);
+    
+    % adjust tick marks
+    sessionLabels = cellfun(@(x) x.seshID,classifyCell,'uniformoutput',false);
+    set(gca,'xtick',sessionMids,'xticklabel',sessionLabels)
+    
+    % terminate here, don't execute the rest of the script which handles
+    % max pooling
+    return
+    
+else
+    % pass
+end
 
-axis tight
-xl = get(gca,'xlim');
-hold all
-line(xl,chanceLevel*[1 1],'linewidth',1,'color',[1 1 1])
-hold all
-line(xl,chanceLevel*[1 1],'linewidth',0.75,'color',[0 0 0],'linestyle','--')
-
-% adjust margins & stuff
-ylim([0 1])
-ylabel('Classification accuracy')
-
-% add legend
-customlegend(colorStruct.labels,'colors',colorStruct.colors);
-
-% adjust tick marks
-sessionLabels = cellfun(@(x) x.seshID,classifyCell,'uniformoutput',false);
-set(gca,'xtick',sessionMids,'xticklabel',sessionLabels)
+%% experimental feature, disregard (will NOT be implemented in the end, the plot I envision is not well-served by this gui!)
+% (the peak accuracy plot is ENOUGH!)
+% % if not None, replace aligns & subaligns with appropriate values
+% nSubAlign = sqrt(subAlignmentCount);
+% 
+% midSubAlign = (nSubAlign + 1)/2;
+% alignNames  = cellstr( unique( char(trainAlign(:)),'rows' ) );
+% 
+% % iterate over train & test
+% % NEW IDEA: classification accuracy TRACES instead of bar plots
+% for traintest = 1:2
+%     switch traintest
+%         case 1
+%             switchval = trainOverride;
+%         case 2
+%             switchval = testOverride;
+%         otherwise
+%             % pass
+%     end
+%     
+%     switch switchval
+%         case 'None'
+%             % pass
+%         case 'Baseline'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'lighton','once') ),alignNames) ...
+%                 );
+%             newSubAlign = 1:(midSubAlign-1); % assume all alignments have equal subalignment counts.
+%         case 'Vision'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'lighton','once') ),alignNames) ...
+%                 );
+%             newSubAlign = midSubAlign:nSubAlign; % assume all alignments have equal subalignment counts.
+%         case 'Late Memory'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'move','once') ),alignNames) ...
+%                 );
+%             newSubAlign = 1:(midSubAlign-1); % assume all alignments have equal subalignment counts.
+%         case 'Early Movement'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'move','once') ),alignNames) ...
+%                 );
+%             newSubAlign = midSubAlign:nSubAlign; % assume all alignments have equal subalignment counts.
+%         case 'Late Movement'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'hold','once') ),alignNames) ...
+%                 );
+%             newSubAlign = 1:(midSubAlign-1); % assume all alignments have equal subalignment counts.
+%         case 'Contact'
+%             newAlign = find( ...
+%                 cellfun(@(x) ~isempty( regexpi(x,'hold','once') ),alignNames) ...
+%                 );
+%             newSubAlign = midSubAlign:nSubAlign; % assume all alignments have equal subalignment counts.
+%         otherwise
+%             % pass
+%     end
+% end
+% data_ = cellfun(@(x) squeeze( x(:,trainContextComparison,testContextComparison,...
+%     trainAlign,testAlign,trainSubAlign,testSubAlign) ),...
+%     data_,'uniformoutput',false);

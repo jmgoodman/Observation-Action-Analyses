@@ -22,7 +22,7 @@ function varargout = GripClassification(varargin)
 
 % Edit the above text to modify the response to help GripClassification
 
-% Last Modified by GUIDE v2.5 14-Jun-2022 11:39:26
+% Last Modified by GUIDE v2.5 15-Jun-2022 14:32:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,12 +55,6 @@ function GripClassification_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for GripClassification
 handles.output = hObject;
 
-% Choose default command line output for CommonSubspace
-handles.output = hObject;
-
-% pull data and set to the handles structure as appdata
-disp('This one requires a lot of data to be loaded. Patience!')
-
 mfd = mfilename('fullpath');
 [cd_,~,~] = fileparts(mfd);
 [cd_,~,~] = fileparts(cd_);
@@ -71,23 +65,32 @@ analysisOutputsDir = fullfile(cd_,'Analysis-Outputs');
 setappdata(handles.output,'mirrorDataDir',mirrorDataDir)
 setappdata(handles.output,'analysisOutputsDir',analysisOutputsDir);
 
-sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara70'};
-set(handles.sessionSelector,'String',sessions2analyze);
+% load in the data for these analyses
+classmatfile = fullfile(analysisOutputsDir,'all-sessions-classmats.mat');
+load(classmatfile); %#ok<LOAD> % sole variable set to "classmats": see "classify_output_analysis.m" under "Analysis-Outputs" for confirmation
+setappdata(handles.output,'classmats',classmats);
 
-arrays2analyze = {'pooled';'AIP';'F5';'M1'};
-set(handles.areaSelector,'String',arrays2analyze)
+% set the names of the epochs
+epochNames = {'Pre-illumination','Post-illumination','Pre-movement','Post-movement','Pre-lift','Post-lift'};
+setappdata(handles.output,'epochNames',epochNames);
+
+%%%%%%%% NOT NEEDED %%%%%%%%
+% sessions2analyze = {'Moe46';'Moe50';'Zara64';'Zara70'};
+% set(handles.sessionSelector,'String',sessions2analyze);
+% 
+% arrays2analyze = {'pooled';'AIP';'F5';'M1'};
+% set(handles.areaSelector,'String',arrays2analyze)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 colorStruct = defColorConvention(); 
 setappdata(handles.output,'colorStruct',colorStruct)
 
-seshNames = sessions2analyze;
+% update editable fields
+updateEditableFieldsGripClassification(hObject, eventdata, handles);
 
-% load in the animal-specific data
-loadClassifyData(hObject, eventdata, handles);
-updatePeakAccuracy(hObject, eventdata, handles);
+% update figure (done as part of updateEditableFieldsGripClassification)
 
-% pull in some kinematic classification numbers
-% TODO
+% update data table
 
 % Update handles structure
 guidata(hObject, handles);
@@ -107,23 +110,21 @@ function varargout = GripClassification_OutputFcn(hObject, eventdata, handles)
 varargout{1} = handles.output;
 
 
-% --- Executes on selection change in sessionSelector.
-function sessionSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to sessionSelector (see GCBO)
+% --- Executes on selection change in monkeySelector.
+function monkeySelector_Callback(hObject, eventdata, handles)
+% hObject    handle to monkeySelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns sessionSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from sessionSelector
+% Hints: contents = cellstr(get(hObject,'String')) returns monkeySelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from monkeySelector
 
-% this is going to be HELLA unoptimized
-% load data anew for changing this value
-loadClassifyData(hObject, eventdata, handles);
-
+% no need to update the editable fields, nothing would change anyway
+updateFigureGripClassification(hObject, eventdata, handles)
 
 % --- Executes during object creation, after setting all properties.
-function sessionSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to sessionSelector (see GCBO)
+function monkeySelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to monkeySelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -134,20 +135,19 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in areaSelector.
-function areaSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to areaSelector (see GCBO)
+% --- Executes on selection change in analysisSelector.
+function analysisSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to analysisSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns areaSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from areaSelector
-updateFields(hObject, eventdata, handles);
-
+% Hints: contents = cellstr(get(hObject,'String')) returns analysisSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from analysisSelector
+updateEditableFieldsGripClassification(hObject, eventdata, handles);
 
 % --- Executes during object creation, after setting all properties.
-function areaSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to areaSelector (see GCBO)
+function analysisSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to analysisSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -158,19 +158,20 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in level1Selector.
-function level1Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level1Selector (see GCBO)
+% --- Executes on selection change in testContextSelector.
+function testContextSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to testContextSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns level1Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level1Selector
+% Hints: contents = cellstr(get(hObject,'String')) returns testContextSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from testContextSelector
+updateEditableFieldsGripClassification(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function level1Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level1Selector (see GCBO)
+function testContextSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to testContextSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -181,19 +182,21 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in level2Selector.
-function level2Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level2Selector (see GCBO)
+% --- Executes on selection change in trainingContextIndicator.
+function trainingContextIndicator_Callback(hObject, eventdata, handles)
+% hObject    handle to trainingContextIndicator (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns level2Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level2Selector
+% Hints: contents = cellstr(get(hObject,'String')) returns trainingContextIndicator contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from trainingContextIndicator
+
+% always an indicator, no need to have a callback here
 
 
 % --- Executes during object creation, after setting all properties.
-function level2Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level2Selector (see GCBO)
+function trainingContextIndicator_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to trainingContextIndicator (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -204,111 +207,20 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in level3Selector.
-function level3Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level3Selector (see GCBO)
+% --- Executes on selection change in trainingEpochIndicator.
+function trainingEpochIndicator_Callback(hObject, eventdata, handles)
+% hObject    handle to trainingEpochIndicator (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns level3Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level3Selector
+% Hints: contents = cellstr(get(hObject,'String')) returns trainingEpochIndicator contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from trainingEpochIndicator
 
-
-% --- Executes during object creation, after setting all properties.
-function level3Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level3Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in level4Selector.
-function level4Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level4Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns level4Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level4Selector
-
+% always an indicator, no need to have a callback here
 
 % --- Executes during object creation, after setting all properties.
-function level4Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level4Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in level5Selector.
-function level5Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level5Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns level5Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level5Selector
-
-
-% --- Executes during object creation, after setting all properties.
-function level5Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level5Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in level6Selector.
-function level6Selector_Callback(hObject, eventdata, handles)
-% hObject    handle to level6Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns level6Selector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from level6Selector
-
-
-% --- Executes during object creation, after setting all properties.
-function level6Selector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to level6Selector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in axisSelector.
-function axisSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to axisSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns axisSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from axisSelector
-
-
-% --- Executes during object creation, after setting all properties.
-function axisSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to axisSelector (see GCBO)
+function trainingEpochIndicator_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to trainingEpochIndicator (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -324,46 +236,24 @@ function returnButton_Callback(hObject, eventdata, handles)
 % hObject    handle to returnButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
 closereq();
 ResultsExplorer();
 
 
-
-% --- Executes on button press in saveHeatmap.
-function saveHeatmap_Callback(hObject, eventdata, handles)
-% hObject    handle to saveHeatmap (see GCBO)
+% --- Executes on selection change in preprocessingSelector.
+function preprocessingSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to preprocessingSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% Hints: contents = cellstr(get(hObject,'String')) returns preprocessingSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from preprocessingSelector
+updateEditableFieldsGripClassification(hObject, eventdata, handles);
 
-% --- Executes on button press in savePeakAccuracyPlot.
-function savePeakAccuracyPlot_Callback(hObject, eventdata, handles)
-% hObject    handle to savePeakAccuracyPlot (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-dataSaver(hObject,eventdata,handles,'peakAccuracyPlot');
-
-% --- Executes on button press in saveStats.
-function saveStats_Callback(hObject, eventdata, handles)
-% hObject    handle to saveStats (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-
-% --- Executes on selection change in controlSelector.
-function controlSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to controlSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns controlSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from controlSelector
-updateFields(hObject, eventdata, handles);
 
 % --- Executes during object creation, after setting all properties.
-function controlSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to controlSelector (see GCBO)
+function preprocessingSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to preprocessingSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -374,128 +264,34 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 
-% --- Executes on selection change in contextSelector.
-function contextSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to contextSelector (see GCBO)
+% --- Executes on button press in figureExport.
+function figureExport_Callback(hObject, eventdata, handles)
+% hObject    handle to figureExport (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+dataSaver(hObject,eventdata,handles,'accuracyPlot');
+
+% --- Executes on button press in dataExport.
+function dataExport_Callback(hObject, eventdata, handles)
+% hObject    handle to dataExport (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns contextSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from contextSelector
-updateFields(hObject, eventdata, handles);
 
-
-% --- Executes during object creation, after setting all properties.
-function contextSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to contextSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in subContextSelector.
-function subContextSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to subContextSelector (see GCBO)
+% --- Executes on selection change in gripClusteringSelector.
+function gripClusteringSelector_Callback(hObject, eventdata, handles)
+% hObject    handle to gripClusteringSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns subContextSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from subContextSelector
-updateFields(hObject, eventdata, handles);
+% Hints: contents = cellstr(get(hObject,'String')) returns gripClusteringSelector contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from gripClusteringSelector
+updateEditableFieldsGripClassification(hObject, eventdata, handles);
 
 
 % --- Executes during object creation, after setting all properties.
-function subContextSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to subContextSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in alignmentSelector.
-function alignmentSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to alignmentSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns alignmentSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from alignmentSelector
-updateFields(hObject, eventdata, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function alignmentSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to alignmentSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in subAlignmentSelector.
-function subAlignmentSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to subAlignmentSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns subAlignmentSelector contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from subAlignmentSelector
-updateFields(hObject, eventdata, handles);
-
-
-% --- Executes during object creation, after setting all properties.
-function subAlignmentSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to subAlignmentSelector (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes on selection change in text100.
-function contextComparisonSelector_Callback(hObject, eventdata, handles)
-% hObject    handle to text100 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: contents = cellstr(get(hObject,'String')) returns text100 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from text100
-updateFields(hObject, eventdata, handles);
-
-% --- Executes during object creation, after setting all properties.
-function text100_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to text100 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: popupmenu controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-
-% --- Executes during object creation, after setting all properties.
-function contextComparisonSelector_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to contextComparisonSelector (see GCBO)
+function gripClusteringSelector_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to gripClusteringSelector (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 

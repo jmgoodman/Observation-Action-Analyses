@@ -314,7 +314,8 @@ line(get(gca,'xlim'),chanceLevel*[1 1],'linewidth',0.75,'color',[0 0 0],'linesty
 ylim([0 1])
 ylabel('Accuracy')
 xlabel('Epoch')
-set(gca,'xtick',1:numel(epochNames),'xticklabel',epochNames,'xticklabelrotation',45)
+% set(gca,'xtick',1:numel(epochNames),'xticklabel',epochNames,'xticklabelrotation',45)
+set(gca,'xtick',2:3:8,'xticklabel',{'Illumination','Movement','Lift'},'xticklabelrotation',45)
 
 % add legend
 customlegend(colorStruct.labels,'colors',colorStruct.colors);

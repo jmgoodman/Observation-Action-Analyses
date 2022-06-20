@@ -311,6 +311,38 @@ hold all
 line(get(gca,'xlim'),chanceLevel*[1 1],'linewidth',1,'color',[1 1 1],'linestyle','-')
 line(get(gca,'xlim'),chanceLevel*[1 1],'linewidth',0.75,'color',[0 0 0],'linestyle','--')
 
+% add kinematic accuracy (hard-coded because I'm *stupid*)
+if ismember(analysisIdx,[1,2,5])
+    if strcmpi(contextField,'active') || strcmpi(contextField,'control')
+        if strcmpi(monkey,'moe')
+            if strcmpi(gripClustering,'none')
+                kinaccs = [0.606969,0.677566];
+            elseif strcmpi(gripClustering,'clustered')
+                kinaccs = [0.857343,0.895848];
+            end
+        elseif strcmpi(monkey,'zara')
+            if strcmpi(gripClustering,'none')
+                kinaccs = [0.665859,0.638547,0.777532];
+            elseif strcmpi(gripClustering,'clustered')
+                kinaccs = [0.895584,0.857453,0.831819];
+            end
+        end
+    elseif strcmpi(contextField,'passive')
+        if strcmpi(gripClustering,'none')
+            kinaccs = [0.658093,0.624144,0.782545];
+        elseif strcmpi(gripClustering,'clustered')
+            kinaccs = [0.910174,0.860654,0.811514];
+        end
+    end
+    
+    kinacc = mean(kinaccs);
+    hold all
+    line(get(gca,'xlim'),kinacc*[1 1],'linewidth',1,'color',[1 1 1],'linestyle','-')
+    line(get(gca,'xlim'),kinacc*[1 1],'linewidth',0.75,'color',[0 0 0],'linestyle','--')
+else
+    % pass
+end
+
 ylim([0 1])
 ylabel('Accuracy')
 xlabel('Epoch')

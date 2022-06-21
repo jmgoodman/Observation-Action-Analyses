@@ -290,7 +290,7 @@ cla;
 
 shiftval = -( size(areamu,2)*size(areamu,3) - 1 )/2;
 for areaind = 1:size(areamu,2)
-    for seshind = 1:size(areamu,3)
+    for seshind = 1 %1:size(areamu,3)
         mutrace = areamu(:,areaind,seshind);
         sdtrace = areasd(:,areaind,seshind);
         

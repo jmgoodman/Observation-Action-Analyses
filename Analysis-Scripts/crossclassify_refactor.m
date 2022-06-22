@@ -262,11 +262,12 @@ if strcmpi(opts.datamode,'neural')
         elseif sss >= 1
             sss_safe = min(cellfun(@(x) size(x,2),keptproj));
             if sss_safe < sss
-                warning('subsampsize too big, defaulting to lowest subpopulation size') % which will be INEFFICIENT unless I adapt my code to handle this condition!
+                warning('subsampsize too big, defaulting to lowest subpopulation size')
+                sss = sss_safe;
             else
                 % pass
             end
-            subsampsize = sss_safe;
+            subsampsize = sss;
         end
         nssreps     = opts.nssreps;
         ssflag      = true;

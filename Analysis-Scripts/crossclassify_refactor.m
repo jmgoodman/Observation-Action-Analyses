@@ -457,6 +457,7 @@ try
     p = parpool(pc,ncores_touse);
 catch err
     delete(gcp('nocreate'))
+    pause(5) % give it time to cool off? is that what needs to happen?
     p = parpool(pc,ncores_touse);
 end
 

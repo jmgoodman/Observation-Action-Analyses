@@ -120,6 +120,8 @@ T = clusterdata(X_trav,'criterion','distance','cutoff',specialclustcutoff,'linka
 clusterstruct.clusterinds = T;
 clusterstruct.objnames    = uobj;
 
+save('humanClusters.mat','clusterstruct','-v7.3');
+
 %% notes
 % louvain sets an adjacency threshold
 % agglomerative sets a clustering threshold

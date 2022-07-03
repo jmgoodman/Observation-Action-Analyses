@@ -454,10 +454,11 @@ ncores_touse = max(ncores - 2,1); % leave a couple of buffer cores to do other n
 pc = parcluster('local');
 
 try
+    pause(10);
     p = parpool(pc,ncores_touse);
 catch err
     delete(gcp('nocreate'))
-    pause(5) % give it time to cool off? is that what needs to happen?
+    pause(10); % give it time to cool off? is that what needs to happen?
     p = parpool(pc,ncores_touse);
 end
 

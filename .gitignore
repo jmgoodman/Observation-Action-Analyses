@@ -58,3 +58,11 @@ MirrorData/.DS_Store
 MirrorData/KinematicsProcessing/.DS_Store
 *.asv
 ResultsExplorer/Data/sustainData.mat
+MirrorData/structMoe32.mat
+MirrorData/structMoe34.mat
+MirrorData/structMoe46.mat
+MirrorData/structMoe50.mat
+MirrorData/structZara64.mat
+MirrorData/structZara65.mat
+MirrorData/structZara68.mat
+MirrorData/structZara70.mat

@@ -29,6 +29,17 @@ plt.figure()
 plt.plot(trueSpikeBins[:-1],binnedSpikeCounts)
 plt.show() # important...
 
+# from here, you can trivially get binned spike counts and binned kinematics to go with them (thanks past me for painstakingly aligning them in MATLAB!)
+# then you can dump each session into a table of a lil sql file
+# and write a PyTorch dataloader to query a session and then a snippet of data from it
+# then get BERT involved and decode joint kinematics
+# TODO: figure out how to decode observed actions: as a literal representation of the viewed hand movements, or as some trial-averaged version of the average grip adopted by the monkey themselves?
+#   probably some variation of both? use the literal representation of viewed hand movements as your model of training a decoder on observed actions, and use the average grip adopted by the monkey themselves as one of two models (the other being "hold still") of what is being decoded by a movement-trained decoder during an observation context
+# TODO: figure out how to stitch sessions together? Given Jannik's work and all... (although this could be trickier with ANN decoders...) (maybe CEBRA is a solution to this?)
+# But both of those todo items are "nice-to-haves". If we can just do raw-ass decoding, PERIOD, that's an EXCELLENT first step.
+# But to that end:
+# TODO: for observation contexts, switch kinematics from the observed ones to a constant stream of the average "on-handrest" position of the animal
+
 # %%
 # convert to a pandas Series
 # (note: DataFrame.hist is very slow here)

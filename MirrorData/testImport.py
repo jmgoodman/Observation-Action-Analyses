@@ -8,7 +8,7 @@ import pandas as pd
 
 # matplotlib.use('WebAgg') # qtagg might be default, I think? which requires PyQt. Or TkAgg, which requires TkInter.
 
-mat = loadmat('structZara68.mat',simplify_cells=True)
+mat = loadmat('structZara70.mat',simplify_cells=True)
 
 print(mat)
 # %%

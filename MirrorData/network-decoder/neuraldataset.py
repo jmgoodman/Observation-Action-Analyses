@@ -13,6 +13,13 @@ class NeuralDataset(Dataset):
 
 		mat = loadmat(session,simplify_cells=True)
 
+		# step 1: get the kinematic data bins
+		kindata = mat['Mstruct']['Kinematic']
+		kinbins = torch.empty(0)
+
+		for kd in kindata:
+			torch.cat(kinbins,kindata['JoinStruct']['data'][:,0])
+
 
 	def __len__(self):
 

@@ -4,13 +4,23 @@ import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import pandas as pd
+import torch
 # import plotly.graph_objects as go
 
 # matplotlib.use('WebAgg') # qtagg might be default, I think? which requires PyQt. Or TkAgg, which requires TkInter.
 
 mat = loadmat('structZara70.mat',simplify_cells=True)
 
-print(mat)
+# step 1: get the kinematic data bins (don't concatenate because they won't be contiguous)
+kindata = mat['Mstruct']['Kinematic']
+kinbins = []
+
+for kd in kindata:
+	kinbins += [torch.tensor(kd['JointStruct']['data'][:,0])]
+
+print(kinbins[3][-1] - kinbins[3][-2])
+print(kinbins[4][0] - kinbins[3][-1])
+
 # %%
 # sample code binning the spike counts (using only the first kinematic "file" and one neuron, though )
 spikeBins  = mat['Mstruct']['Kinematic'][0]['JointStruct']['data'][:,0]

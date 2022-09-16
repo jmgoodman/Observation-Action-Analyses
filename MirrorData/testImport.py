@@ -21,6 +21,20 @@ for kd in kindata:
 print(kinbins[3][-1] - kinbins[3][-2])
 print(kinbins[4][0] - kinbins[3][-1])
 
+# step 2: bin the spike counts
+neurdata = mat['Mstruct']['Neural']
+
+binnedspikecounts = []
+
+for nd in neurdata:
+	bsc,_ = torch.histogram(torch.tensor(nd['spiketimes']),kinbins[0])
+	binnedspikecounts += [torch.unsqueeze(bsc,dim=-1)]
+
+binnedspikecounts = torch.cat(tuple(binnedspikecounts),dim=1)
+
+print(binnedspikecounts)
+print(binnedspikecounts.size())
+
 # %%
 # sample code binning the spike counts (using only the first kinematic "file" and one neuron, though )
 spikeBins  = mat['Mstruct']['Kinematic'][0]['JointStruct']['data'][:,0]
@@ -35,9 +49,9 @@ spikeTimes = mat['Mstruct']['Neural'][mostSpikesNeuron]['spiketimes']
 binnedSpikeCounts,trueSpikeBins = np.histogram(spikeTimes,bins=spikeBins)
 
 # and plot (not using hist, but rather just a time-varying trace)
-plt.figure()
-plt.plot(trueSpikeBins[:-1],binnedSpikeCounts)
-plt.show() # important...
+# plt.figure()
+# plt.plot(trueSpikeBins[:-1],binnedSpikeCounts)
+# plt.show() # important...
 
 # from here, you can trivially get binned spike counts and binned kinematics to go with them (thanks past me for painstakingly aligning them in MATLAB!)
 # then you can dump each session into a table of a lil sql file
@@ -53,8 +67,8 @@ plt.show() # important...
 # %%
 # convert to a pandas Series
 # (note: DataFrame.hist is very slow here)
-s = pd.Series(spikeTimes)
-histo = s.value_counts(bins=spikeBins)
+# s = pd.Series(spikeTimes)
+# histo = s.value_counts(bins=spikeBins)
 
 # %%
-input('Press any key to end...\n')
+input('Press enter to end...\n')

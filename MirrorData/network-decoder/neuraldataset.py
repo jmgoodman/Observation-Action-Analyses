@@ -52,9 +52,12 @@ class NeuralDataset(Dataset):
 			temp = torch.cat(tuple(temp),dim=1)
 			binnedspikecounts += [temp]
 
+		# now save it as a data file
+		# (in fact this should probably be preprocessing for the dataset)
 
 
 
 	def __len__(self):
 
 	def __getitem__(self,idx:int):
+		return neuraldata, kinematicdata # image, label framework: https://pytorch.org/tutorials/beginner/basics/data_tutorial.html

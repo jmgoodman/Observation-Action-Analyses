@@ -28,6 +28,8 @@ print(kinbins[4][0] - kinbins[3][-1])
 # step 2: bin the spike counts
 neurdata = mat['Mstruct']['Neural']
 
+print(neurdata)
+
 binnedspikecounts = []
 
 for block in kinbins:

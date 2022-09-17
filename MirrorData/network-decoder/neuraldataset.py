@@ -56,7 +56,6 @@ class NeuralDataset(Dataset):
 		# (in fact this should probably be preprocessing for the dataset)
 
 
-
 	def __len__(self):
 
 	def __getitem__(self,idx:int):

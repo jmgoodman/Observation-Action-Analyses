@@ -14,9 +14,13 @@ mat = loadmat('structZara70.mat',simplify_cells=True)
 # step 1: get the kinematic data bins (don't concatenate because they won't be contiguous)
 kindata = mat['Mstruct']['Kinematic']
 kinbins = []
+binnedjointangles = []
 
 for kd in kindata:
 	kinbins += [torch.tensor(kd['JointStruct']['data'][:,0])]
+	binnedjointangles += [torch.tensor(kd['JointStruct']['data'][:,1:])]
+
+print(kindata[0]['JointStruct'])
 
 print(kinbins[3][-1] - kinbins[3][-2])
 print(kinbins[4][0] - kinbins[3][-1])
@@ -26,14 +30,20 @@ neurdata = mat['Mstruct']['Neural']
 
 binnedspikecounts = []
 
-for nd in neurdata:
-	bsc,_ = torch.histogram(torch.tensor(nd['spiketimes']),kinbins[0])
-	binnedspikecounts += [torch.unsqueeze(bsc,dim=-1)]
+for block in kinbins:
+	temp = []
+	for nd in neurdata:
+		bsc,_ = torch.histogram(torch.tensor(nd['spiketimes']),block)
+		temp += [torch.unsqueeze(bsc,dim=-1)]
 
-binnedspikecounts = torch.cat(tuple(binnedspikecounts),dim=1)
+	temp = torch.cat(tuple(temp),dim=1)
+	binnedspikecounts += [temp]
 
-print(binnedspikecounts)
-print(binnedspikecounts.size())
+print(binnedspikecounts[0].size())
+print(binnedspikecounts[1].size())
+print(binnedjointangles[0].size())
+print(binnedjointangles[1].size())
+
 
 # %%
 # sample code binning the spike counts (using only the first kinematic "file" and one neuron, though )

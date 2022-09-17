@@ -20,15 +20,16 @@ for kd in kindata:
 	kinbins += [torch.tensor(kd['JointStruct']['data'][:,0])]
 	binnedjointangles += [torch.tensor(kd['JointStruct']['data'][:,1:])]
 
-print(kindata[0]['JointStruct'])
+print(kindata[0]['JointStruct']['columnNames'][1:])
 
 print(kinbins[3][-1] - kinbins[3][-2])
+print(kinbins[3][1] - kinbins[3][0])
 print(kinbins[4][0] - kinbins[3][-1])
 
 # step 2: bin the spike counts
 neurdata = mat['Mstruct']['Neural']
 
-print(neurdata)
+print(mat['Mstruct']['TrialType'])
 
 binnedspikecounts = []
 

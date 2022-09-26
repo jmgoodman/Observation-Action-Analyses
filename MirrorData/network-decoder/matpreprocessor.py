@@ -5,7 +5,7 @@ import torch
 import re
 import pickle
 
-# TODO: separate contexts!
+# TODO: separate contexts! (may require a "refresh")
 
 fileTemplate = os.path.join('..','struct*.mat')
 

@@ -9,7 +9,7 @@ class NeuralDataset(Dataset):
 	def __init__(self,session:str,area:str,context:str,window:float):
 		self.session = session
 		self.area    = area
-		self.window  = window # let's make the 
+		self.window  = window
 
 
 	def __len__(self):

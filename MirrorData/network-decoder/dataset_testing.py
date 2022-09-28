@@ -1,6 +1,6 @@
 from neuraldataset import *
 
-nd = NeuralDataset('Zara70','active','M1',60000)
+nd = NeuralDataset('Zara70','control','M1',60000)
 
 l = len(nd)
 

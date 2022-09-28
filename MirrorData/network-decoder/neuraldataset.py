@@ -42,6 +42,6 @@ class NeuralDataset(Dataset):
 		endind   = startind + self.__window # non-inclusive
   
 		neuraldata    = self.neurdata['data'][listind][startind:endind,:]
-		kinematicdata = self.kindata['data'][listind][startind:endind,:]
+		kinematicdata = self.kindata['data'][listind][startind:endind,1:]
 
 		return neuraldata, kinematicdata # image, label framework: https://pytorch.org/tutorials/beginner/basics/data_tutorial.html

@@ -53,7 +53,6 @@ def getKinematicData(mat:dict) -> Tuple[torch.DoubleTensor,List[str]]:
 	kindata = mat['Mstruct']['Kinematic']
 
 	for idx,val in enumerate(kindata):
-		print(val)
 		currentkindata = torch.tensor(val['JointStruct']['data'],dtype=torch.double)
 		if idx == 0:
 			catkindata = currentkindata
@@ -67,7 +66,7 @@ def getKinematicData(mat:dict) -> Tuple[torch.DoubleTensor,List[str]]:
 # split concatenated time bins according to contexts
 # also extract neural data while you're here
 # (we assume for now that contexts won't straddle splits in the data files)
-def getContextData(mat:dict,targetcontext:str,area:str) -> Tuple[List[torch.DoubleTensor],List[torch.DoubleTensor],List[str]]:
+def getContextData(mat:dict,targetcontext:str,area:str) -> Tuple[List[torch.DoubleTensor],List[torch.ByteTensor],List[str]]:
 	contextnames, contextonsets, contextoffsets = getContextTimings(mat)
 	catkindata, colnames = getKinematicData(mat)
 	contextkindata = []
@@ -91,7 +90,7 @@ def getContextData(mat:dict,targetcontext:str,area:str) -> Tuple[List[torch.Doub
 			binnedspikecounts = []
 			for nd in neuraldata:
 				spikecounts,_ = torch.histogram(torch.tensor(nd['spiketimes'],dtype=torch.double),maskedkindata[:,0])
-				binnedspikecounts += [torch.unsqueeze(spikecounts,1)]
+				binnedspikecounts += [torch.unsqueeze(spikecounts.to(torch.uint8),1)] # can't have negative or noninteger spikes, nor can you have more than like 10 in a 10ms bin
 
 			binnedspikecounts = torch.cat(tuple(binnedspikecounts),dim=1)
 			contextneurdata += [binnedspikecounts]
@@ -115,7 +114,6 @@ if not os.path.exists(fldr):
 
 for file in mirrorDataFiles:
 	animalName, sessionNumber = getFileMetadata(file)
-	print(animalName+sessionNumber)
  
 	# moe's data don't have simultaneous neural & kinematic data for the mirror context, so only pay attention to zara
 	if animalName != 'Zara':
@@ -137,7 +135,7 @@ for file in mirrorDataFiles:
 		for area in areanames:
 			# inefficient that we extract the kinematic data anew every time we want a new area...
 			# ...but this is a one-time preprocessing, nothing that is worth optimizing too much
-			contextkindata,contextneurdata,colnames = getContextData(mat,context,'all')
+			contextkindata,contextneurdata,colnames = getContextData(mat,context,area)
    
 			if area == 'all':
 				kinfile = animalName+sessionNumber+'_'+context+'_kin.pickle'

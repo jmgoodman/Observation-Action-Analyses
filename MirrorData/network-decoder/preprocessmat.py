@@ -1,14 +1,17 @@
 import os
 import glob
-from scipy.io import loadmat
 import torch
+from scipy.io import loadmat # imports need to happen in this order (on mac), otherwise scipy inits libiomp.dylib which is incompatible with torch's preference for libiomp5.dylib
 import re
 import pickle
 
 from typing import Tuple, List
 
+# to run on mac: https://stackoverflow.com/questions/53014306/error-15-initializing-libiomp5-dylib-but-found-libiomp5-dylib-already-initial
+# actually nevermind, it's hopelessly bugged and the only version of pytorch that works with nomkl (1.4) is so feature-poor as to be useless. THANKS PYTORCH FOR BEING COOL AND GOOD
+
 # define a method for getting metadata from file names
-def getFileMetadata(filename:str) -> Tuple[str,int]:
+def getFileMetadata(filename:str) -> Tuple[str,str]:
 	pathlist = os.path.split(file)
 	filename = pathlist[-1]
 	sessionName = filename[6:-4]
@@ -22,7 +25,7 @@ def getFileMetadata(filename:str) -> Tuple[str,int]:
 	animalName     = animalMatch.group()
 	sessionNumber  = sessionMatch.group()
 
-	return animalName, int(sessionNumber)
+	return animalName, sessionNumber
 
 # define a method for extracting the context names, onsets, and offsets present
 def getContextTimings(mat:dict) -> Tuple[List[str],List[float],List[float]]:
@@ -46,11 +49,12 @@ def getContextTimings(mat:dict) -> Tuple[List[str],List[float],List[float]]:
 	return contextnames, contextonsets, contextoffsets
 
 # get concatenated kinematic time bins and data
-def getKinematicData(mat:dict) -> Tuple[torch.FloatTensor,List[str]]:
+def getKinematicData(mat:dict) -> Tuple[torch.DoubleTensor,List[str]]:
 	kindata = mat['Mstruct']['Kinematic']
 
 	for idx,val in enumerate(kindata):
-		currentkindata = torch.tensor(val['JointStruct']['data'],dtype=torch.float)
+		print(val)
+		currentkindata = torch.tensor(val['JointStruct']['data'],dtype=torch.double)
 		if idx == 0:
 			catkindata = currentkindata
 		else:
@@ -61,25 +65,42 @@ def getKinematicData(mat:dict) -> Tuple[torch.FloatTensor,List[str]]:
 	return catkindata, colnames
 
 # split concatenated time bins according to contexts
+# also extract neural data while you're here
 # (we assume for now that contexts won't straddle splits in the data files)
-def getContextKinematicData(mat:dict,targetcontext:str) -> Tuple[List[torch.FloatTensor],List[str]]:
+def getContextData(mat:dict,targetcontext:str,area:str) -> Tuple[List[torch.DoubleTensor],List[torch.DoubleTensor],List[str]]:
 	contextnames, contextonsets, contextoffsets = getContextTimings(mat)
 	catkindata, colnames = getKinematicData(mat)
 	contextkindata = []
+	contextneurdata = []
+ 
+	# first off, reduce the neural data to the target area
+	neuraldata = mat['Mstruct']['Neural']
+ 
+	if area != 'all':
+		neuraldata = [nd for nd in neuraldata if re.match(area,nd['array'])]
+ 
 	for idx,cname in enumerate(contextnames):
 		if cname == targetcontext:
 			onset  = contextonsets[idx]
 			offset = contextoffsets[idx]
-			# why are pytorch's logical indexing rules so opaque?
-			# and why does pytorch's documentation lie to me and say this is a valid comparison?
-			mask = torch.logical_and(catkindata[:,0]>=onset,catkindata[:,0]<offset)
+			mask = (catkindata[:,0]>=onset) & (catkindata[:,0]<offset)
 			maskedkindata = catkindata[mask]
 			contextkindata += [maskedkindata]
 
-	return contextkindata,colnames
+			# now extract the neural data
+			binnedspikecounts = []
+			for nd in neuraldata:
+				spikecounts,_ = torch.histogram(torch.tensor(nd['spiketimes'],dtype=torch.double),maskedkindata[:,0])
+				binnedspikecounts += [torch.unsqueeze(spikecounts,1)]
 
-# bin the neural data (from a particular area) and split into appropriate context-block bins
-# TODO
+			binnedspikecounts = torch.cat(tuple(binnedspikecounts),dim=1)
+			contextneurdata += [binnedspikecounts]
+
+
+	return contextkindata,contextneurdata,colnames
+    
+    
+    
 
 # END METHODS DEFINITION
 # setup: define set of files to process & create a directory to put the pickles
@@ -94,6 +115,13 @@ if not os.path.exists(fldr):
 
 for file in mirrorDataFiles:
 	animalName, sessionNumber = getFileMetadata(file)
+	print(animalName+sessionNumber)
+ 
+	# moe's data don't have simultaneous neural & kinematic data for the mirror context, so only pay attention to zara
+	if animalName != 'Zara':
+		continue
+	elif sessionNumber == '65':
+		continue # also ignore session 65 which lacks any neural data
 
 	mat = loadmat(file,simplify_cells=True)
 
@@ -102,10 +130,27 @@ for file in mirrorDataFiles:
 	for context in mat['Mstruct']['TrialType']['names']:
 		if not context in contextnames:
 			contextnames += [context]
+   
+	areanames = ['all','M1','F5','AIP']
 
 	for context in contextnames:
-		contextkindata,colnames = getContextKinematicData(mat,context)
+		for area in areanames:
+			# inefficient that we extract the kinematic data anew every time we want a new area...
+			# ...but this is a one-time preprocessing, nothing that is worth optimizing too much
+			contextkindata,contextneurdata,colnames = getContextData(mat,context,'all')
+   
+			if area == 'all':
+				kinfile = animalName+sessionNumber+'_'+context+'_kin.pickle'
+				kinfile = os.path.join(fldr,kinfile)
+				with open(kinfile,'wb') as handle:
+					kin = dict()
+					kin['kinColNames'] = colnames
+					kin['data']        = contextkindata
+					pickle.dump(kin,handle,protocol=pickle.HIGHEST_PROTOCOL)
 
-		# extract the neural data to go with it
-
-	break
+			neurfile = animalName+sessionNumber+'_'+context+'_'+area+'_neur.pickle'
+			neurfile = os.path.join(fldr,neurfile)
+			with open(neurfile,'wb') as handle:
+				neur = dict()
+				neur['data'] = contextneurdata # for style consistency with the kinematic data
+				pickle.dump(neur,handle,protocol=pickle.HIGHEST_PROTOCOL)

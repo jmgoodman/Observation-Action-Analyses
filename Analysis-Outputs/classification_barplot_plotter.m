@@ -125,7 +125,15 @@ for uind = 1:numel(unique_animal_names)
     title(['Monkey ',upper(unique_animal_names{uind}(1))]);
     
     % and here's the stats (bootstrapped)
-    stats_10vs90 = vertcat( stats_10vs90,sum(o90(:,1:4) > a10(:,1:4)) );
-    stats_ovschance = vertcat( stats_ovschance,sum(o90(:,1:4) < o90(:,5)) );
-    stats_a10vschance = vertcat( stats_a10vschance,sum(a10(:,1:4) < a10(:,5)) );
+    stats_10vs90 = vertcat( stats_10vs90,sum(o90(:,1:4) > a10(:,1:4))./size(o90,1) );
+    stats_ovschance = vertcat( stats_ovschance,sum(o90(:,1:4) < o90(:,5))./size(o90,1) );
+    stats_a10vschance = vertcat( stats_a10vschance,sum(a10(:,1:4) < a10(:,5))./size(a10,1) );
 end
+
+%% save
+for i = 1:4
+    figure(i)
+    print(sprintf('classify-barplot-%i.svg',i),'-dsvg')
+end
+
+save('classify-barplot-stats.mat','stats_ovschance','stats_a10vschance','stats_10vs90');

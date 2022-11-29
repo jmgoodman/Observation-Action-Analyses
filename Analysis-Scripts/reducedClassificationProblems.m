@@ -125,6 +125,7 @@ for seshind = 1:numel(sessionsList)
 
                     cout = crossclassify_refactor(temptempdatacell,sustainspace,opts);
                     outputs(seshind,orthoind,ctxind,subGripInd,subGripIter).classificationAccuracyCell = cout;
+                    % AIP-F5-M1-pooled-chance
                 end
             end
             

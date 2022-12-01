@@ -13,5 +13,5 @@ cd /scratch/users/jgoodma/Mirror-Analysis/Analysis-Scripts # hard-coded director
 module load matlab
 
 # Kick off matlab
-# matlab -c "/home/uni08/jgoodma/.matlab/R2020b/R2020b_licenses/network.lic" -nodisplay < supplementalCall.m
-matlab -nodisplay < supplementalCall.m
+# matlab -c "/home/uni08/jgoodma/.matlab/R2020b/R2020b_licenses/network.lic" -nodisplay < supplementalCall_Moe46.m
+matlab -nodisplay < reducedCall_Moe46.m

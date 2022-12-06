@@ -27,6 +27,9 @@ outputs = struct('sessionName',cell(outputsize),...
     'classificationOptions',cell(outputsize),...
     'gripCount',cell(outputsize));
 
+%% export init
+file2save = fullfile('..','Analysis-Outputs',sprintf('%s-grip-count-control-%s.mat',sessionName,date));
+
 %% loop
 for seshind = 1:numel(sessionsList)
     thisSesh    = sessionsList{seshind};
@@ -127,13 +130,13 @@ for seshind = 1:numel(sessionsList)
                     outputs(seshind,orthoind,ctxind,subGripInd,subGripIter).classificationAccuracyCell = cout;
                     % AIP-F5-M1-pooled-chance
                 end
+                % export to file
+                save(file2save,'outputs','-v7.3')
             end
             
         end
     end
 end
 
-%% export
-file2save = fullfile('..','Analysis-Outputs',sprintf('%s-grip-count-control-%s.mat',sessionName,date));
-save(file2save,'outputs','-v7.3')
+
         

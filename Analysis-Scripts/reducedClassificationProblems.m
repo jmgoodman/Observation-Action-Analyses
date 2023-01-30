@@ -130,11 +130,10 @@ for seshind = 1:numel(sessionsList)
                     outputs(seshind,orthoind,ctxind,subGripInd,subGripIter).classificationAccuracyCell = cout;
                     % AIP-F5-M1-pooled-chance
                 end
-                % export to file
-                save(file2save,'outputs','-v7.3')
             end
-            
         end
+        % export to file
+        save(file2save,'outputs','-v7.3')
     end
 end
 

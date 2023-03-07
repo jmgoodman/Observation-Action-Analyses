@@ -68,7 +68,7 @@ for seshind = 1:numel(seshnames)
         congruencestruct(seshind).(fieldname) = neuronIDs(areainds,:);
     end
     
-    clearvars -except noldfig ucells uinds seshnames seshname seshind dt dtt1 areanames areaorder wingwidth dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct
+    clearvars -except noldfig ucells uinds seshnames seshname seshind dt dtt1 areanames areaorder wingwidth dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct congruencestruct
     
     %% clustering strategy 1: use modulation aligned to movement, active vs. passive
     % (consider also running this when aligning to "hold", as there's reason to suspect that "hold", NOT "movement onset", is the alignment point that matters for observation responses...
@@ -97,7 +97,7 @@ for seshind = 1:numel(seshnames)
     
     % ignore neurons that don't have an IQR (range) of at least X Hz
     keepinds = dtiqrtotal > 0.2; %10; % when I switched to using pre-computed datastructs, this meant using normalized instead of absolute firing rates. ergo, this threshold needed to change. So, change it did; now, firing rate modulation needs to be at least 20% of the base firing rate OR 5Hz (given the "soft" part of soft-normalization), whichever is higher. In other words, don't give me neurons whose overall modulation is less than 1 Hz. This is a "looser" restriction than the one I was using before, but hey, the results should *still* hold (in fact, firing rate as a threshold is kinda suspect, since multi units tend to have the highest rates!)
-    szvals   = dtiqrtotal(keepinds)./max(dtiqrtotal(keepinds));
+    szvals   = dtiqrtotal./nanmax(dtiqrtotal);
     szvals   = 625 * szvals;
     szvals   = 100 * ones(size(szvals)); % all the same size, no information overload please!
 
@@ -268,6 +268,9 @@ for seshind = 1:numel(seshnames)
         corrvals(neurind) = corr(thisiqr(1,:)',thisiqr(2,:)'); % we're just working with dt, not dtt1, so we only have to worry about two tasks: vgg and obs
     end
     
+    % ignore neurons outside of keepinds
+    corrvals(~keepinds) = nan;
+    
     % populate congruence struct
     congruencestruct(seshind).pooled = corrvals;
     congruencestruct(seshind).pooledareanames = areanames;
@@ -328,7 +331,10 @@ for seshind = 1:numel(seshnames)
     ps = PAIRStest(pairsdata(all(~isnan(pairsdata),2),:),3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
     figure,pause(0.5)
     %     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'filled','markerfacealpha',0.5,'markeredgecolor',[0 0 0],'markeredgealpha',1)
-    scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])
+    scatter(pairsdata(all(~isnan(pairsdata),2),1),...
+        pairsdata(all(~isnan(pairsdata),2),2),...
+        szvals(all(~isnan(pairsdata),2)),...
+        [0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])
     xlim([-1 1])
     ylim([-1 1])
     box off, grid on
@@ -365,7 +371,7 @@ for seshind = 1:numel(seshnames)
     title(seshname)
         
     %% cleanup
-    clearvars -except noldfig seshnames seshind dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct
+    clearvars -except noldfig seshnames seshind dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct congruencestruct
     
     
 end
@@ -385,7 +391,7 @@ for ii = 1:nfig
     savefig(fullfile('Analysis-Outputs','clustfiles',sprintf('clustfigure%0.2i.fig',ii)))
 end
 
-save(fullfile('.','Analysis-Outputs','clustfiles','clustout_stats.mat'),'contraststruct','dipteststruct','dipteststructcorrs','PAIRSstruct','seshnames','Nstruct','-v7.3')
+save(fullfile('.','Analysis-Outputs','clustfiles','clustout_stats.mat'),'congruencestruct','contraststruct','dipteststruct','dipteststructcorrs','PAIRSstruct','seshnames','Nstruct','-v7.3')
     
 cd(olddir);
 %% sending outputs

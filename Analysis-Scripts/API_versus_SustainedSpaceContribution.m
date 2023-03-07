@@ -77,7 +77,7 @@ for seshid = 1:numel(seshnames)
         Y = Y(~kickout);
         
         subplot(2,2,areaind)
-        scatter(X,Y,36,colorval,'markeredgecolor',[0 0 0],'markerfacealpha',0.25,'markeredgealpha',0.5,'markerfacecolor',colorval)
+        scatter(X,Y,36,colorval,'markeredgecolor',colorval)
         xlabel('FVE by Orthogonal Space During Movement')
         ylabel('Active-Passive Index')
         

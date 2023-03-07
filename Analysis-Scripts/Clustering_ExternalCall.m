@@ -13,6 +13,8 @@ PAIRSstruct        = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshn
 Nstruct            = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)));
 contraststruct     = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)),'pooledareanames',cell(size(seshnames)),...
     'pooledneuronIDs',cell(size(seshnames)),'AIPneuronIDs',cell(size(seshnames)),'F5neuronIDs',cell(size(seshnames)),'M1neuronIDs',cell(size(seshnames)));
+congruencestruct   = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)),'pooledareanames',cell(size(seshnames)),...
+    'pooledneuronIDs',cell(size(seshnames)),'AIPneuronIDs',cell(size(seshnames)),'F5neuronIDs',cell(size(seshnames)),'M1neuronIDs',cell(size(seshnames)));
 
 for seshind = 1:numel(seshnames)
     %% load in the data
@@ -55,6 +57,7 @@ for seshind = 1:numel(seshnames)
     
     % save neuron IDs
     contraststruct(seshind).pooledneuronIDs = neuronIDs;
+    congruencestruct(seshind).pooledneuronIDs = neuronIDs;
     
     fullareas = {'M1','F5','AIP'};
     
@@ -62,6 +65,7 @@ for seshind = 1:numel(seshnames)
         areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         fieldname = [fullareas{areaind},'neuronIDs'];
         contraststruct(seshind).(fieldname) = neuronIDs(areainds,:);
+        congruencestruct(seshind).(fieldname) = neuronIDs(areainds,:);
     end
     
     clearvars -except noldfig ucells uinds seshnames seshname seshind dt dtt1 areanames areaorder wingwidth dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct
@@ -264,7 +268,16 @@ for seshind = 1:numel(seshnames)
         corrvals(neurind) = corr(thisiqr(1,:)',thisiqr(2,:)'); % we're just working with dt, not dtt1, so we only have to worry about two tasks: vgg and obs
     end
     
-    corrvals(isnan(corrvals)) = 0; % any NaN correlation values will be set automatically to 0.
+    % populate congruence struct
+    congruencestruct(seshind).pooled = corrvals;
+    congruencestruct(seshind).pooledareanames = areanames;
+    
+    fullareas = {'M1','F5','AIP'};
+    
+    for areaind = 1:numel(fullareas)
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
+        congruencestruct(seshind).(fullareas{areaind}) = corrvals(areainds);
+    end
     
     % and run stats
     clear tempstruct
@@ -289,9 +302,9 @@ for seshind = 1:numel(seshnames)
         areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
         %         areainds = ismember( areaskept,areaorder{areaind} );
         clear tempstruct
-        [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(areainds),1e4,'uniform');
+        [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(areainds & ~isnan(corrvals)),1e4,'uniform');
         dipteststructcorrs(seshind).(fullareas{areaind}) = tempstruct;
-        hold all,q=cdfplot(corrvals(areainds));
+        hold all,q=cdfplot(corrvals(areainds & ~isnan(corrvals)));
         set(q,'color',clors(areaind,:))
         %         ci(areainds) = bsxfun(@minus, contrastinds(areainds),median(contrastinds(areainds)) ); % remove area medians in case there is an area effect on top of the "mirror neuron" effect
     end
@@ -312,7 +325,7 @@ for seshind = 1:numel(seshnames)
     pairsdata = [contrastinds(:),corrvals(:)];
     
     clear ps
-    ps = PAIRStest(pairsdata,3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
+    ps = PAIRStest(pairsdata(all(~isnan(pairsdata),2),:),3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
     figure,pause(0.5)
     %     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'filled','markerfacealpha',0.5,'markeredgecolor',[0 0 0],'markeredgealpha',1)
     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])
@@ -338,10 +351,10 @@ for seshind = 1:numel(seshnames)
     for areaind = 1:numel(fullareas)
         areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
         clear ps
-        ps = PAIRStest(pairsdata(areainds,:),3,2,1000);
+        ps = PAIRStest(pairsdata(areainds&all(~isnan(pairsdata),2),:),3,2,1000);
         PAIRSstruct(seshind).(fullareas{areaind}) = ps;
         %         hold all,scatter(pairsdata(areainds,1),pairsdata(areainds,2),szvals(areainds),clors(areaind,:),'filled','markerfacealpha',0.5,'markeredgecolor',clors(areaind,:),'markeredgealpha',1)
-        hold all,scatter(pairsdata(areainds,1),pairsdata(areainds,2),szvals(areainds),clors(areaind,:),'linewidth',1.5,'markeredgecolor',clors(areaind,:))
+        hold all,scatter(pairsdata(areainds&all(~isnan(pairsdata),2),1),pairsdata(areainds&all(~isnan(pairsdata),2),2),szvals(areainds&all(~isnan(pairsdata),2)),clors(areaind,:),'linewidth',1.5,'markeredgecolor',clors(areaind,:))
     end
     xlim([-1 1])
     ylim([-1 1])

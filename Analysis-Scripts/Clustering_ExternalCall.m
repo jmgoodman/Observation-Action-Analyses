@@ -401,3 +401,4 @@ outstruct.PAIRSstruct = PAIRSstruct;
 outstruct.seshnames = seshnames;
 outstruct.Nstruct = Nstruct;
 outstruct.contraststruct = contraststruct;
+outstruct.congruencestruct = congruencestruct;

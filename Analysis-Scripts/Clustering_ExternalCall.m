@@ -262,9 +262,9 @@ for seshind = 1:numel(seshnames)
     dtpermiqr     = range(dtperm,4); %iqr(dtperm,4); % neuron x condition x object
     dtpermiqrkept = dtpermiqr(keepinds,:,:);
     
-    corrvals = zeros(size(dtpermiqrkept,1),1);
-    for neurind = 1:size(dtpermiqrkept)
-        thisiqr = squeeze(dtpermiqrkept(neurind,:,:)); % condition x object
+    corrvals = zeros(size(dtpermiqr,1),1);
+    for neurind = 1:size(dtpermiqr,1)
+        thisiqr = squeeze(dtpermiqr(neurind,:,:)); % condition x object
         corrvals(neurind) = corr(thisiqr(1,:)',thisiqr(2,:)'); % we're just working with dt, not dtt1, so we only have to worry about two tasks: vgg and obs
     end
     
@@ -281,7 +281,7 @@ for seshind = 1:numel(seshnames)
     
     % and run stats
     clear tempstruct
-    [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals,1e4,'uniform');
+    [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(~isnan(corrvals)),1e4,'uniform');
     figure,pause(0.5)
     q=cdfplot(corrvals);
     set(q,'color',[0 0 0]);
@@ -299,7 +299,7 @@ for seshind = 1:numel(seshnames)
     %     ci = zeros(size(contrastinds));
     hold all
     for areaind = 1:numel(fullareas)
-        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         %         areainds = ismember( areaskept,areaorder{areaind} );
         clear tempstruct
         [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(areainds & ~isnan(corrvals)),1e4,'uniform');
@@ -322,7 +322,7 @@ for seshind = 1:numel(seshnames)
     ylim([0 1])
 
     %% use PAIRS test to seek multivariate clusters (TODO: test unsupervised clustering algorithms to see if PAIRS is being unfair... it SHOULD be an awfully false-positive-happy method if anything, but it's quirky and nonstandard and therefore it's possible that it's actually super conservative in this case)
-    pairsdata = [contrastinds(:),corrvals(:)];
+    pairsdata = [cifull(:),corrvals(:)];
     
     clear ps
     ps = PAIRStest(pairsdata(all(~isnan(pairsdata),2),:),3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
@@ -349,7 +349,7 @@ for seshind = 1:numel(seshnames)
     %     ci = zeros(size(contrastinds));
     figure,pause(0.5)
     for areaind = 1:numel(fullareas)
-        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         clear ps
         ps = PAIRStest(pairsdata(areainds&all(~isnan(pairsdata),2),:),3,2,1000);
         PAIRSstruct(seshind).(fullareas{areaind}) = ps;

@@ -1,4 +1,10 @@
 import plotly.express as px
+import plotly.graph_objects as go
+from plotly.offline import iplot
+
+# plotly doesn't support "staircase" histogram
+# at least not easily... what a pain in the butt!
+
 import mat73
 import pandas as pd
 import numpy as np
@@ -66,13 +72,134 @@ class Figure3(Figure):
         
     def _build_data(self):
         d = mat73.loadmat(self.datafiles[0])
-        print(d.keys())
-        print(d['congruencestruct'].keys())
-        print(d['contraststruct'].keys())
+        contrast = d['contraststruct']
+        congruence = d['congruencestruct']
+        
+        # pool across sessions and get into a single dataframe
+        # use this format:
+        # https://stackoverflow.com/questions/57988604/overlaying-two-histograms-with-plotly-express
+        self.datadict["df"] = pd.DataFrame(
+            {"Area":np.concatenate((
+                ["AIP"]*sum([len(x) for x in contrast["AIP"]]),
+                ["F5"]*sum([len(x) for x in contrast["F5"]]),
+                ["M1"]*sum([len(x) for x in contrast["M1"]])
+                )),
+             "Active-Passive Index":np.concatenate((
+                np.concatenate(contrast["AIP"]),
+                np.concatenate(contrast["F5"]),
+                np.concatenate(contrast["M1"])
+                )),
+             "Congruence Index":np.concatenate((
+                np.concatenate(congruence["AIP"]),
+                np.concatenate(congruence["F5"]),
+                np.concatenate(congruence["M1"])
+                ))
+            }
+        )
+        
+        # let's bin the data beforehand
+        self.datadict["binned_data"] = dict()
+        
+        for area in ['AIP','F5','M1']:
+            b   = np.linspace(-1,1,30)
+            
+            api,_ = np.histogram(
+                np.concatenate(contrast[area]),
+                bins=b
+                )
+                        
+            ci,_  = np.histogram(
+                np.concatenate(congruence[area]),
+                bins=b
+                )
+                        
+            self.datadict['binned_data'][area] = {
+                "Active-Passive Index":api,
+                "Congruence Index":ci,
+                "Bin Edges":b
+            }
+        
+        self.datadict["colors"] = pd.read_csv(os.path.join('pythonfigures','colors.csv'))
+                
         return
     
     def _build_fig(self):
+        # pool across all animals & sessions for now
+        # subplot 1: histograms of each area, API, with cdfs overlaid
+        # subplot 2: histograms of each area, congruence, with cdfs overlaid
+        
+        figurelist = []
+        
+        shift = -0.001
+        for area in ['AIP','F5','M1']:
+            c = self.datadict["colors"]
+            c = c[c["Area"]==area].to_numpy()
+            c = c[0][:3]
+            
+            # figure
+            b   = self.datadict['binned_data'][area]['Bin Edges']
+            api = self.datadict['binned_data'][area]['Active-Passive Index']
+            api = api / sum(api)
+            figurelist += [go.Scatter(
+                x=b + shift,
+                y=np.append( api, api[-1] ),
+                mode='lines',
+                line={
+                    'color':f'rgba({c[0]},{c[1]},{c[2]},0.3)',
+                    'shape':'hv'
+                }
+            )]
+            
+            shift += 0.001
+        
+        self.figurehandle = figurelist
+                
+        # old
+        old="""c = self.datadict["colors"]
+        
+        self.figurehandle = px.histogram(self.datadict["df"],
+                                         x="Active-Passive Index",
+                                         color="Area",
+                                         barmode="overlay",
+                                         histnorm="probability",
+                                         nbins=40,
+                                         opacity=1,
+                                         color_discrete_sequence=[f'rgb({c["R"][c["Area"]=="AIP"].item()},{c["G"][c["Area"]=="AIP"].item()},{c["B"][c["Area"]=="AIP"].item()})',
+                                                                  f'rgb({c["R"][c["Area"]=="F5"].item()},{c["G"][c["Area"]=="F5"].item()},{c["B"][c["Area"]=="F5"].item()})',
+                                                                  f'rgb({c["R"][c["Area"]=="M1"].item()},{c["G"][c["Area"]=="M1"].item()},{c["B"][c["Area"]=="M1"].item()})'],
+                                         cumulative=False
+        ).update_layout(plot_bgcolor='rgba(0,0,0,0)',
+                        bargap=0.05)
+        
+        self.figurehandle.update_xaxes(ticks='outside',
+                                       tickwidth=1,
+                                       tickcolor='black',
+                                       ticklen=4,
+                                       linecolor='rgba(0,0,0,1)',
+                                       linewidth=1)
+        
+        self.figurehandle.update_yaxes(ticks='outside',
+                                       tickwidth=1,
+                                       tickcolor='black',
+                                       ticklen=4,
+                                       linecolor='rgba(0,0,0,1)',
+                                       linewidth=1)
+        
+        self.figurehandle.update_traces(marker_line_width=2,
+                                        marker_line_color='rgba(0,0,0,1)',
+                                        xbins={
+                                            "start":-1.0,
+                                            "end":1.0,
+                                            "size":0.05
+                                        })"""
+        
+        
+        
         return
+    
+    def preview(self):
+        if self.figurehandle is not None:
+            iplot( self.figurehandle )
 
 
 
@@ -81,8 +208,8 @@ if __name__ == "__main__":
     F = Figure3(datafiles = [os.path.join('Analysis-Outputs','clustfiles','clustout_stats.mat')],
                 outputfilename = 'fig3test.svg')
     
-    """F.preview()
-    input()
+    F.preview()
+    # input()
     
-    F.save_image()"""
+    # F.save_image()
     

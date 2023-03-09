@@ -58,6 +58,8 @@ class Figure:
         if self.figurehandle is not None:
             self.figurehandle.write_image(self.outputfilename)
 
+
+
 class Figure3(Figure):
     def __init__(self,datafiles:list,outputfilename:str):
         super().__init__(datafiles=datafiles,outputfilename=outputfilename)
@@ -65,10 +67,14 @@ class Figure3(Figure):
     def _build_data(self):
         d = mat73.loadmat(self.datafiles[0])
         print(d.keys())
+        print(d['congruencestruct'].keys())
+        print(d['contraststruct'].keys())
         return
     
     def _build_fig(self):
         return
+
+
 
 # manual unit test
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.offline import iplot
+from plotly.subplots import make_subplots
 
 # plotly doesn't support "staircase" histogram
 # at least not easily... what a pain in the butt!
@@ -128,7 +129,8 @@ class Figure3(Figure):
         # subplot 1: histograms of each area, API, with cdfs overlaid
         # subplot 2: histograms of each area, congruence, with cdfs overlaid
         
-        plobjectlist = []
+        self.figurehandle = make_subplots(rows=1,
+                                          cols=2)
         
         shift = -0.001
         maxfreq = 0
@@ -137,33 +139,51 @@ class Figure3(Figure):
             c = c[c["Area"]==area].to_numpy()
             c = c[0][:3]
             
-            # figure
+            # api figure
             b   = self.datadict['binned_data'][area]['Bin Edges']
             api = self.datadict['binned_data'][area]['Active-Passive Index']
             api = api / sum(api)
             
             maxfreq = max(maxfreq,max(api))
             
-            plobjectlist += [go.Scatter(
-                x=b + shift,
-                y=np.append( api, api[-1] ),
-                name=area,
-                mode='lines',
-                line={
-                    'color':f'rgba({c[0]},{c[1]},{c[2]},0.5)',
-                    'shape':'hv'
-                }
-            )]
+            self.figurehandle.add_trace(
+                go.Scatter(
+                    x=b+shift,
+                    y=np.append(api,api[-1]),
+                    name=area,
+                    mode='lines',
+                    line={
+                        'color':f'rgba({c[0]},{c[1]},{c[2]},0.5)',
+                        'shape':'hv'
+                    }
+                ),
+                row=1,
+                col=1
+            )
+            
+            # cong figure
+            cong = self.datadict['binned_data'][area]['Congruence Index']
+            cong = cong / sum(cong)
+            
+            maxfreq = max(maxfreq,max(cong))
+            
+            self.figurehandle.add_trace(
+                go.Scatter(
+                    x=b+shift,
+                    y=np.append(cong,cong[-1]),
+                    name=area,
+                    mode='lines',
+                    line={
+                        'color':f'rgba({c[0]},{c[1]},{c[2]},0.5)',
+                        'shape':'hv'
+                    }
+                ),
+                row=1,
+                col=2
+            )
             
             shift += 0.001
-        
-        layout = go.Layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-        )
-        
-        self.figurehandle = go.Figure( data=plobjectlist, layout=layout )
-        
+                
         self.figurehandle.update_xaxes(ticks='outside',
                                        tickwidth=1,
                                        tickcolor='black',
@@ -176,13 +196,46 @@ class Figure3(Figure):
                                        tickcolor='black',
                                        ticklen=4,
                                        linecolor='rgba(0,0,0,1)',
-                                       linewidth=1,
-                                       range = [0,maxfreq])
+                                       linewidth=1
+                                       )
+        
+        # guess I gotta go low-level for this
+        self.figurehandle['layout']['xaxis']['title'] = 'Active-Passive Index'
+        self.figurehandle['layout']['xaxis2']['title'] = 'Congruence Index'
+        self.figurehandle['layout']['yaxis']['range'] = [0,maxfreq+0.001]
+        self.figurehandle['layout']['yaxis2']['range'] = [0,maxfreq+0.001]
         
         self.figurehandle.update_layout(
-            xaxis_title='Active-Passive Index',
-            yaxis_title='Fraction of Neurons'
+            yaxis_title='Fraction of Neurons',
+            plot_bgcolor='rgba(0,0,0,0)' ,
+            paper_bgcolor='rgba(0,0,0,0)',
+            showlegend=False
         )
+        
+        # I also need to do janky things to make a custom legend, too! wow!
+        prepend=''
+        for area in ['AIP','F5','M1']:
+            c = self.datadict["colors"]
+            c = c[c["Area"]==area].to_numpy()
+            c = c[0][:3]
+            
+            self.figurehandle.add_annotation(xref='x domain',
+                                             yref='y domain',
+                                             x = 0.99,
+                                             y = 0.99,
+                                             text = prepend+area,
+                                             showarrow=False,
+                                             font={
+                                                 'color':f'rgba({c[0]},{c[1]},{c[2]},0.7)',
+                                                 'size':14
+                                                 },
+                                             align='right',
+                                             valign='top',
+                                             row=1,
+                                             col=2)
+            
+            prepend+=' <br>' # needs a space
+                                             
                 
         # old
         old="""c = self.datadict["colors"]

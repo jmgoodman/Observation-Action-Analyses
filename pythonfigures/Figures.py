@@ -101,7 +101,7 @@ class Figure3(Figure):
         self.datadict["binned_data"] = dict()
         
         for area in ['AIP','F5','M1']:
-            b   = np.linspace(-1,1,30)
+            b   = np.linspace(-1,1,24)
             
             api,_ = np.histogram(
                 np.concatenate(contrast[area]),
@@ -128,9 +128,10 @@ class Figure3(Figure):
         # subplot 1: histograms of each area, API, with cdfs overlaid
         # subplot 2: histograms of each area, congruence, with cdfs overlaid
         
-        figurelist = []
+        plobjectlist = []
         
         shift = -0.001
+        maxfreq = 0
         for area in ['AIP','F5','M1']:
             c = self.datadict["colors"]
             c = c[c["Area"]==area].to_numpy()
@@ -140,19 +141,48 @@ class Figure3(Figure):
             b   = self.datadict['binned_data'][area]['Bin Edges']
             api = self.datadict['binned_data'][area]['Active-Passive Index']
             api = api / sum(api)
-            figurelist += [go.Scatter(
+            
+            maxfreq = max(maxfreq,max(api))
+            
+            plobjectlist += [go.Scatter(
                 x=b + shift,
                 y=np.append( api, api[-1] ),
+                name=area,
                 mode='lines',
                 line={
-                    'color':f'rgba({c[0]},{c[1]},{c[2]},0.3)',
+                    'color':f'rgba({c[0]},{c[1]},{c[2]},0.5)',
                     'shape':'hv'
                 }
             )]
             
             shift += 0.001
         
-        self.figurehandle = figurelist
+        layout = go.Layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+        )
+        
+        self.figurehandle = go.Figure( data=plobjectlist, layout=layout )
+        
+        self.figurehandle.update_xaxes(ticks='outside',
+                                       tickwidth=1,
+                                       tickcolor='black',
+                                       ticklen=4,
+                                       linecolor='rgba(0,0,0,1)',
+                                       linewidth=1)
+        
+        self.figurehandle.update_yaxes(ticks='outside',
+                                       tickwidth=1,
+                                       tickcolor='black',
+                                       ticklen=4,
+                                       linecolor='rgba(0,0,0,1)',
+                                       linewidth=1,
+                                       range = [0,maxfreq])
+        
+        self.figurehandle.update_layout(
+            xaxis_title='Active-Passive Index',
+            yaxis_title='Fraction of Neurons'
+        )
                 
         # old
         old="""c = self.datadict["colors"]
@@ -199,7 +229,8 @@ class Figure3(Figure):
     
     def preview(self):
         if self.figurehandle is not None:
-            iplot( self.figurehandle )
+            self.figurehandle.show()
+            # iplot( self.figurehandle )
 
 
 

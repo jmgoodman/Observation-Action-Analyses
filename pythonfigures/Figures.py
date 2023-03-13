@@ -221,8 +221,8 @@ class Figure3(Figure):
             
             self.figurehandle.add_annotation(xref='x domain',
                                              yref='y domain',
-                                             x = 0.99,
-                                             y = 0.99,
+                                             x = 1,
+                                             y = 1,
                                              text = prepend+area,
                                              showarrow=False,
                                              font={
@@ -231,12 +231,50 @@ class Figure3(Figure):
                                                  },
                                              align='right',
                                              valign='top',
+                                             yanchor='top',
+                                             xanchor='right',
                                              row=1,
                                              col=2)
             
             prepend+=' <br>' # needs a space
-                                             
-                
+            
+        # add panel labels
+        # OR NOT
+        panellabels = \
+        """self.figurehandle.add_annotation(xref='x domain',
+                                        yref='y domain',
+                                        x=-0.3,
+                                        y=1,
+                                        text='A',
+                                        showarrow=False,
+                                        font={
+                                            'color':'black',
+                                            'size':18
+                                            },
+                                        align='left',
+                                        valign='bottom',
+                                        yanchor='bottom',
+                                        xanchor='left',
+                                        row=1,
+                                        col=1)
+        
+        self.figurehandle.add_annotation(xref='x domain',
+                                        yref='y domain',
+                                        x=-0.16,
+                                        y=1,
+                                        text='B',
+                                        showarrow=False,
+                                        font={
+                                            'color':'black',
+                                            'size':18
+                                            },
+                                        align='right',
+                                        valign='bottom',
+                                        yanchor='bottom',
+                                        xanchor='right',
+                                        row=1,
+                                        col=2)"""
+        
         # old
         old="""c = self.datadict["colors"]
         
@@ -290,10 +328,7 @@ class Figure3(Figure):
 # manual unit test
 if __name__ == "__main__":
     F = Figure3(datafiles = [os.path.join('Analysis-Outputs','clustfiles','clustout_stats.mat')],
-                outputfilename = 'fig3test.svg')
+                outputfilename = os.path.join('pythonfigures','fig3.svg'))
     
-    F.preview()
-    # input()
-    
-    # F.save_image()
+    F.save_image()
     

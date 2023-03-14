@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 import mat73
 import pandas as pd
@@ -7,20 +7,24 @@ import numpy as np
 from sklearn.decomposition import PCA
 import os
 
-# what is the subspace alignment index?
-# essentially, it's the ratio of variance explained by some arbitrary n-dimensional manfiold w.r.t. that explained by the n-dimensional pca decomposition of the data
+from sqlalchemy import create_engine, URL, text
+from sqlalchemy_utils import database_exists, create_database
 
-# TODO: load data files as dataframe databases, the "Data" object will be a wrapper for these
-# each array will be a different table (dataframe) in each of these databases
-# in each table (dataframe), features will be firing rates of individual neurons
-# each time x trial will have an entry in this table
-# in addition to firing rates, trial index and time will be features of this table
-# in addition, there will be a table with object and context as features of each trial
-# the Data object will then leverage sql-like view selection in pandas
+# sneaky dependency: pip install mysqlclient
+
+def get_auth(auth_file:str) -> Tuple[str,str]:
+    with open(auth_file) as f:
+        lines = [line.rstrip() for line in f]
+    
+    # format: (user, pass)
+    return tuple(lines)
 
 class Data:
     def __init__(self,
-                 filename:str = os.path.join('MirrorData','Zara70_datastruct.mat')
+                 auth:str=os.path.join('pythonfigures','auth'),
+                 databasename:str="Zara70",
+                 host:str="localhost",
+                 filename:str = os.path.join('MirrorData','Zara70_datastruct.mat'),
                  ):
         # presets:
         # Zara70
@@ -29,6 +33,21 @@ class Data:
         self.filename = filename
         self.data     = None
         self.predata  = None
+        
+        self.authfile = auth
+        self.databasename = databasename
+        self.host = host
+        
+        usr,pwd = get_auth(self.authfile)
+        url_object = URL.create(
+            "mysql",
+            username=usr,
+            password=pwd,
+            host=self.host,
+            database=self.databasename
+        )
+        
+        self.engine = create_engine(url_object)
     
     def preload(self):
         if not self.predata:
@@ -67,7 +86,7 @@ class Data:
         
         for arrayidx,array in enumerate(arraynames):
             dcataligns = []
-            for alignidx,align in enumerate(temp['datastruct']['cellform'][arrayidx][0]):
+            for align in temp['datastruct']['cellform'][arrayidx][0]:
                 # grab data and reshape
                 dtrials  = np.transpose( align[0]['Data'],[1,2,0] ) # from time x neuron x trial to neuron x trial x time
                 dreshape = np.reshape(dtrials,(dtrials.shape[0],-1)) # C-like order is the opposite of MATLAB-like order, but is standard in numpy (hence why we permuted to have time be the last, i.e., fastest-changing index)
@@ -80,4 +99,21 @@ class Data:
             colnames = ['Trial'] + [f'Neuron_{i}' for i in range(dcat.shape[1]-1)]
             
             self.data[array] = pd.DataFrame(dcat,columns=colnames)
-            self.data[array]['Trial'] = self.data[array]['Trial'].astype(int) # for some reason numpy and/or pandas is obsessed with converting this into a float, so here I convert it back 
+            self.data[array]['Trial'] = self.data[array]['Trial'].astype(int) # for some reason numpy and/or pandas is obsessed with converting this into a float, so here I convert it back
+            
+    def export(self,if_exists='replace'):
+        if not (self.data==None):
+            for key in self.data.keys():
+                self.data[key].to_sql(key,con=self.engine,if_exists=if_exists)
+            
+            
+    
+            
+if __name__=='__main__':
+    # you should probably make a proper test class for this
+    d = Data()
+    d.preload()
+    d.load()
+    d.export()
+    
+    

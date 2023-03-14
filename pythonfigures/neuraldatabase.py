@@ -12,6 +12,9 @@ from sqlalchemy_utils import database_exists, create_database
 
 # sneaky dependency: pip install mysqlclient
 
+# still won't work on mac
+# read this: https://stackoverflow.com/questions/70519950/python-import-mysqldb-on-macos-m1-doesnt-work
+
 def get_auth(auth_file:str) -> Tuple[str,str]:
     with open(auth_file) as f:
         lines = [line.rstrip() for line in f]

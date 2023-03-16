@@ -21,10 +21,16 @@ from sqlalchemy_utils import database_exists, create_database
 
 def get_auth(auth_file:str) -> Tuple[str,str]:
     with open(auth_file) as f:
+        
         lines = [line.rstrip() for line in f]
     
     # format: (user, pass)
     return tuple(lines)
+
+def get_query(query_file:str) -> str:
+    with open(query_file) as f:
+        return f.read()
+        
 
 class Data:
     def __init__(self,
@@ -129,6 +135,53 @@ def create():
         d.preload()
         d.load()
         d.export()
+        
+class Query:
+    def __init__(self,
+                 query:str=os.path.join('pythonfigures','query.sql'),
+                 queryfile:bool=True,
+                 auth:str=os.path.join('pythonfigures','auth'),
+                 host:str='localhost'
+                 ):
+        """Generates an instance of a Query object
+        
+        Args:
+            query (str): MySQL query. Can span multiple databses, but databases must always be specified in the query! Can either be a query string or a file name (see 'queryfile' arg for more info). Defaults to 'pythonfigures/query.sql' (with appropriate platform-dependent path separator)
+            queryfile (bool, optional): If true, reads SQL query from the specified file. Else, treats the input string as a literal query. Defaults to True.
+            auth (str, optional): Sets the file from which to read authentication credentials for use of the SQL connector. Defaults to pythonfigures/auth.
+            host (str, optional): Sets the host IP for sending SQL requests. Defaults to localhost.
+        """
+        self.query = query
+        self.queryfile = queryfile
+        self.auth = auth
+        self.host = host
+        
+        usr,pwd = get_auth(self.auth)
+        url_object = URL.create(
+            "mysql",
+            username=usr,
+            password=pwd,
+            host=self.host,
+        )
+        
+        self.engine = create_engine(url_object)
+        
+    def read(self) -> pd.DataFrame:
+        # note: once you have the df in python, it turns out that df.groupby([list,of,columns])[list,of,columns].mean() is way more powerful than trying to do something with an sql query...
+        # indeed, see this answer: https://stackoverflow.com/questions/70320083/mode-of-each-column-in-mysql-without-explicitly-writing-column-names
+        # but geez it's annoying to have to load everything in memory to make this work
+        # in the end, I may need to write a python script that extracts the column names of all tables across all databases
+        # extracts just the ones with neuron_ in their name
+        # and builds avg(column) queries using those column names
+        if self.queryfile:
+            q = get_query(self.query)
+        else:
+            q = self.query
+        
+        with self.engine.begin() as conn:
+            df = pd.read_sql_query(text(q), con=conn)
+        
+        return df
             
             
     

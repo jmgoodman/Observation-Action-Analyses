@@ -120,15 +120,20 @@ class Data:
         if not (self.data==None):
             for key in self.data.keys():
                 self.data[key].to_sql(key,con=self.engine,if_exists=if_exists)
+                
+def create():
+    session_names = ['Moe46','Moe50','Zara64','Zara68','Zara70']
+    for sname in session_names:
+        d = Data(databasename=sname,
+                 filename=os.path.join('MirrorData',f'{sname}_datastruct.mat'))
+        d.preload()
+        d.load()
+        d.export()
             
             
     
             
 if __name__=='__main__':
-    # you should probably make a proper test class for this
-    d = Data()
-    d.preload()
-    d.load()
-    d.export()
+    create()
     
     

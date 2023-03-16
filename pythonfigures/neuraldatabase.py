@@ -13,7 +13,11 @@ from sqlalchemy_utils import database_exists, create_database
 # sneaky dependency: pip install mysqlclient
 
 # still won't work on mac
-# read this: https://stackoverflow.com/questions/70519950/python-import-mysqldb-on-macos-m1-doesnt-work
+# read this: https://stackoverflow.com/questions/63109987/nameerror-name-mysql-is-not-defined-after-setting-change-to-mysql
+# specifically, the comment that says to run the following in the terminal: cp -r /usr/local/mysql/lib/* /usr/local/lib/
+# basically, mysqlclient expects the mysql lib functions to be located in /usr/local/lib/, and not nested inside the mysql directory of /usr/local/
+
+
 
 def get_auth(auth_file:str) -> Tuple[str,str]:
     with open(auth_file) as f:
@@ -51,7 +55,7 @@ class Data:
         )
         
         self.engine = create_engine(url_object)
-    
+            
     def preload(self):
         if not self.predata:
             self.predata = mat73.loadmat(self.filename)
@@ -103,8 +107,16 @@ class Data:
             
             self.data[array] = pd.DataFrame(dcat,columns=colnames)
             self.data[array]['Trial'] = self.data[array]['Trial'].astype(int) # for some reason numpy and/or pandas is obsessed with converting this into a float, so here I convert it back
+    
+    
+    def create_database_if_not_exist(self):
+        """Creates the database specified by the sqlalchemy engine if it doesn't already exist. This is done as a separate, explicit method to guard against fragmenting disks via implicit database creations upon instantiation of FinDataReader objects.
+        """
+        if not database_exists(self.engine.url):
+            create_database(self.engine.url)
             
     def export(self,if_exists='replace'):
+        self.create_database_if_not_exist()
         if not (self.data==None):
             for key in self.data.keys():
                 self.data[key].to_sql(key,con=self.engine,if_exists=if_exists)

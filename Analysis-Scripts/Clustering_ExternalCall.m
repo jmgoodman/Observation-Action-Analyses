@@ -13,6 +13,8 @@ PAIRSstruct        = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshn
 Nstruct            = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)));
 contraststruct     = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)),'pooledareanames',cell(size(seshnames)),...
     'pooledneuronIDs',cell(size(seshnames)),'AIPneuronIDs',cell(size(seshnames)),'F5neuronIDs',cell(size(seshnames)),'M1neuronIDs',cell(size(seshnames)));
+congruencestruct   = struct('pooled',cell(size(seshnames)),'AIP',cell(size(seshnames)),'F5',cell(size(seshnames)),'M1',cell(size(seshnames)),'pooledareanames',cell(size(seshnames)),...
+    'pooledneuronIDs',cell(size(seshnames)),'AIPneuronIDs',cell(size(seshnames)),'F5neuronIDs',cell(size(seshnames)),'M1neuronIDs',cell(size(seshnames)));
 
 for seshind = 1:numel(seshnames)
     %% load in the data
@@ -55,6 +57,7 @@ for seshind = 1:numel(seshnames)
     
     % save neuron IDs
     contraststruct(seshind).pooledneuronIDs = neuronIDs;
+    congruencestruct(seshind).pooledneuronIDs = neuronIDs;
     
     fullareas = {'M1','F5','AIP'};
     
@@ -62,9 +65,10 @@ for seshind = 1:numel(seshnames)
         areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         fieldname = [fullareas{areaind},'neuronIDs'];
         contraststruct(seshind).(fieldname) = neuronIDs(areainds,:);
+        congruencestruct(seshind).(fieldname) = neuronIDs(areainds,:);
     end
     
-    clearvars -except noldfig ucells uinds seshnames seshname seshind dt dtt1 areanames areaorder wingwidth dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct
+    clearvars -except noldfig ucells uinds seshnames seshname seshind dt dtt1 areanames areaorder wingwidth dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct congruencestruct
     
     %% clustering strategy 1: use modulation aligned to movement, active vs. passive
     % (consider also running this when aligning to "hold", as there's reason to suspect that "hold", NOT "movement onset", is the alignment point that matters for observation responses...
@@ -93,7 +97,7 @@ for seshind = 1:numel(seshnames)
     
     % ignore neurons that don't have an IQR (range) of at least X Hz
     keepinds = dtiqrtotal > 0.2; %10; % when I switched to using pre-computed datastructs, this meant using normalized instead of absolute firing rates. ergo, this threshold needed to change. So, change it did; now, firing rate modulation needs to be at least 20% of the base firing rate OR 5Hz (given the "soft" part of soft-normalization), whichever is higher. In other words, don't give me neurons whose overall modulation is less than 1 Hz. This is a "looser" restriction than the one I was using before, but hey, the results should *still* hold (in fact, firing rate as a threshold is kinda suspect, since multi units tend to have the highest rates!)
-    szvals   = dtiqrtotal(keepinds)./max(dtiqrtotal(keepinds));
+    szvals   = dtiqrtotal./nanmax(dtiqrtotal);
     szvals   = 625 * szvals;
     szvals   = 100 * ones(size(szvals)); % all the same size, no information overload please!
 
@@ -258,17 +262,29 @@ for seshind = 1:numel(seshnames)
     dtpermiqr     = range(dtperm,4); %iqr(dtperm,4); % neuron x condition x object
     dtpermiqrkept = dtpermiqr(keepinds,:,:);
     
-    corrvals = zeros(size(dtpermiqrkept,1),1);
-    for neurind = 1:size(dtpermiqrkept)
-        thisiqr = squeeze(dtpermiqrkept(neurind,:,:)); % condition x object
+    corrvals = zeros(size(dtpermiqr,1),1);
+    for neurind = 1:size(dtpermiqr,1)
+        thisiqr = squeeze(dtpermiqr(neurind,:,:)); % condition x object
         corrvals(neurind) = corr(thisiqr(1,:)',thisiqr(2,:)'); % we're just working with dt, not dtt1, so we only have to worry about two tasks: vgg and obs
     end
     
-    corrvals(isnan(corrvals)) = 0; % any NaN correlation values will be set automatically to 0.
+    % ignore neurons outside of keepinds
+    corrvals(~keepinds) = nan;
+    
+    % populate congruence struct
+    congruencestruct(seshind).pooled = corrvals;
+    congruencestruct(seshind).pooledareanames = areanames;
+    
+    fullareas = {'M1','F5','AIP'};
+    
+    for areaind = 1:numel(fullareas)
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
+        congruencestruct(seshind).(fullareas{areaind}) = corrvals(areainds);
+    end
     
     % and run stats
     clear tempstruct
-    [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals,1e4,'uniform');
+    [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(~isnan(corrvals)),1e4,'uniform');
     figure,pause(0.5)
     q=cdfplot(corrvals);
     set(q,'color',[0 0 0]);
@@ -286,12 +302,12 @@ for seshind = 1:numel(seshnames)
     %     ci = zeros(size(contrastinds));
     hold all
     for areaind = 1:numel(fullareas)
-        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         %         areainds = ismember( areaskept,areaorder{areaind} );
         clear tempstruct
-        [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(areainds),1e4,'uniform');
+        [tempstruct.dipstat,tempstruct.pval] = HartigansDipSignifTest(corrvals(areainds & ~isnan(corrvals)),1e4,'uniform');
         dipteststructcorrs(seshind).(fullareas{areaind}) = tempstruct;
-        hold all,q=cdfplot(corrvals(areainds));
+        hold all,q=cdfplot(corrvals(areainds & ~isnan(corrvals)));
         set(q,'color',clors(areaind,:))
         %         ci(areainds) = bsxfun(@minus, contrastinds(areainds),median(contrastinds(areainds)) ); % remove area medians in case there is an area effect on top of the "mirror neuron" effect
     end
@@ -309,13 +325,16 @@ for seshind = 1:numel(seshnames)
     ylim([0 1])
 
     %% use PAIRS test to seek multivariate clusters (TODO: test unsupervised clustering algorithms to see if PAIRS is being unfair... it SHOULD be an awfully false-positive-happy method if anything, but it's quirky and nonstandard and therefore it's possible that it's actually super conservative in this case)
-    pairsdata = [contrastinds(:),corrvals(:)];
+    pairsdata = [cifull(:),corrvals(:)];
     
     clear ps
-    ps = PAIRStest(pairsdata,3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
+    ps = PAIRStest(pairsdata(all(~isnan(pairsdata),2),:),3,2,1000); % NOTE: I ran this for 1000 iterations, not the full 1e4! ...but, if it takes that many iterations of my null sample to get a significant result with a test this sensitive, it's safe to at least say that mirror neurons are a somewhat dubious neuron class...
     figure,pause(0.5)
     %     scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'filled','markerfacealpha',0.5,'markeredgecolor',[0 0 0],'markeredgealpha',1)
-    scatter(pairsdata(:,1),pairsdata(:,2),szvals,[0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])
+    scatter(pairsdata(all(~isnan(pairsdata),2),1),...
+        pairsdata(all(~isnan(pairsdata),2),2),...
+        szvals(all(~isnan(pairsdata),2)),...
+        [0 0 0],'linewidth',1.5,'markeredgecolor',[0 0 0])
     xlim([-1 1])
     ylim([-1 1])
     box off, grid on
@@ -336,12 +355,12 @@ for seshind = 1:numel(seshnames)
     %     ci = zeros(size(contrastinds));
     figure,pause(0.5)
     for areaind = 1:numel(fullareas)
-        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areaskept );
+        areainds = cellfun( @(x) ~isempty( regexpi(x,fullareas{areaind},'once') ),areanames );
         clear ps
-        ps = PAIRStest(pairsdata(areainds,:),3,2,1000);
+        ps = PAIRStest(pairsdata(areainds&all(~isnan(pairsdata),2),:),3,2,1000);
         PAIRSstruct(seshind).(fullareas{areaind}) = ps;
         %         hold all,scatter(pairsdata(areainds,1),pairsdata(areainds,2),szvals(areainds),clors(areaind,:),'filled','markerfacealpha',0.5,'markeredgecolor',clors(areaind,:),'markeredgealpha',1)
-        hold all,scatter(pairsdata(areainds,1),pairsdata(areainds,2),szvals(areainds),clors(areaind,:),'linewidth',1.5,'markeredgecolor',clors(areaind,:))
+        hold all,scatter(pairsdata(areainds&all(~isnan(pairsdata),2),1),pairsdata(areainds&all(~isnan(pairsdata),2),2),szvals(areainds&all(~isnan(pairsdata),2)),clors(areaind,:),'linewidth',1.5,'markeredgecolor',clors(areaind,:))
     end
     xlim([-1 1])
     ylim([-1 1])
@@ -352,7 +371,7 @@ for seshind = 1:numel(seshnames)
     title(seshname)
         
     %% cleanup
-    clearvars -except noldfig seshnames seshind dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct
+    clearvars -except noldfig seshnames seshind dipteststruct dipteststructcorrs PAIRSstruct Nstruct contraststruct congruencestruct
     
     
 end
@@ -372,7 +391,7 @@ for ii = 1:nfig
     savefig(fullfile('Analysis-Outputs','clustfiles',sprintf('clustfigure%0.2i.fig',ii)))
 end
 
-save(fullfile('.','Analysis-Outputs','clustfiles','clustout_stats.mat'),'contraststruct','dipteststruct','dipteststructcorrs','PAIRSstruct','seshnames','Nstruct','-v7.3')
+save(fullfile('.','Analysis-Outputs','clustfiles','clustout_stats.mat'),'congruencestruct','contraststruct','dipteststruct','dipteststructcorrs','PAIRSstruct','seshnames','Nstruct','-v7.3')
     
 cd(olddir);
 %% sending outputs
@@ -382,3 +401,4 @@ outstruct.PAIRSstruct = PAIRSstruct;
 outstruct.seshnames = seshnames;
 outstruct.Nstruct = Nstruct;
 outstruct.contraststruct = contraststruct;
+outstruct.congruencestruct = congruencestruct;

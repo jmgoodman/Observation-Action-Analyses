@@ -68,3 +68,5 @@ MirrorData/structZara68.mat
 MirrorData/structZara70.mat
 *.pyc
 pickles/
+pythonfigures/auth
+Pythonfigures/venv

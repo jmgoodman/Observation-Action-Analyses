@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pythonfigures"
+version = "0.0.1"
+dependencies = [
+    "numpy",
+    "pandas",
+    "plotly",
+    "sqlalchemy>=2.0",
+    "sqlalchemy-utils",
+    "mysqlclient",
+    "mat73",
+    "scikit-learn"
+]

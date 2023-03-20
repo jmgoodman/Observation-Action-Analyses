@@ -69,7 +69,10 @@ class Data:
     def load(self):
         if not self.predata:
             self.preload()
-            
+        
+        if not self.predata:
+            return
+        
         temp = self.predata
         
         # re-init dict (this will be how you implement a database)

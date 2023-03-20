@@ -8,10 +8,9 @@ version = "0.0.1"
 dependencies = [
     "numpy",
     "pandas",
-    "plotly",
     "sqlalchemy>=2.0",
     "sqlalchemy-utils",
     "mysqlclient",
-    "mat73",
-    "scikit-learn"
+    "scikit-learn",
+    "mat73"
 ]

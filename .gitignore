@@ -69,5 +69,7 @@ MirrorData/structZara70.mat
 *.pyc
 pickles/
 pythonfigures/auth
-Pythonfigures/venv
+pythonfigures/venv
 .vscode/
+pythonfigures.egg-info
+pythonfigures/yfapp.egg-info

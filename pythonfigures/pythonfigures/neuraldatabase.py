@@ -34,10 +34,10 @@ def get_query(query_file:str) -> str:
 
 class Data:
     def __init__(self,
-                 auth:str=os.path.join('pythonfigures','auth'),
+                 auth:str=os.path.join('.','auth'),
                  databasename:str="Zara70",
                  host:str="localhost",
-                 filename:str = os.path.join('MirrorData','Zara70_datastruct.mat'),
+                 filename:str = os.path.join('..','MirrorData','Zara70_datastruct.mat'),
                  ):
         # presets:
         # Zara70

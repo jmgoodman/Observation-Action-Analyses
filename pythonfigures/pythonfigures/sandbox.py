@@ -6,81 +6,105 @@ from sklearn.decomposition import PCA
 
 
 sessions =  ['Moe46'] # ['Moe46','Moe50','Zara64','Zara68','Zara70']
-areas    = ['M1','F5','AIP']
+areas    = ['M1'] #['M1','F5','AIP']
 
 for session in sessions:
     seshout = []
     for area in areas:
         q = Query(query=f"""SHOW COLUMNS FROM `{session}`.`{area}-med`;""",
                   queryfile=False)
-        cols = q.read()
-        cols = cols['Field'][ cols['Field'].str.startswith('Neuron_') ].values.tolist()
+        colsmed = q.read()
+        colsmed = colsmed['Field'][ colsmed['Field'].str.startswith('Neuron_') ].values.tolist()
+        
+        q = Query(query=f"""SHOW COLUMNS FROM `{session}`.`{area}-lat`;""",
+                  queryfile=False)
+        colslat = q.read()
+        colslat = colslat['Field'][ colslat['Field'].str.startswith('Neuron_') ].values.tolist()
         
         # construct the big bad aggregate query
-        query = 'SELECT '
         
-        for col in cols:
-            query+=f'AVG(`{session}`.`{area}-med`.`{col}`),\n'
+        # first, average across time as your subquery
+        subquery = 'SELECT '
+        
+        nidx=0
+        for col in colsmed:
+            subquery+=f"AVG(`{session}`.`{area}-med`.`{col}`) as n{nidx},\n"
+            nidx+=1
             
-        # now add the other table parts
-        # (note: the indents are quite weird)
-        query+=f"""`{session}`.`Trial_Info`.`Object`,
-`{session}`.`Trial_Info`.`Context`,
-`{session}`.`Index_Info`.`Alignment`
-FROM `{session}`.`{area}-med`
-LEFT JOIN `{session}`.`Index_Info`
-ON `{session}`.`{area}-med`.`index`=`{session}`.`Index_Info`.`index`
-LEFT JOIN `{session}`.`Trial_Info`
-ON `{session}`.`{area}-med`.`Trial`=`{session}`.`Trial_Info`.`Trial`
-GROUP BY `{session}`.`Trial_Info`.`Object`,
-`{session}`.`Trial_Info`.`Context`,
-`{session}`.`Index_Info`.`Alignment`
-HAVING `{session}`.`Index_Info`.`Alignment`='movement onset'
-ORDER BY `{session}`.`Trial_Info`.`Object`,
-`{session}`.`Trial_Info`.`Context`;"""
+        for col in colslat:
+            subquery+=f"AVG(`{session}`.`{area}-lat`.`{col}`) as n{nidx},\n"
+            nidx+=1
             
-        print(query)
+        subquery+=f"""`{session}`.`Trial_Info`.`Trial` as trial,
+        `{session}`.`Trial_Info`.`Object` as object,
+        `{session}`.`Trial_Info`.`Context` as context,
+        `{session}`.`Index_Info`.`Alignment` as alignment
+        FROM `{session}`.`{area}-med`
+        LEFT JOIN `{session}`.`{area}-lat`
+        ON `{session}`.`{area}-med`.`index`=`{session}`.`{area}-lat`.`index`
+        LEFT JOIN `{session}`.`Index_Info`
+        ON `{session}`.`{area}-med`.`index`=`{session}`.`Index_Info`.`index`
+        LEFT JOIN `{session}`.`Trial_Info`
+        ON `{session}`.`{area}-med`.`Trial`=`{session}`.`Trial_Info`.`Trial`
+        GROUP BY `{session}`.`Trial_Info`.`Trial`,
+        `{session}`.`Index_Info`.`Alignment`
+        HAVING `{session}`.`Index_Info`.`Alignment`='movement onset'
+        ORDER BY `{session}`.`Trial_Info`.`Object`,
+        `{session}`.`Trial_Info`.`Context`"""
+                
+        print(subquery)
         
-        q = Query(query=query, queryfile=False)
-        df = q.read()
+        # now generate an aggregating query that gets averages aggregated over object x context
+        aggquery = 'SELECT '
         
-        # get the active & passive dataframes
-        df_active  = df[df['Context']=='active'].iloc[:,:-3]
-        df_passive = df[df['Context']=='passive'].iloc[:,:-3]
+        for idx in range(nidx):
+            aggquery+=f"AVG(n{idx}) as mu_n{idx},\n"
         
-        # pca = object-separating subspace (kinda... LDA is better but let's use this as a proxy)
-        active  = df_active.to_numpy()
-        passive = df_passive.to_numpy()
+        aggquery+="object as objectagg,\ncontext as contextagg\n"
+        aggquery+=f"""FROM ({subquery}) t
+        GROUP BY object, context
+        ORDER BY object, context"""
         
-        # demean
-        active  = active - np.mean(active,axis=0)
-        passive = passive - np.mean(passive,axis=0)
+        # now produce an outer query that joins the two
+        # (in practice this should be handled by a window function, but there's a column limit on that...)
+        joinquery = f"""SELECT sub.*,
+        agg.*
+        FROM ({subquery}) sub
+        LEFT JOIN ({aggquery}) agg
+        ON sub.context=agg.contextagg AND sub.object=agg.objectagg
+        ORDER BY sub.object,sub.context"""
         
-        print(active)
-        print(passive)
+        # now subtract columns from their means
+        deltaquery = "SELECT "
+        for idx in range(nidx):
+            deltaquery+=f"n{idx}-mu_n{idx} as d{idx}"
+            if idx < (nidx-1):
+                deltaquery+=",\n"
+            else:
+                deltaquery+="\n"
+                
+        deltaquery+=f"FROM ({joinquery}) j;"
         
-        aPCA = PCA().fit(active)
-        pPCA = PCA().fit(passive)
+        # make the queries
+        # aggregate (between-class variance)
+        print(aggquery+";")
         
-        CVE = lambda x: np.cumsum( np.var(x,axis=0) )# / np.sum( np.var(x,axis=0) )
-        TVE = lambda x: np.sum( np.var( x,axis=0 ))
+        qagg = Query(query=aggquery+";",
+                     queryfile=False)
+        df_agg = qagg.read()
         
-        active_in_active = CVE( aPCA.transform(active) )
-        passive_in_passive = CVE( pPCA.transform(passive) )
-        active_in_passive = CVE( pPCA.transform(active) )
-        passive_in_active = CVE( aPCA.transform(passive) )
+        print(df_agg)
         
-        d = pd.DataFrame({'alignment-index-active':active_in_passive/active_in_active,
-                          'alignment-index-passive':passive_in_active/passive_in_passive})
+        # delta (within-class variance)
+        print(deltaquery)
         
-        print(d)
+        qdel = Query(query=deltaquery,
+                  queryfile=False)
+        df_del = qdel.read()
         
-        fig = px.line(d,y=d['alignment-index-active'])
-        fig.add_scatter(y=d['alignment-index-passive'])
-        fig.show()
+        print(df_del)
         
-        # okay, computed alignment indices that vary as a function of dimensionality
-        # question: WHAT DOES IT MEAN?!?!?!?
-        
+        # and now we have the dataframes needed to do LDA
+
         
         

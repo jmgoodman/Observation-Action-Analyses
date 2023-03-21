@@ -18,7 +18,8 @@ from sqlalchemy_utils import database_exists, create_database
 # basically, mysqlclient expects the mysql lib functions to be located in /usr/local/lib/, and not nested inside the mysql directory of /usr/local/
 
 
-
+# these should probably be class methods, eh? especially for get_auth, you probably want to avoid exposing that for security purposes, no? 
+# ah well, I'll refactor when it matters.
 def get_auth(auth_file:str) -> Tuple[str,str]:
     with open(auth_file) as f:
         

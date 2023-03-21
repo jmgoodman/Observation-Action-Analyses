@@ -134,7 +134,7 @@ def create():
     session_names = ['Moe46','Moe50','Zara64','Zara68','Zara70']
     for sname in session_names:
         d = Data(databasename=sname,
-                 filename=os.path.join('MirrorData',f'{sname}_datastruct.mat'))
+                 filename=os.path.join('..','MirrorData',f'{sname}_datastruct.mat'))
         d.preload()
         d.load()
         d.export()
@@ -143,7 +143,7 @@ class Query:
     def __init__(self,
                  query:str=os.path.join('pythonfigures','query.sql'),
                  queryfile:bool=True,
-                 auth:str=os.path.join('pythonfigures','auth'),
+                 auth:str=os.path.join('.','auth'),
                  host:str='localhost'
                  ):
         """Generates an instance of a Query object

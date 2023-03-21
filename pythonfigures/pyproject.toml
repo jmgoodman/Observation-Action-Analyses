@@ -12,5 +12,6 @@ dependencies = [
     "sqlalchemy-utils",
     "mysqlclient",
     "scikit-learn",
-    "mat73"
+    "mat73",
+    "plotly"
 ]

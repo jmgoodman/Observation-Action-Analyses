@@ -35,10 +35,10 @@ for session in sessions:
             subquery+=f"AVG(`{session}`.`{area}-lat`.`{col}`) as n{nidx},\n"
             nidx+=1
             
-        subquery+=f"""`{session}`.`Trial_Info`.`Trial` as trial,
-        `{session}`.`Trial_Info`.`Object` as object,
-        `{session}`.`Trial_Info`.`Context` as context,
-        `{session}`.`Index_Info`.`Alignment` as alignment
+        subquery+=f"""MAX(`{session}`.`Trial_Info`.`Trial`) as trial,
+        MAX(`{session}`.`Trial_Info`.`Object`) as object,
+        MAX(`{session}`.`Trial_Info`.`Context`) as context,
+        MAX(`{session}`.`Index_Info`.`Alignment`) as alignment
         FROM `{session}`.`{area}-med`
         LEFT JOIN `{session}`.`{area}-lat`
         ON `{session}`.`{area}-med`.`index`=`{session}`.`{area}-lat`.`index`
@@ -49,8 +49,8 @@ for session in sessions:
         GROUP BY `{session}`.`Trial_Info`.`Trial`,
         `{session}`.`Index_Info`.`Alignment`
         HAVING `{session}`.`Index_Info`.`Alignment`='movement onset'
-        ORDER BY `{session}`.`Trial_Info`.`Object`,
-        `{session}`.`Trial_Info`.`Context`"""
+        ORDER BY object,
+        context"""
                 
         print(subquery)
         
@@ -60,7 +60,7 @@ for session in sessions:
         for idx in range(nidx):
             aggquery+=f"AVG(n{idx}) as mu_n{idx},\n"
         
-        aggquery+="object as objectagg,\ncontext as contextagg\n"
+        aggquery+="MAX(object) as objectagg,\nMAX(context) as contextagg\n"
         aggquery+=f"""FROM ({subquery}) t
         GROUP BY object, context
         ORDER BY object, context"""
@@ -77,12 +77,9 @@ for session in sessions:
         # now subtract columns from their means
         deltaquery = "SELECT "
         for idx in range(nidx):
-            deltaquery+=f"n{idx}-mu_n{idx} as d{idx}"
-            if idx < (nidx-1):
-                deltaquery+=",\n"
-            else:
-                deltaquery+="\n"
-                
+            deltaquery+=f"n{idx}-mu_n{idx} as d{idx},\n"
+        
+        deltaquery+="contextagg as contextdiff, objectagg as objectdiff\n"
         deltaquery+=f"FROM ({joinquery}) j;"
         
         # make the queries
@@ -105,6 +102,21 @@ for session in sessions:
         print(df_del)
         
         # and now we have the dataframes needed to do LDA
+        aggdata = dict()
+        aggdata['active']  = df_agg[df_agg['contextagg']=='active'].iloc[:,:-2].to_numpy()
+        aggdata['passive'] = df_agg[df_agg['contextagg']=='passive'].iloc[:,:-2].to_numpy()
+        
+        print(aggdata)
+        print(aggdata['active'].shape)
+        print(aggdata['passive'].shape)
+        
+        diffdata = dict()
+        diffdata['active'] = df_del[df_del['contextdiff']=='active'].iloc[:,:-2].to_numpy()
+        diffdata['passive'] = df_del[df_del['contextdiff']=='passive'].iloc[:,:-2].to_numpy()
+        
+        print(diffdata)
+        print(diffdata['active'].shape)
+        print(diffdata['passive'].shape)
 
         
         

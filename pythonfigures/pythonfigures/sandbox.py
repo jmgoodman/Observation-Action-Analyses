@@ -117,6 +117,37 @@ for session in sessions:
         print(diffdata)
         print(diffdata['active'].shape)
         print(diffdata['passive'].shape)
-
         
-        
+        for context in ['active','passive']:
+            neigs = aggdata[context].shape[0] - 1 # nobjs - 1 eigenvalues
+            B = np.cov( aggdata[context],rowvar=False )
+            W = np.cov( diffdata[context], rowvar=False )
+            W = W + 1e-6 * np.eye(W.shape[0])
+            
+            D = np.linalg.solve(W,B)
+            
+            # test symmetry (all values are real so no conjugates to worry about)
+            # (test is failed, a skew-symmetric divided by a skew-symmetric does not give a skew-symmetric per se)
+            # Dtest = D + D.T
+            # print('symmetry test: should be all zeros')
+            # print(Dtest)
+            
+            print(context)
+            print(B)
+            print(B.shape)
+            print(W)
+            print(W.shape)
+            print(D)
+            print(D.shape)
+            
+            # can't use eigh due to the non-symmetry
+            vals,vecs = np.linalg.eig(D)
+            vals = vals[:neigs]
+            vecs = vecs[:,:neigs]
+            
+            
+            print('vals')
+            print(vals)
+            
+            print('vecs')
+            print(vecs)

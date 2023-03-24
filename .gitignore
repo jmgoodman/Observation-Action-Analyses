@@ -73,3 +73,4 @@ pythonfigures/venv
 .vscode/
 pythonfigures.egg-info
 pythonfigures/yfapp.egg-info
+*.json

@@ -325,6 +325,7 @@ for session in sessions:
         # it MUST be something I'm doing with the data per se, since the LDA model here does just about as well as MATLAB's when applied
         # indeed, when I load the data in from the mat file, doing all the same preprocessing as the SQL query, it gives me an accuracy of 0.4619
         # SOMETHING about either neuraldatabase.py OR my SQL query is seriously screwy...
+        # (although note: you ain't hitting 80-90% because you're not pooling across areas!)
         
         
         # remember: Jannik's paper tells us that poor classification performance is not enough! the manifolds have to have poor alignment, too!

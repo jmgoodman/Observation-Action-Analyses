@@ -84,6 +84,7 @@ class Data:
         time_  = temp['datastruct']['cellform'][0][0][0][0]['BinTimes']
         obj_   = temp['datastruct']['cellform'][0][0][0][0]['Objects']
         context_ = temp['datastruct']['cellform'][0][0][0][0]['TrialTypes']
+        turntable_ = temp['datastruct']['cellform'][0][0][0][0]['TurnTableIDs']
         trial_ = np.arange(len(context_))
         
         align_expand,trial_expand,time_expand = np.meshgrid(align_,trial_,time_)
@@ -93,8 +94,8 @@ class Data:
         indexmat     = np.column_stack( (align_expand.flatten(),trial_expand.flatten(),time_expand.flatten()))
         indexdf      = pd.DataFrame(indexmat,columns=['Alignment','Trial','Time'])
         
-        trialmat     = np.column_stack( (trial_,obj_,context_) )
-        trialdf      = pd.DataFrame(trialmat,columns=['Trial','Object','Context'])
+        trialmat     = np.column_stack( (trial_,obj_,context_,turntable_) )
+        trialdf      = pd.DataFrame(trialmat,columns=['Trial','Object','Context','Turntable'])
         
         self.data['Trial_Info'] = trialdf
         self.data['Index_Info'] = indexdf

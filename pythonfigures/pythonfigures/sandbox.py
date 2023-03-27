@@ -324,6 +324,7 @@ for session in sessions:
         # then what? what, in god's name, is creaming this guy's performance so thoroughly?
         # it MUST be something I'm doing with the data per se, since the LDA model here does just about as well as MATLAB's when applied
         # indeed, when I load the data in from the mat file, doing all the same preprocessing as the SQL query, it gives me an accuracy of 0.4619
+        # and furthermore, when I use sklearn's LDA model on data that I load directly from the mat via mat73... I get a similar-looking 0.4831 number (be nice to write proper unit tests instead of comments about what u did in ipython ya dipstick)
         # SOMETHING about either neuraldatabase.py OR my SQL query is seriously screwy...
         # (although note: you ain't hitting 80-90% because you're not pooling across areas!)
         

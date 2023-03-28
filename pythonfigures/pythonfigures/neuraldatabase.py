@@ -87,7 +87,7 @@ class Data:
         turntable_ = temp['datastruct']['cellform'][0][0][0][0]['TurnTableIDs']
         trial_ = np.arange(len(context_))
         
-        align_expand,trial_expand,time_expand = np.meshgrid(align_,trial_,time_)
+        align_expand,trial_expand,time_expand = np.meshgrid(align_,trial_,time_,indexing='ij') # indexing should be ij to match how the data are ultimately stacked: time is fastest-changing (i.e., last), trial is mid, and then alignments are stacked on each other (i.e., slowest-changing)
         trial_expand = trial_expand.astype('int')
         time_expand  = time_expand.astype('int')
         
@@ -106,6 +106,7 @@ class Data:
             dcataligns = []
             for align in temp['datastruct']['cellform'][arrayidx][0]:
                 # grab data and reshape
+                # (I suspect this is where we are getting the error)
                 dtrials  = np.transpose( align[0]['Data'],[1,2,0] ) # from time x neuron x trial to neuron x trial x time
                 dreshape = np.reshape(dtrials,(dtrials.shape[0],-1)) # C-like order is the opposite of MATLAB-like order, but is standard in numpy (hence why we permuted to have time be the last, i.e., fastest-changing index)
                 dreshape = np.transpose(dreshape,[1,0]) # from neuron x (trial x time) to (trial x time) x neuron

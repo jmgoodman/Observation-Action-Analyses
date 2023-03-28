@@ -47,7 +47,7 @@ for session in sessions:
             nidx+=1
             
         for col in colslat:
-            subquery+=f"AVG(`{session}`.`{area}-lat`.`{col}`) as n{nidx},\n"
+            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`>0 THEN `{session}`.`{area}-lat`.`{col}` END) as n{nidx},\n"
             nidx+=1
             
         subquery+=f"""MAX(`{session}`.`Trial_Info`.`Trial`) as trial,
@@ -143,6 +143,7 @@ for session in sessions:
         
         subdata = dict()
         sublabels = dict()
+        
         subdata['active'] = df_sub[ df_sub['context']=='active' ].iloc[:,:-4].to_numpy()
         subdata['passive'] = df_sub[ df_sub['context']=='passive' ].iloc[:,:-4].to_numpy()
         sublabels['active'] = df_sub[ df_sub['context']=='active' ].iloc[:,-3].to_numpy()

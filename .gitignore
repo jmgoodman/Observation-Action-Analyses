@@ -74,3 +74,4 @@ pythonfigures/venv
 pythonfigures.egg-info
 pythonfigures/yfapp.egg-info
 *.json
+pythonfigures/sampledataquery.csv

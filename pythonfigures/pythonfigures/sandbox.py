@@ -302,11 +302,11 @@ for session in sessions:
         for train_,test_ in cv.split(subdata['active'],sublabels['active']):
             PCmdl = PCA(n_components=20)
             PCmdl.fit(subdata['active'][train_,:])
-            SVMmdl = SVM()
-            SVMmdl.fit(X=PCmdl.transform( subdata['active'][train_,:] ),y=sublabels['active'][train_])
+            classmdl = LDA() # could also be SVM(), named "classmdl" for "classification model"
+            classmdl.fit(X=PCmdl.transform( subdata['active'][train_,:] ),y=sublabels['active'][train_])
             
             y = sublabels['active'][test_]
-            yhat = SVMmdl.predict(PCmdl.transform(subdata['active'][test_,:]))
+            yhat = classmdl.predict(PCmdl.transform(subdata['active'][test_,:]))
             
             if y==yhat:
                 correct_count+=1
@@ -326,7 +326,8 @@ for session in sessions:
         # it MUST be something I'm doing with the data per se, since the LDA model here does just about as well as MATLAB's when applied
         # indeed, when I load the data in from the mat file, doing all the same preprocessing as the SQL query, it gives me an accuracy of 0.4619
         # and furthermore, when I use sklearn's LDA model on data that I load directly from the mat via mat73... I get a similar-looking 0.4831 number (be nice to write proper unit tests instead of comments about what u did in ipython ya dipstick)
-        # SOMETHING about either neuraldatabase.py OR my SQL query is seriously screwy...
+        # SOMETHING about either neuraldatabase.py OR my SQL query is seriously screwy... (actually I screwed up dimension scanning order when creating the database. Hopefully it works better now as of 29.03.2023!)
+        # okay, it works now (linear SVM gives 39% accuracy, which is in the right ballpark, and LDA is giving .4831 just like MATLAB does)
         # (although note: you ain't hitting 80-90% because you're not pooling across areas!)
         
         

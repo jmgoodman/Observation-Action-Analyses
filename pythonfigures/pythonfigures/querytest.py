@@ -6,8 +6,8 @@ from pythonfigures.neuraldatabase import Query
 # numpy manipulations
 m = mat73.loadmat('../MirrorData/Zara70_datastruct.mat')
 
-aipmed = np.mean( m['datastruct']['cellform'][4][0][4][0]['Data'][51:,:,:],axis=0 )
-aiplat = np.mean( m['datastruct']['cellform'][5][0][4][0]['Data'][51:,:,:],axis=0 )
+aipmed = np.mean( m['datastruct']['cellform'][4][0][4][0]['Data'][50:,:,:],axis=0 )
+aiplat = np.mean( m['datastruct']['cellform'][5][0][4][0]['Data'][50:,:,:],axis=0 )
 aip = np.concatenate((aipmed,aiplat),axis=0)
 obj =  m['datastruct']['cellform'][5][0][5][0]['Objects']
 obj = np.array(obj)
@@ -18,7 +18,7 @@ obj_ = obj[lindx]
 aip_ = aip[:,lindx].T
 
 
-# sql to grab data -> pandas to clean it
+# sql to grab data
 session = 'Zara70'
 area    = 'AIP'
 subquery = 'SELECT '
@@ -65,5 +65,31 @@ objquery = f"SELECT Object, Trial FROM {session}.Trial_Info WHERE Context='activ
 q = Query(query=objquery,queryfile=False)
 objframe = q.read()
 
+# run some tests
+for idx in range(aip.shape[0]):
+    testdf = df[f"n{idx}"] - aip[idx,:]
+    assert abs( testdf.sum() ) < 1e-10 
 
-# pure sql
+for idx in range(len(obj_)):
+    assert obj_[idx][0] == objframe.iloc[idx]['Object']
+    
+print('all clear!')
+
+# all right!
+# now, to plot out the analysis:
+# step 1: partition into grip types
+# step 2: decoding of movement onset
+    # self-decoding
+    # cross-decoding
+    # subspace alignment
+# step 3: decoding of grip type
+    # self-decoding
+    # (no cross-decoding, there are too few overlapping grips)
+    # subspace alignment
+# step 4: visual (object cue period) decoding
+    # self-decoding
+    # cross-decoding vs. movement period
+    # subspace alignment vs. movement period
+    # subspace orthogonalization
+# step 5: step 2, post-ortho
+# step 6: step 3, post-ortho

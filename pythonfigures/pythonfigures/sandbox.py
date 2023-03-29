@@ -43,11 +43,11 @@ for session in sessions:
         
         nidx=0
         for col in colsmed:
-            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`>0 THEN `{session}`.`{area}-med`.`{col}` END) as n{nidx},\n"
+            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<0 THEN `{session}`.`{area}-med`.`{col}` END) as n{nidx},\n"
             nidx+=1
             
         for col in colslat:
-            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`>0 THEN `{session}`.`{area}-lat`.`{col}` END) as n{nidx},\n"
+            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<0 THEN `{session}`.`{area}-lat`.`{col}` END) as n{nidx},\n"
             nidx+=1
             
         subquery+=f"""MAX(`{session}`.`Trial_Info`.`Trial`) as trial,
@@ -63,7 +63,7 @@ for session in sessions:
         ON `{session}`.`{area}-med`.`Trial`=`{session}`.`Trial_Info`.`Trial`
         GROUP BY `{session}`.`Trial_Info`.`Trial`,
         `{session}`.`Index_Info`.`Alignment`
-        HAVING alignment='movement onset'
+        HAVING alignment='hold onset'
         ORDER BY object,
         context"""
                 

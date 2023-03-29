@@ -58,7 +58,7 @@ class Data:
             username=usr,
             password=pwd,
             host=self.host,
-            database=self.databasename
+            database=self.databasename.lower()
         )
         
         self.engine = create_engine(url_object)
@@ -131,7 +131,7 @@ class Data:
         self.create_database_if_not_exist()
         if not (self.data==None):
             for key in self.data.keys():
-                self.data[key].to_sql(key,con=self.engine,if_exists=if_exists)
+                self.data[key].to_sql(key.lower(),con=self.engine,if_exists=if_exists)
                 
 def create():
     session_names = ['Moe46','Moe50','Zara64','Zara68','Zara70']

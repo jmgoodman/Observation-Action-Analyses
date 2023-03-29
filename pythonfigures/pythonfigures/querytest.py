@@ -78,18 +78,22 @@ print('all clear!')
 # all right!
 # now, to plot out the analysis:
 # step 1: partition into grip types
+    # variance partitioning
+        # t = grouped by time (cross-context average trace)
+        # tc = grouped by time, context - t (cross-grip average trace for each context)
+        # tcg = grouped by time, context, grip - tc - t (average trace for each grip x context) (can be further split into contextual components)
 # step 2: decoding of movement onset
     # self-decoding
     # cross-decoding
-    # subspace alignment
+    # tc subspace alignment (only needed if cross-decoding is bad)
 # step 3: decoding of grip type
     # self-decoding
     # (no cross-decoding, there are too few overlapping grips)
-    # subspace alignment
+    # tcg subspace alignment (needed because there is no cross-decoding)
 # step 4: visual (object cue period) decoding
     # self-decoding
     # cross-decoding vs. movement period
-    # subspace alignment vs. movement period
+    # t(c)g subspace alignment vs. movement period (only needed if cross-decoding is bad)
     # subspace orthogonalization
 # step 5: step 2, post-ortho
 # step 6: step 3, post-ortho

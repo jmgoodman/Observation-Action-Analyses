@@ -43,11 +43,11 @@ for session in sessions:
         
         nidx=0
         for col in colsmed:
-            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<0 THEN `{session}`.`{area}-med`.`{col}` END) as n{nidx},\n"
+            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<500 AND `{session}`.`Index_Info`.`Time`>0 THEN `{session}`.`{area}-med`.`{col}` END) as n{nidx},\n"
             nidx+=1
             
         for col in colslat:
-            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<0 THEN `{session}`.`{area}-lat`.`{col}` END) as n{nidx},\n"
+            subquery+=f"AVG(CASE WHEN `{session}`.`Index_Info`.`Time`<500 AND `{session}`.`Index_Info`.`Time`>0 THEN `{session}`.`{area}-lat`.`{col}` END) as n{nidx},\n"
             nidx+=1
             
         subquery+=f"""MAX(`{session}`.`Trial_Info`.`Trial`) as trial,
@@ -63,7 +63,7 @@ for session in sessions:
         ON `{session}`.`{area}-med`.`Trial`=`{session}`.`Trial_Info`.`Trial`
         GROUP BY `{session}`.`Trial_Info`.`Trial`,
         `{session}`.`Index_Info`.`Alignment`
-        HAVING alignment='hold onset'
+        HAVING alignment='cue onset'
         ORDER BY object,
         context"""
                 
@@ -328,6 +328,9 @@ for session in sessions:
         # and furthermore, when I use sklearn's LDA model on data that I load directly from the mat via mat73... I get a similar-looking 0.4831 number (be nice to write proper unit tests instead of comments about what u did in ipython ya dipstick)
         # SOMETHING about either neuraldatabase.py OR my SQL query is seriously screwy... (actually I screwed up dimension scanning order when creating the database. Hopefully it works better now as of 29.03.2023!)
         # okay, it works now (linear SVM gives 39% accuracy, which is in the right ballpark, and LDA is giving .4831 just like MATLAB does)
+        # (accuracy jumps to 0.5339 when aligning to pre-hold)
+        # (centering on hold drops it to 0.5085)
+        # (and post-cue: 0.4195)
         # (although note: you ain't hitting 80-90% because you're not pooling across areas!)
         
         

@@ -6,6 +6,7 @@ import pandas as pd
 import numpy as np
 from sklearn.decomposition import PCA
 import os
+import re
 
 from sqlalchemy import create_engine, URL, text
 from sqlalchemy_utils import database_exists, create_database
@@ -86,6 +87,32 @@ class Data:
         context_ = temp['datastruct']['cellform'][0][0][0][0]['TrialTypes']
         turntable_ = temp['datastruct']['cellform'][0][0][0][0]['TurnTableIDs']
         trial_ = np.arange(len(context_))
+        
+        # adding grip type information to this (from humanClusters.mat, zaraClusters.mat, and moeClusters.mat)
+        mo = re.match("(zara|moe)",self.databasename.lower())
+        pathstr = os.path.join('..','Analysis-Outputs',mo[0]+"Clusters.mat")
+        active_grips = mat73.loadmat(pathstr)
+        
+        active_clusters = [int(x) for x in active_grips['clusterstruct']['clusterinds']]
+        active_objects  = [x[0] for x in active_grips['clusterstruct']['objnames']]
+    
+        pathstr = os.path.join('..','Analysis-Outputs',"humanClusters.mat")
+        passive_grips = mat73.loadmat(pathstr)
+        
+        passive_clusters = [int(x+max(active_clusters)) for x in passive_grips['clusterstruct']['clusterinds']] # make sure these grips have labels distinct from the active grips, as they are NOT the same
+        passive_objects  = [x[0] for x in passive_grips['clusterstruct']['objnames']]
+        
+        # include control too, why not
+        # and yeah, have it be repeated across databases, even though this could all be dumped into its own database
+        # this has such a small memory footprint that you're going to save more time making it conventiently accessible across multiple databases than you are space consolidating it into a separate one
+        gripcontext = ['active' for _ in range(len(active_clusters))] + ['control' for _ in range(len(active_clusters))] + ['passive' for _ in range(len(passive_clusters))]
+        gripobjects = active_objects+active_objects+passive_objects
+        gripclusters = active_clusters+active_clusters+passive_clusters
+        gripmat      = np.column_stack( (gripcontext,gripobjects,gripclusters) )
+        
+        gripdf = pd.DataFrame(gripmat,columns=['Context','Object','Grip'])
+        
+        self.data['Grip_Info'] = gripdf
         
         align_expand,trial_expand,time_expand = np.meshgrid(align_,trial_,time_,indexing='ij') # indexing should be ij to match how the data are ultimately stacked: time is fastest-changing (i.e., last), trial is mid, and then alignments are stacked on each other (i.e., slowest-changing)
         trial_expand = trial_expand.astype('int')

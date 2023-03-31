@@ -26,7 +26,7 @@ class DataPartitioner:
             itemp = i
             for j in reversed(range(len(groupings))):
                 if itemp>>j > 0:
-                    temp  +=[groupings[j]]
+                    temp  = [groupings[j]]+temp
                     itemp %= 2**j
             
             self._groupings += [temp]
@@ -82,7 +82,9 @@ class DataPartitioner:
         query+=f"CAST(`{self._session}`.`Trial_Info`.`Turntable` as UNSIGNED) as turntable,\n"
         
         query+=f"`{self._session}`.`Index_Info`.`Alignment` as alignment,\n"
-        query+=f"CAST(`{self._session}`.`Index_Info`.`Time` as SIGNED) as time\n"
+        query+=f"CAST(`{self._session}`.`Index_Info`.`Time` as SIGNED) as time,\n"
+        
+        query+=f"CAST(`{self._session}`.`grip_info`.`Grip` as UNSIGNED) as grip\n"
         
         
         query+=f"FROM `{self._session}`.`{maintbl}`\n"
@@ -97,6 +99,11 @@ class DataPartitioner:
                 
             query+=f"ON `{self._session}`.`{maintbl}`.`{joincol}`=`{self._session}`.`{table}`.`{joincol}`\n"
             
+        # join grip information, too (which requires joining on two columns)
+        query+=f"LEFT JOIN `{self._session}`.`grip_info`\n"
+        query+=f"ON `{self._session}`.`trial_info`.`Context`=`{self._session}`.`grip_info`.`Context`\n"
+        query+=f"AND `{self._session}`.`trial_info`.`Object`=`{self._session}`.`grip_info`.`Object`\n"
+            
         query+="WHERE alignment IN ("
         
         for align in self._aligns:
@@ -105,8 +112,9 @@ class DataPartitioner:
                 query+=") "
             else:
                 query+=","
-                
-        query+="AND context IN ("
+        
+        # needed to avoid collision with grip_info's context column     
+        query+=f"AND `{self._session}`.`Trial_Info`.`Context` IN ("
         for context in self._contexts:
             query+=f"'{context}'"
             if context==self._contexts[-1]:
@@ -155,7 +163,7 @@ class DataPartitioner:
                 
                 self._queries+=[gquery]
         
-    def readQuery(self,idx) -> pd.DataFrame:
+    def readQuery(self,idx:int) -> pd.DataFrame:
         if self._queries is None:
             print('run buildQueries first!')
             return
@@ -195,15 +203,23 @@ if __name__=='__main__':
                          areas=['M1'],
                          aligns=['movement onset','hold onset'],
                          contexts=['active','passive'],
-                         groupings=['time','turntable','context'])
+                         groupings=['grip','object','context'])
     
     groupslist = dp.get('groupings')
     
     print(groupslist)
     
-    df = dp.readQuery(5)
+    df = dp.readQuery(0) # just get the full data
+    df_mu = dp.readQuery(7) # note: joining the grip table on object x context yields a few "NaN" grip labels in Moe's dataset. Why? Because we didn't have human kinematics in Moe's dataset, and the human subjects grasped objects that were not present in the human datasets for Zara's recordings! (which means: if you see NaN, don't freak out too much! It's a genuine feature of the data, not a bug!)
+    
+    # how frustrating
+    # pandas join only works on index columns
+    # pandas "merge" is what actually gives us SQL-style joins
+    df_joined = pd.merge(df,df_mu,how='left',on=['grip','object','context'],sort=True,suffixes=("","_mu"))
     
     print(df)
+    print(df_mu)
+    print(df_joined)
     
     # df.loc['hold onset']
     

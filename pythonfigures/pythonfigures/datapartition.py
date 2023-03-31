@@ -1,0 +1,218 @@
+from pythonfigures.neuraldatabase import Query
+import pandas as pd
+import numpy as np
+
+from typing import List, Dict, Optional
+
+class DataPartitioner:
+    def __init__(self,
+                 session:str,
+                 areas:List[str],
+                 aligns:List[str],
+                 contexts:List[str],
+                 groupings:List[str]):
+        # let's just handle a single session at a time, trying to handle pooling of sessions and the different behavior thereof (namely, trial averaging to make joining possible) sounds like a pain
+        self._session           = session
+        self._areas             = areas
+        self._aligns            = aligns
+        self._contexts          = contexts
+        
+        # expand groupings
+        self._groupings         = list()
+        for i in range(2**len(groupings)):
+            temp = list()
+            
+            # binary decoder
+            itemp = i
+            for j in reversed(range(len(groupings))):
+                if itemp>>j > 0:
+                    temp  +=[groupings[j]]
+                    itemp %= 2**j
+            
+            self._groupings += [temp]
+        
+        # these will be determined later when building the queries
+        self._neuronColumnNames = None
+        self._queries           = None
+        
+        # speaking of which
+        self._buildQueries()
+        
+    def _buildQueries(self):
+        # first off, get the neuron columns
+        all_cols = []
+        for area in self._areas:
+            q = Query(query=f"""SHOW COLUMNS FROM `{self._session}`.`{area}-med`;""",
+                        queryfile=False)
+            colsmed = q.read()
+            colsmed = colsmed['Field'][ colsmed['Field'].str.startswith('Neuron_') ].values.tolist()
+            colsmed = [f"`{self._session}`.`{area}-med`.`{x}`" for x in colsmed]
+            
+            q = Query(query=f"""SHOW COLUMNS FROM `{self._session}`.`{area}-lat`;""",
+                        queryfile=False)
+            colslat = q.read()
+            colslat = colslat['Field'][ colslat['Field'].str.startswith('Neuron_') ].values.tolist()
+            colslat = [f"`{self._session}`.`{area}-lat`.`{x}`" for x in colslat]
+            
+            all_cols+=colsmed+colslat
+            
+        # now, get all the tables to join
+        tables_to_join = []
+        for area in self._areas:
+            tables_to_join+=[f"{area}-med",f"{area}-lat"]
+        
+        tables_to_join+=["Trial_Info","Index_Info"]
+        maintbl = tables_to_join.pop(0)
+        
+        # now, build the base query
+        query = "SELECT "
+        
+        neuridx = 0
+        for colname in all_cols:
+            query+=f"{colname} as n{neuridx},\n"
+            neuridx+=1
+            
+        self._neuronColumnNames = [f"n{idx}" for idx in range(neuridx)]
+        
+        # get the trial index too
+        query+=f"CAST(`{self._session}`.`{maintbl}`.`Trial` as UNSIGNED) as trial,\n"
+        
+        query+=f"`{self._session}`.`Trial_Info`.`Object` as object,\n"
+        query+=f"`{self._session}`.`Trial_Info`.`Context` as context,\n"
+        query+=f"CAST(`{self._session}`.`Trial_Info`.`Turntable` as UNSIGNED) as turntable,\n"
+        
+        query+=f"`{self._session}`.`Index_Info`.`Alignment` as alignment,\n"
+        query+=f"CAST(`{self._session}`.`Index_Info`.`Time` as SIGNED) as time\n"
+        
+        
+        query+=f"FROM `{self._session}`.`{maintbl}`\n"
+        
+        for table in tables_to_join:
+            query+=f"LEFT JOIN `{self._session}`.`{table}`\n"
+            
+            if table=="Trial_Info":
+                joincol = "Trial"
+            else:
+                joincol = "index"
+                
+            query+=f"ON `{self._session}`.`{maintbl}`.`{joincol}`=`{self._session}`.`{table}`.`{joincol}`\n"
+            
+        query+="WHERE alignment IN ("
+        
+        for align in self._aligns:
+            query+=f"'{align}'"
+            if align==self._aligns[-1]:
+                query+=") "
+            else:
+                query+=","
+                
+        query+="AND context IN ("
+        for context in self._contexts:
+            query+=f"'{context}'"
+            if context==self._contexts[-1]:
+                query+=")\n"
+            else:
+                query+=","
+        
+        query+="ORDER BY trial, alignment, time"
+            
+        # now, construct the grouped queries
+        self._queries = []
+        for grouping in self._groupings:
+            if len(grouping)==0:
+                self._queries+=[query+";"]
+            else:
+                # now, build the base query
+                gquery = "SELECT "
+                
+                for col in self._neuronColumnNames:
+                    gquery+=f"AVG({col}) as {col},\n"
+                
+                # preserve grouped indices
+                for col in grouping:
+                    gquery+=f"MAX({col}) as {col}"
+                    if col!=grouping[-1]:
+                        gquery+=","
+                    gquery+="\n"
+                
+                gquery+=f"FROM ({query}) t\n"
+                gquery+=f"GROUP BY "
+                
+                for col in grouping:
+                    gquery+=f"{col}"
+                    if col!=grouping[-1]:
+                        gquery+=","
+                    gquery+="\n"
+                
+                gquery+="ORDER BY "
+                
+                for col in grouping:
+                    gquery+=f"{col}"
+                    if col!=grouping[-1]:
+                        gquery+=",\n"
+                
+                gquery+=";"
+                
+                self._queries+=[gquery]
+        
+    def readQuery(self,idx) -> pd.DataFrame:
+        if self._queries is None:
+            print('run buildQueries first!')
+            return
+            
+        q = Query(query=self._queries[idx],
+                  queryfile=False)
+        
+        return q.read()
+        
+    def get(self,
+            param:str):
+        return self.__dict__["_"+param]
+    
+    def set(self,
+            param:str,
+            val):
+        
+        if param in ["queries","neuronColumnNames"]:
+            print("I won't let you set queries or neuronColumnNames, sorry.")
+            return
+        
+        # TODO: find a way to constrain val's type
+        if "_"+param in self.__dict__:
+            self.__dict__["_"+param] = val
+        else:
+            print(f"Invalid parameter '{param}'")
+            return
+        
+        # reset _queries and _neuronColumnNames
+        self._queries           = None
+        self._neuronColumnNames = None
+        self._buildQueries()
+
+        
+if __name__=='__main__':
+    dp = DataPartitioner(session='Moe46',
+                         areas=['M1'],
+                         aligns=['movement onset','hold onset'],
+                         contexts=['active','passive'],
+                         groupings=['time','turntable','context'])
+    
+    groupslist = dp.get('groupings')
+    
+    print(groupslist)
+    
+    df = dp.readQuery(5)
+    
+    print(df)
+    
+    # df.loc['hold onset']
+    
+    # https://stackoverflow.com/questions/17921010/how-to-query-multiindex-index-columns-values-in-pandas
+    # no more attempting to do data slicing with pandas
+    # it's just too miserable to work with
+    # instead, we're calling partitions by query index, then running that sql query to grab that partitioned dataframe
+    
+                
+                
+        
+        

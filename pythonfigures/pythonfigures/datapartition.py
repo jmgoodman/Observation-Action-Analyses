@@ -212,23 +212,20 @@ if __name__=='__main__':
     df = dp.readQuery(0) # just get the full data
     df_mu = dp.readQuery(7) # note: joining the grip table on object x context yields a few "NaN" grip labels in Moe's dataset. Why? Because we didn't have human kinematics in Moe's dataset, and the human subjects grasped objects that were not present in the human datasets for Zara's recordings! (which means: if you see NaN, don't freak out too much! It's a genuine feature of the data, not a bug!)
     
-    # how frustrating
-    # pandas join only works on index columns
-    # pandas "merge" is what actually gives us SQL-style joins
-    df_joined = pd.merge(df,df_mu,how='left',on=['grip','object','context'],sort=True,suffixes=("","_mu"))
+    # sql-style join
+    df_joined = pd.merge(df,df_mu,how='left',on=['grip','object','context'],sort=False,suffixes=("","_mu")) # sort=False to keep the nx_mu columns congruent with the columns in df_win
     
     print(df)
     print(df_mu)
     print(df_joined)
     
-    # df.loc['hold onset']
+    # sql-style window function, i.e., agg() over (partition by)
+    df_win = df.groupby(['grip','object','context'])[dp.get('neuronColumnNames')].transform('mean') # only work with the neuron columns, as the others are columns that were not grouped by and then we try to take an average of, for instance, the time indices. NOT NEEDED and throws an annoying warning. (note: the grouped-by columns are excluded from the output by default, so you need to rely on congruence between the indices of this dataframe and the source dataframe)
+    print(df_win)
     
-    # https://stackoverflow.com/questions/17921010/how-to-query-multiindex-index-columns-values-in-pandas
-    # no more attempting to do data slicing with pandas
-    # it's just too miserable to work with
-    # instead, we're calling partitions by query index, then running that sql query to grab that partitioned dataframe
-    
-                
+    # sql-style groupby and aggregate
+    df_mu2 = df.groupby(['grip','object','context'])[dp.get('neuronColumnNames')].aggregate('mean') # also need to only work with the neuron columns here for similar reasons (note: instead of just deleting the grouped-by labels, they instead get coalesced into a multi-index)
+    print(df_mu2)
                 
         
         

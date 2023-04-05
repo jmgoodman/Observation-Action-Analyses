@@ -13,9 +13,9 @@ dependencies = [
     "mysqlclient",
     "scikit-learn",
     "mat73",
-    "plotly"
-    "jupyterlab"
-    "notebook"
-    "pymanopt"
+    "plotly",
+    "jupyterlab",
+    "notebook",
+    "pymanopt",
     "matplotlib"
 ]

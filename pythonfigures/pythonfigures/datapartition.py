@@ -29,7 +29,7 @@ class DataPartitioner:
                     temp  = [groupings[j]]+temp
                     itemp %= 2**j
             
-            self._groupings += [temp]
+            self._groupings += [set(temp)]
         
         # these will be determined later when building the queries
         self._neuronColumnNames = None
@@ -127,6 +127,7 @@ class DataPartitioner:
         # now, construct the grouped queries
         self._queries = []
         for grouping in self._groupings:
+            grouping = list(grouping) # they're sets to allow for indexing
             if len(grouping)==0:
                 self._queries+=[query+";"]
             else:
@@ -163,11 +164,16 @@ class DataPartitioner:
                 
                 self._queries+=[gquery]
         
-    def readQuery(self,idx:int) -> pd.DataFrame:
+    def readQuery(self,idx) -> pd.DataFrame:
         if self._queries is None:
             print('run buildQueries first!')
             return
-            
+        
+        if isinstance(idx,int):
+            pass
+        elif isinstance(idx,(list,set,tuple)):
+            idx = self._groupings.index(idx)
+        
         q = Query(query=self._queries[idx],
                   queryfile=False)
         

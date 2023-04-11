@@ -17,8 +17,9 @@ dependencies = [
     "jupyterlab",
     "notebook",
     "pymanopt",
-    "matplotlib"
-    "kaleido"
+    "matplotlib",
+    "kaleido",
+    "ipywidgets"
 ]
 
 [tool.setuptools]

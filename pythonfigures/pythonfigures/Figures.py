@@ -189,14 +189,16 @@ class Figure3(Figure):
                                        tickcolor='black',
                                        ticklen=4,
                                        linecolor='rgba(0,0,0,1)',
-                                       linewidth=1)
+                                       linewidth=1,
+                                       showgrid=False)
         
         self.figurehandle.update_yaxes(ticks='outside',
                                        tickwidth=1,
                                        tickcolor='black',
                                        ticklen=4,
                                        linecolor='rgba(0,0,0,1)',
-                                       linewidth=1
+                                       linewidth=1,
+                                       showgrid=False
                                        )
         
         # guess I gotta go low-level for this
@@ -328,7 +330,7 @@ class Figure3(Figure):
 # manual unit test
 if __name__ == "__main__":
     F = Figure3(datafiles = [os.path.join('Analysis-Outputs','clustfiles','clustout_stats.mat')],
-                outputfilename = os.path.join('pythonfigures','fig3.svg'))
+                outputfilename = os.path.join('figs','fig3.svg'))
     
     F.save_image()
     

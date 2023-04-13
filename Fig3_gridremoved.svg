@@ -1,0 +1,1165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   inkscape:version="1.0 (4035a4fb49, 2020-05-01)"
+   sodipodi:docname="Fig3_gridremoved.svg"
+   id="svg546"
+   version="1.1"
+   viewBox="0 0 700 500"
+   style=""
+   height="500"
+   width="700"
+   class="main-svg">
+  <metadata
+     id="metadata550">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     inkscape:current-layer="g243"
+     inkscape:window-maximized="0"
+     inkscape:window-y="0"
+     inkscape:window-x="0"
+     inkscape:cy="250"
+     inkscape:cx="350"
+     inkscape:zoom="1.4985714"
+     showgrid="false"
+     id="namedview548"
+     inkscape:window-height="887"
+     inkscape:window-width="1831"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0"
+     guidetolerance="10"
+     gridtolerance="10"
+     objecttolerance="10"
+     borderopacity="1"
+     bordercolor="#666666"
+     pagecolor="#ffffff" />
+  <rect
+     id="rect2"
+     style="fill: rgb(0, 0, 0); fill-opacity: 0;"
+     height="500"
+     width="700"
+     y="0"
+     x="0" />
+  <defs
+     id="defs-0bb24e">
+    <g
+       id="g34"
+       class="clips">
+      <clipPath
+         class="plotclip"
+         id="clip0bb24exyplot">
+        <rect
+           id="rect4"
+           height="320"
+           width="243" />
+      </clipPath>
+      <clipPath
+         class="plotclip"
+         id="clip0bb24ex2y2plot">
+        <rect
+           id="rect7"
+           height="320"
+           width="242.99999999999997" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ex"
+         class="axesclip">
+        <rect
+           id="rect10"
+           height="500"
+           width="243"
+           y="0"
+           x="80" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ey"
+         class="axesclip">
+        <rect
+           id="rect13"
+           height="320"
+           width="700"
+           y="100"
+           x="0" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24exy"
+         class="axesclip">
+        <rect
+           id="rect16"
+           height="320"
+           width="243"
+           y="100"
+           x="80" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ey2"
+         class="axesclip">
+        <rect
+           id="rect19"
+           height="320"
+           width="700"
+           y="100"
+           x="0" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24exy2"
+         class="axesclip">
+        <rect
+           id="rect22"
+           height="320"
+           width="243"
+           y="100"
+           x="80" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ex2"
+         class="axesclip">
+        <rect
+           id="rect25"
+           height="500"
+           width="242.99999999999997"
+           y="0"
+           x="377" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ex2y"
+         class="axesclip">
+        <rect
+           id="rect28"
+           height="320"
+           width="242.99999999999997"
+           y="100"
+           x="377" />
+      </clipPath>
+      <clipPath
+         id="clip0bb24ex2y2"
+         class="axesclip">
+        <rect
+           id="rect31"
+           height="320"
+           width="242.99999999999997"
+           y="100"
+           x="377" />
+      </clipPath>
+    </g>
+    <g
+       id="g36"
+       class="gradients" />
+    <g
+       id="g38"
+       class="patterns" />
+  </defs>
+  <g
+     id="g45"
+     class="bglayer">
+    <rect
+       id="rect41"
+       style="fill: rgb(0, 0, 0); fill-opacity: 0; stroke-width: 0;"
+       height="320"
+       width="243"
+       y="100"
+       x="80"
+       class="bg" />
+    <rect
+       id="rect43"
+       style="fill: rgb(0, 0, 0); fill-opacity: 0; stroke-width: 0;"
+       height="320"
+       width="242.99999999999997"
+       y="100"
+       x="377"
+       class="bg" />
+  </g>
+  <g
+     id="g51"
+     class="layer-below">
+    <g
+       id="g47"
+       class="imagelayer" />
+    <g
+       id="g49"
+       class="shapelayer" />
+  </g>
+  <g
+     id="g437"
+     class="cartesianlayer">
+    <g
+       id="g243"
+       class="subplot xy">
+      <g
+         id="g57"
+         class="layer-subplot">
+        <g
+           id="g53"
+           class="shapelayer" />
+        <g
+           id="g55"
+           class="imagelayer" />
+      </g>
+      <g
+         id="g63"
+         class="minor-gridlayer">
+        <g
+           id="g59"
+           class="x" />
+        <g
+           id="g61"
+           class="y" />
+      </g>
+      <path
+         id="path93"
+         class="xlines-below" />
+      <path
+         id="path95"
+         class="ylines-below" />
+      <g
+         id="g97"
+         class="overlines-below" />
+      <g
+         id="g99"
+         class="xaxislayer-below" />
+      <g
+         id="g101"
+         class="yaxislayer-below" />
+      <g
+         id="g103"
+         class="overaxes-below" />
+      <g
+         id="g149"
+         clip-path="url(#clip0bb24exyplot)"
+         transform="translate(80,100)"
+         class="plot">
+        <g
+           id="g147"
+           class="scatterlayer mlayer">
+          <g
+             id="g117"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter traceed3cc4">
+            <g
+               id="g105"
+               class="fills" />
+            <g
+               id="g107"
+               class="errorbars" />
+            <g
+               id="g111"
+               class="lines">
+              <path
+                 id="path109"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(125, 46, 141); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0,304.11H10.55V309.4H21.11V320H31.66V309.4H42.22V304.11H52.77V251.13H63.33V214.05H73.88V192.86H84.44V161.07H94.99V155.78H105.55V108.1H116.1V2.15H126.66V39.23H137.21V113.39H147.77V166.37H158.32V198.16H168.87V245.83H179.43V267.02H189.98V293.51H200.54V309.4H211.09V314.7H221.65V314.7H232.2V320H242.76V320"
+                 class="js-line" />
+            </g>
+            <g
+               id="g113"
+               class="points" />
+            <g
+               id="g115"
+               class="text" />
+          </g>
+          <g
+             id="g131"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter tracefd5dea">
+            <g
+               id="g119"
+               class="fills" />
+            <g
+               id="g121"
+               class="errorbars" />
+            <g
+               id="g125"
+               class="lines">
+              <path
+                 id="path123"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(226, 129, 28); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0.12,304.2H10.68V285.24H21.23V266.28H31.79V259.96H42.34V212.57H52.89V206.25H63.45V120.93H74V136.73H84.56V79.85H95.11V57.73H105.67V38.78H116.22V89.33H126.78V171.49H137.33V212.57H147.89V285.24H158.44V301.04H169V304.2H179.55V313.68H190.11V310.52H200.66V307.36H211.21V313.68H221.77V316.84H232.32V320H242.88V320"
+                 class="js-line" />
+            </g>
+            <g
+               id="g127"
+               class="points" />
+            <g
+               id="g129"
+               class="text" />
+          </g>
+          <g
+             id="g145"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter trace2309de">
+            <g
+               id="g133"
+               class="fills" />
+            <g
+               id="g135"
+               class="errorbars" />
+            <g
+               id="g139"
+               class="lines">
+              <path
+                 id="path137"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(0, 113, 188); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0.24,240.15H10.8V219.32H21.35V156.83H31.91V97.81H42.46V63.09H53.02V76.98H63.57V73.51H74.13V104.75H84.68V87.4H95.23V167.24H105.79V247.09H116.34V274.87H126.9V292.23H137.45V285.28H148.01V306.11H158.56V306.11H169.12V316.53H179.67V313.06H190.23V316.53H200.78V316.53H211.34V316.53H221.89V316.53H232.45V320H243V320"
+                 class="js-line" />
+            </g>
+            <g
+               id="g141"
+               class="points" />
+            <g
+               id="g143"
+               class="text" />
+          </g>
+        </g>
+      </g>
+      <g
+         id="g151"
+         class="overplot" />
+      <path
+         id="path153"
+         style="fill: none; stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 1;"
+         d="M79,420.5H323"
+         class="xlines-above crisp" />
+      <path
+         id="path155"
+         style="fill: none; stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 1;"
+         d="M79.5,100V420"
+         class="ylines-above crisp" />
+      <g
+         id="g157"
+         class="overlines-above" />
+      <g
+         id="g189"
+         class="xaxislayer-above">
+        <path
+           id="path159"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(80.12,0)"
+           d="M0,421v4"
+           class="xtick ticks crisp" />
+        <path
+           id="path161"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(140.81,0)"
+           d="M0,421v4"
+           class="xtick ticks crisp" />
+        <path
+           id="path163"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(201.5,0)"
+           d="M0,421v4"
+           class="xtick ticks crisp" />
+        <path
+           id="path165"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(262.19,0)"
+           d="M0,421v4"
+           class="xtick ticks crisp" />
+        <path
+           id="path167"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(322.88,0)"
+           d="M0,421v4"
+           class="xtick ticks crisp" />
+        <g
+           id="g171"
+           class="xtick">
+          <text
+             id="text169"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(80.12,0)"
+             y="439.4"
+             x="0"
+             text-anchor="middle">−1</text>
+        </g>
+        <g
+           id="g175"
+           class="xtick">
+          <text
+             id="text173"
+             transform="translate(140.81,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">−0.5</text>
+        </g>
+        <g
+           id="g179"
+           class="xtick">
+          <text
+             id="text177"
+             transform="translate(201.5,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">0</text>
+        </g>
+        <g
+           id="g183"
+           class="xtick">
+          <text
+             id="text181"
+             transform="translate(262.19,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">0.5</text>
+        </g>
+        <g
+           id="g187"
+           class="xtick">
+          <text
+             id="text185"
+             transform="translate(322.88,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">1</text>
+        </g>
+      </g>
+      <g
+         id="g239"
+         class="yaxislayer-above">
+        <path
+           id="path191"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,420)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path193"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,377.09)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path195"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,334.18)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path197"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,291.27)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path199"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,248.36)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path201"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,205.45)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path203"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,162.54)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <path
+           id="path205"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,119.63)"
+           d="M79,0h-4"
+           class="ytick ticks crisp" />
+        <g
+           id="g209"
+           class="ytick">
+          <text
+             id="text207"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(0,420)"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0</text>
+        </g>
+        <g
+           id="g213"
+           class="ytick">
+          <text
+             id="text211"
+             transform="translate(0,377.09)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.02</text>
+        </g>
+        <g
+           id="g217"
+           class="ytick">
+          <text
+             id="text215"
+             transform="translate(0,334.18)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.04</text>
+        </g>
+        <g
+           id="g221"
+           class="ytick">
+          <text
+             id="text219"
+             transform="translate(0,291.27)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.06</text>
+        </g>
+        <g
+           id="g225"
+           class="ytick">
+          <text
+             id="text223"
+             transform="translate(0,248.36)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.08</text>
+        </g>
+        <g
+           id="g229"
+           class="ytick">
+          <text
+             id="text227"
+             transform="translate(0,205.45)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.1</text>
+        </g>
+        <g
+           id="g233"
+           class="ytick">
+          <text
+             id="text231"
+             transform="translate(0,162.54)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.12</text>
+        </g>
+        <g
+           id="g237"
+           class="ytick">
+          <text
+             id="text235"
+             transform="translate(0,119.63)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="72.6"
+             text-anchor="end">0.14</text>
+        </g>
+      </g>
+      <g
+         id="g241"
+         class="overaxes-above" />
+    </g>
+    <g
+       id="g435"
+       class="subplot x2y2">
+      <g
+         id="g249"
+         class="layer-subplot">
+        <g
+           id="g245"
+           class="shapelayer" />
+        <g
+           id="g247"
+           class="imagelayer" />
+      </g>
+      <g
+         id="g255"
+         class="minor-gridlayer">
+        <g
+           id="g251"
+           class="x2" />
+        <g
+           id="g253"
+           class="y2" />
+      </g>
+      <path
+         id="path285"
+         class="xlines-below" />
+      <path
+         id="path287"
+         class="ylines-below" />
+      <g
+         id="g289"
+         class="overlines-below" />
+      <g
+         id="g291"
+         class="xaxislayer-below" />
+      <g
+         id="g293"
+         class="yaxislayer-below" />
+      <g
+         id="g295"
+         class="overaxes-below" />
+      <g
+         id="g341"
+         clip-path="url(#clip0bb24ex2y2plot)"
+         transform="translate(377,100)"
+         class="plot">
+        <g
+           id="g339"
+           class="scatterlayer mlayer">
+          <g
+             id="g309"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter trace7b2669">
+            <g
+               id="g297"
+               class="fills" />
+            <g
+               id="g299"
+               class="errorbars" />
+            <g
+               id="g303"
+               class="lines">
+              <path
+                 id="path301"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(125, 46, 141); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0,304.07H10.55V298.76H21.11V304.07H31.66V288.14H42.22V277.51H52.77V235.03H63.33V261.58H73.88V208.48H84.44V181.92H94.99V229.72H105.55V197.85H116.1V208.48H126.66V192.54H137.21V203.16H147.77V155.37H158.32V107.57H168.87V208.48H179.43V235.03H189.98V240.34H200.54V208.48H211.09V160.68H221.65V235.03H232.2V272.2H242.76V272.2"
+                 class="js-line" />
+            </g>
+            <g
+               id="g305"
+               class="points" />
+            <g
+               id="g307"
+               class="text" />
+          </g>
+          <g
+             id="g323"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter trace47a130">
+            <g
+               id="g311"
+               class="fills" />
+            <g
+               id="g313"
+               class="errorbars" />
+            <g
+               id="g317"
+               class="lines">
+              <path
+                 id="path315"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(226, 129, 28); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0.12,310.51H10.68V294.68H21.23V294.68H31.79V278.86H42.34V234.56H52.89V228.23H63.45V231.39H74V196.59H84.56V193.42H95.11V183.93H105.67V168.1H116.22V196.59H126.78V206.08H137.33V196.59H147.89V196.59H158.44V183.93H169V193.42H179.55V199.75H190.11V206.08H200.66V247.22H211.21V215.57H221.77V272.53H232.32V285.19H242.88V285.19"
+                 class="js-line" />
+            </g>
+            <g
+               id="g319"
+               class="points" />
+            <g
+               id="g321"
+               class="text" />
+          </g>
+          <g
+             id="g337"
+             style="stroke-miterlimit: 2; opacity: 1;"
+             class="trace scatter tracebb18e2">
+            <g
+               id="g325"
+               class="fills" />
+            <g
+               id="g327"
+               class="errorbars" />
+            <g
+               id="g331"
+               class="lines">
+              <path
+                 id="path329"
+                 style="vector-effect: non-scaling-stroke; fill: none; stroke: rgb(0, 113, 188); stroke-opacity: 0.5; stroke-width: 2px; opacity: 1;"
+                 d="M0.24,316.47H10.8V291.77H21.35V245.89H31.91V263.54H42.46V231.78H53.02V252.95H63.57V182.38H74.13V200.02H84.68V192.96H95.23V189.43H105.79V164.73H116.34V161.2H126.9V182.38H137.45V175.32H148.01V221.19H158.56V214.14H169.12V224.72H179.67V217.66H190.23V228.25H200.78V249.42H211.34V228.25H221.89V270.6H232.45V309.41H243V309.41"
+                 class="js-line" />
+            </g>
+            <g
+               id="g333"
+               class="points" />
+            <g
+               id="g335"
+               class="text" />
+          </g>
+        </g>
+      </g>
+      <g
+         id="g343"
+         class="overplot" />
+      <path
+         id="path345"
+         style="fill: none; stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 1;"
+         d="M376,420.5H620"
+         class="xlines-above crisp" />
+      <path
+         id="path347"
+         style="fill: none; stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 1;"
+         d="M376.5,100V420"
+         class="ylines-above crisp" />
+      <g
+         id="g349"
+         class="overlines-above" />
+      <g
+         id="g381"
+         class="xaxislayer-above">
+        <path
+           id="path351"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(377.12,0)"
+           d="M0,421v4"
+           class="x2tick ticks crisp" />
+        <path
+           id="path353"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(437.81,0)"
+           d="M0,421v4"
+           class="x2tick ticks crisp" />
+        <path
+           id="path355"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(498.5,0)"
+           d="M0,421v4"
+           class="x2tick ticks crisp" />
+        <path
+           id="path357"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(559.19,0)"
+           d="M0,421v4"
+           class="x2tick ticks crisp" />
+        <path
+           id="path359"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(619.88,0)"
+           d="M0,421v4"
+           class="x2tick ticks crisp" />
+        <g
+           id="g363"
+           class="x2tick">
+          <text
+             id="text361"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(377.12,0)"
+             y="439.4"
+             x="0"
+             text-anchor="middle">−1</text>
+        </g>
+        <g
+           id="g367"
+           class="x2tick">
+          <text
+             id="text365"
+             transform="translate(437.81,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">−0.5</text>
+        </g>
+        <g
+           id="g371"
+           class="x2tick">
+          <text
+             id="text369"
+             transform="translate(498.5,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">0</text>
+        </g>
+        <g
+           id="g375"
+           class="x2tick">
+          <text
+             id="text373"
+             transform="translate(559.19,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">0.5</text>
+        </g>
+        <g
+           id="g379"
+           class="x2tick">
+          <text
+             id="text377"
+             transform="translate(619.88,0)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="439.4"
+             x="0"
+             text-anchor="middle">1</text>
+        </g>
+      </g>
+      <g
+         id="g431"
+         class="yaxislayer-above">
+        <path
+           id="path383"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,420)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path385"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,377.09)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path387"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,334.18)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path389"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,291.27)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path391"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,248.36)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path393"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,205.45)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path395"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,162.54)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <path
+           id="path397"
+           style="stroke: rgb(0, 0, 0); stroke-opacity: 1; stroke-width: 1px;"
+           transform="translate(0,119.63)"
+           d="M376,0h-4"
+           class="y2tick ticks crisp" />
+        <g
+           id="g401"
+           class="y2tick">
+          <text
+             id="text399"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             transform="translate(0,420)"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0</text>
+        </g>
+        <g
+           id="g405"
+           class="y2tick">
+          <text
+             id="text403"
+             transform="translate(0,377.09)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.02</text>
+        </g>
+        <g
+           id="g409"
+           class="y2tick">
+          <text
+             id="text407"
+             transform="translate(0,334.18)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.04</text>
+        </g>
+        <g
+           id="g413"
+           class="y2tick">
+          <text
+             id="text411"
+             transform="translate(0,291.27)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.06</text>
+        </g>
+        <g
+           id="g417"
+           class="y2tick">
+          <text
+             id="text415"
+             transform="translate(0,248.36)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.08</text>
+        </g>
+        <g
+           id="g421"
+           class="y2tick">
+          <text
+             id="text419"
+             transform="translate(0,205.45)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.1</text>
+        </g>
+        <g
+           id="g425"
+           class="y2tick">
+          <text
+             id="text423"
+             transform="translate(0,162.54)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.12</text>
+        </g>
+        <g
+           id="g429"
+           class="y2tick">
+          <text
+             id="text427"
+             transform="translate(0,119.63)"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 12px; fill: rgb(42, 63, 95); fill-opacity: 1; white-space: pre; opacity: 1;"
+             y="4.199999999999999"
+             x="369.6"
+             text-anchor="end">0.14</text>
+        </g>
+      </g>
+      <g
+         id="g433"
+         class="overaxes-above" />
+    </g>
+  </g>
+  <g
+     id="g439"
+     class="polarlayer" />
+  <g
+     id="g441"
+     class="smithlayer" />
+  <g
+     id="g443"
+     class="ternarylayer" />
+  <g
+     id="g445"
+     class="geolayer" />
+  <g
+     id="g447"
+     class="funnelarealayer" />
+  <g
+     id="g449"
+     class="pielayer" />
+  <g
+     id="g451"
+     class="iciclelayer" />
+  <g
+     id="g453"
+     class="treemaplayer" />
+  <g
+     id="g455"
+     class="sunburstlayer" />
+  <g
+     id="g457"
+     class="glimages" />
+  <defs
+     id="topdefs-0bb24e">
+    <g
+       id="g459"
+       class="clips" />
+  </defs>
+  <g
+     id="g466"
+     class="layer-above">
+    <g
+       id="g462"
+       class="imagelayer" />
+    <g
+       id="g464"
+       class="shapelayer" />
+  </g>
+  <g
+     id="g544"
+     class="infolayer">
+    <g
+       id="g468"
+       class="g-gtitle" />
+    <g
+       id="g472"
+       class="g-xtitle">
+      <text
+         id="text470"
+         style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); opacity: 1; font-weight: normal; white-space: pre;"
+         text-anchor="middle"
+         y="466.70625"
+         x="201.5"
+         class="xtitle">Active-Passive Index</text>
+    </g>
+    <g
+       id="g476"
+       class="g-x2title">
+      <text
+         id="text474"
+         style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); opacity: 1; font-weight: normal; white-space: pre;"
+         text-anchor="middle"
+         y="466.70625"
+         x="498.5"
+         class="x2title">Congruence Index</text>
+    </g>
+    <g
+       id="g480"
+       class="g-ytitle">
+      <text
+         id="text478"
+         style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(42, 63, 95); opacity: 1; font-weight: normal; white-space: pre;"
+         text-anchor="middle"
+         y="260"
+         x="20.543750000000003"
+         transform="rotate(-90,20.543750000000003,260)"
+         class="ytitle">Fraction of Neurons</text>
+    </g>
+    <g
+       id="g482"
+       class="g-y2title" />
+    <g
+       id="g492"
+       style="opacity: 1;"
+       data-index="0"
+       class="annotation">
+      <g
+         id="g490"
+         transform="rotate(0,606,110.5)"
+         class="annotation-text-g">
+        <g
+           id="g488"
+           transform="translate(592,100)"
+           class="cursor-pointer">
+          <rect
+             id="rect484"
+             style="stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 0; fill: rgb(0, 0, 0); fill-opacity: 0;"
+             height="20"
+             width="27"
+             y="0.5"
+             x="0.5"
+             class="bg" />
+          <text
+             id="text486"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(125, 46, 141); fill-opacity: 0.7; white-space: pre;"
+             y="16"
+             x="25.90625"
+             text-anchor="end"
+             class="annotation-text">AIP</text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g506"
+       style="opacity: 1;"
+       data-index="1"
+       class="annotation">
+      <g
+         id="g504"
+         transform="rotate(0,609.5,119.5)"
+         class="annotation-text-g">
+        <g
+           id="g502"
+           transform="translate(599,100)"
+           class="cursor-pointer">
+          <rect
+             id="rect494"
+             style="stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 0; fill: rgb(0, 0, 0); fill-opacity: 0;"
+             height="38"
+             width="20"
+             y="0.5"
+             x="0.5"
+             class="bg" />
+          <text
+             id="text500"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(226, 129, 28); fill-opacity: 0.7; white-space: pre;"
+             y="16"
+             x="18.953125"
+             text-anchor="end"
+             class="annotation-text"><tspan
+               id="tspan496"
+               y="16"
+               x="18.953125"
+               dy="0em"
+               class="line" /><tspan
+               id="tspan498"
+               y="16"
+               x="18.953125"
+               dy="1.3em"
+               class="line">F5</tspan></text>
+        </g>
+      </g>
+    </g>
+    <g
+       id="g522"
+       style="opacity: 1;"
+       data-index="2"
+       class="annotation">
+      <g
+         id="g520"
+         transform="rotate(0,607.5,128.5)"
+         class="annotation-text-g">
+        <g
+           id="g518"
+           transform="translate(595,100)"
+           class="cursor-pointer">
+          <rect
+             id="rect508"
+             style="stroke-width: 1px; stroke: rgb(0, 0, 0); stroke-opacity: 0; fill: rgb(0, 0, 0); fill-opacity: 0;"
+             height="56"
+             width="24"
+             y="0.5"
+             x="0.5"
+             class="bg" />
+          <text
+             id="text516"
+             style="font-family: 'Open Sans', verdana, arial, sans-serif; font-size: 14px; fill: rgb(0, 113, 188); fill-opacity: 0.7; white-space: pre;"
+             y="16"
+             x="22.703125"
+             text-anchor="end"
+             class="annotation-text"><tspan
+               id="tspan510"
+               y="16"
+               x="22.703125"
+               dy="0em"
+               class="line" /><tspan
+               id="tspan512"
+               y="16"
+               x="22.703125"
+               dy="1.3em"
+               class="line" /><tspan
+               id="tspan514"
+               y="16"
+               x="22.703125"
+               dy="2.6em"
+               class="line">M1</tspan></text>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>
